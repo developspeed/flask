@@ -23,7 +23,7 @@ def Authenticate():
     login_code = request.form['login_code']
 
     # You can add code here to validate the user's login information
-    check_for_cred = f"SELECT `phytonlogin` FROM `user` WHERE `email` = '{email}'"
+    check_for_cred = f"SELECT `2falogincode` FROM `user` WHERE `email` = '{email}'"
     cursor.execute(check_for_cred)
     session['get_user_email'] = email
 
