@@ -3,7 +3,7 @@ import mysql.connector as ms
 
 cnx = ms.connect(user='magic_register', password='Indira@2000',
                  host='185.104.29.84',
-                 database='magic_register')
+                 database='magic_register',connection_timeout=1200)
 
 cursor = cnx.cursor()
 
