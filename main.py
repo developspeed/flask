@@ -1,11 +1,11 @@
 from flask import Flask, render_template, request, redirect, session, url_for
 import mysql.connector as ms
 
+
 cnx = ms.connect(user='magic_register', password='Indira@2000',
                  host='185.104.29.84',
-                 database='magic_register',connection_timeout=1200)
+                 database='magic_register',connection_timeout=120)
 
-cursor = cnx.cursor()
 
 
 app = Flask(__name__)
@@ -24,6 +24,7 @@ def Authenticate():
     login_code = request.form['login_code']
 
     # You can add code here to validate the user's login information
+    cursor = cnx.cursor()
     check_for_cred = f"SELECT `phytonlogin` FROM `user` WHERE `email` = '{email}'"
     cursor.execute(check_for_cred)
     session['get_user_email'] = email
@@ -33,10 +34,13 @@ def Authenticate():
         for code in codes:
             auth_code = code
 
+    # cnx.commit()
+    cnx.close()
     if login_code != auth_code:
         return render_template("login.html",data="Incorrect Email or Password")
     else:
         return redirect(url_for('Dashboard'))
+
 
 @app.route('/logout')
 def logout():
@@ -47,6 +51,7 @@ def logout():
 @app.route("/dashboard")
 def Dashboard():
     if 'get_user_email' in session:
+        cursor = cnx.cursor()
         email = session.get("get_user_email")
         # print(email)
         query = f"SELECT `name` FROM `user` WHERE `email` = '{email}'"
@@ -54,7 +59,7 @@ def Dashboard():
         # Fetching the password from the database query
         password = cursor.fetchone()[0]
         # print(password)
-        cnx.commit()
+        cnx.close()
         return render_template("dashboard.html",data=password)
 
     else :
