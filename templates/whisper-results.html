@@ -1,0 +1,86 @@
+{% extends 'base.html' %}
+
+{% block title %}Whisper AI{% endblock %}
+
+{% block content %}
+<link rel="stylesheet" href="{{ url_for('static', filename='css/whisper.css') }}">
+<div class="sticky-card btn-success">
+    <!-- <h3>Minutes Usage</h3> -->
+    <p>Minutes Used</p>
+    <p style="text-align:center;">{{data[3]}} / {{data[4]}}</p>
+</div>
+<div class="sticky-card btn-warning">
+    <!-- <h3>Minutes Usage</h3> -->
+    <!-- <p>Minutes Used</p> -->
+    <p style="text-align:center;">{{data[5]}}</p>
+</div>
+<div class="container">
+    <div class="card">
+        <h1>Speech Recognizer</h1>
+        <hr>
+        <p> Welcome to the automatic <i>Speech Recognition</i> application. It allows transcription in multiple
+            languages
+            (currently 99) as well as automatic translation from those <b> languages</b> to English. Click the
+            microphone to
+            record the audio recording, the color of the microphone will turn red. Click the microphone again to stop
+            recording and the "Transcribe Audio" button to convert the audio to text and translate it into English. The
+            first time you start the tool, it may take about 1 minute for the tool to load completely. The transcription
+            of the audio can take anywhere from 10 to 60 seconds, depending on the length of the recording. Try to limit
+            the recording to about 30 seconds to avoid the transcription taking too long. If the output or translation
+            is not good, you can click the "Transcribe Audio" button again to run the process again.
+        </p>
+    </div>
+</div>
+<form action="/whisper-results" method="POST" enctype="multipart/form-data">
+    <div class="container" id="data_send_by_user">
+        <div class="card">
+            <div class="form-group">
+                <label for="audioFile"><b>Select Audio File:</b></label>
+                <input type="file" class="form-control-file" id="audioFile" name="audioFile" disabled>
+            </div>
+        </div>
+        <h4>or</h4>
+        <div class="card">
+            <label for="audioRecord"><b>Record Audio:</b></label>
+            <button type="button" id="startButton" class="btn btn-secondary" disabled style="margin: 5px; cursor: not-allowed;">Start Recording</button>
+            <button type="button" id="stopButton"  class="btn btn-secondary" disabled style="margin: 5px; cursor: not-allowed;">Stop Recording</button>
+            <br>
+            <audio id="audio-player" controls>
+                <source src="" type="audio/mpeg/wav">
+                Your browser does not support the audio tag.
+            </audio>
+        </div>
+    </div>
+    <div class="container">
+        <div class="card">
+            <input type="text" placeholder="Name of Language or Leave it for Language Detection" name="language">
+            <br>
+            <div class="form-check form-check-inline">
+                <input class="form-check-input" type="checkbox" id="inlineCheckbox1" name="to_translate">
+                <label class="form-check-label" for="inlineCheckbox1">Translate</label>
+            </div>
+        </div>
+        <div class="card">
+            <a href="/whisper" class="btn btn-primary">Use Again</a>
+        </div>
+    </div>
+</form>
+
+<form method="get">
+    <div class="container">
+        <div class="card">
+            <h2>Ouptut</h2>
+            <p class="detected_language"><b>Detected Language : {{data[2]}}</b></p>
+            <p class="output" name="output">{{data[0]}}</p>
+        </div>
+        <div class="card">
+            <h2>Translation</h2>
+            <p class="translate" name="translate">{{data[1]}}</p>
+        </div>
+    </div>    
+</form>
+<script>
+
+</script>
+<script src="{{ url_for('static', filename='js/whisper.js') }}"></script>
+{% endblock %}
