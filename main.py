@@ -182,7 +182,7 @@ def WhisperAI():
     audioRecords = BytesIO(audioRecordedGlobal)
     # print(audioRecordedGlobal)
 
-    #language = request.form['language']
+    # language = request.form['language']
     to_translate = request.form.get('to_translate') == 'on'
 
     # Model Configuration Fetching from database
