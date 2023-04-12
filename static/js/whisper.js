@@ -50,3 +50,12 @@ function stopRecording() {
 
 startButton.addEventListener("click", startRecording);
 stopButton.addEventListener("click", stopRecording);
+
+const audioFile = document.getElementById('audioFile');
+const audioFilePlayer = document.getElementById('audio-upload-player')
+
+audioFile.addEventListener('change', function(){
+  const file = audioFile.files[0];
+  const obj = URL.createObjectURL(file);
+  audioFilePlayer.src = obj;
+})
