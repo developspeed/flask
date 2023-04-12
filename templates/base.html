@@ -49,10 +49,23 @@
 			cursor: pointer;
 			text-decoration: none;
 			color: black;
+			/* padding: 5px; */
 		}
 
 		.menu-item:hover {
-			text-decoration: underline;
+			text-decoration: none;
+			/* background-color: rgb(226, 226, 226); */
+			transition: 50ms ease-in-out;
+		}
+
+		@media only screen and (max-width:600px) {
+			.logo{
+				font-size: 20px;
+			}
+			.menu-item{
+				font-size: 13px;
+				/* margin-left: 10px; */
+			}
 		}
 	</style>
 </head>
@@ -62,7 +75,7 @@
 		<div class="menu">
 			<a href="/dashboard" class="menu-item">Home</a>
 			<a href="/logout" class="menu-item">Logout</a>
-			<!-- <a href="" class="menu-item">Settings</a> -->
+			<a href="/admin" class="menu-item">Settings</a>
 		</div>
 	</div>
 	
