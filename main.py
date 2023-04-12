@@ -5,16 +5,15 @@ import replicate
 from io import BytesIO
 
 
+
 # Setting the Environment of the application using the API token of Replicate from the database
 cnx = ms.connect(user='magic_register', password='Indira@2000',
                  host='185.104.29.84', database='magic_register')
 cursor = cnx.cursor()
 get_API_key_query = "SELECT `API_KEY` FROM `whisper_config`"
 cursor.execute(get_API_key_query)
-get_API_key = ''
-for apiKEY in cursor:
-    get_API_key = apiKEY[0]
-# print(get_API_key)
+get_API_key = cursor.fetchone()[0]
+
 os.environ['REPLICATE_API_TOKEN'] = str(get_API_key)
 
 # Closing the DB Connection
@@ -46,12 +45,8 @@ def Authenticate():
     cursor.execute(check_for_cred)
     session['get_user_email'] = email
 
-    auth_code = ""
-    for codes in cursor:
-        for code in codes:
-            auth_code = code
-
-    # cnx.commit()
+    auth_code = cursor.fetchone()[0]
+    
     cursor.close()
     cnx.close()
     if login_code != auth_code:
@@ -366,5 +361,6 @@ def page_not_found(e):
 def internal_server(e):
     return render_template('500.html'), 500
 
+  
 if __name__ == "__main__":
     app.run(port=5000)
