@@ -65,7 +65,7 @@ def logout():
     session.pop('get_user_email', None)  # remove the email from the session
     return redirect(url_for('login'))
 
-
+admin_name_validation = ""
 @app.route("/dashboard")
 def Dashboard():
     if 'get_user_email' in session:
@@ -78,6 +78,8 @@ def Dashboard():
         name_query = f"SELECT `name` FROM `user` WHERE `email` = '{email}'"
         cursor.execute(name_query)
         name = cursor.fetchone()[0]
+        global admin_name_validation
+        admin_name_validation = name
 
         # Subscription Details
         subscription_end_query = f"SELECT `end_subscription_period` FROM `user` WHERE `email` = '{email}'"
@@ -102,6 +104,15 @@ def Dashboard():
         cursor.execute(images_count_query)
         images_count = cursor.fetchone()[0]
 
+        #Minutes Usage Whisper
+        minutes_total_query = f"SELECT `minutes_total` FROM `user` WHERE `email` = '{email}'"
+        cursor.execute(minutes_total_query)
+        minutes_total = cursor.fetchone()[0]
+
+        minutes_count_query = f"SELECT `minutes_count` FROM `user` WHERE `email` = '{email}'"
+        cursor.execute(minutes_count_query)
+        minutes_count = cursor.fetchone()[0]
+
         cursor.close()
         cnx.close()
         return render_template("dashboard.html", data={'name': name, 'subscription_end': subscription_end, 'words_total': words_total, 'words_count': words_count, 'images_total': images_total, 'images_count': images_count, 'minutes_total':minutes_total, 'minutes_count':minutes_count})
@@ -110,6 +121,7 @@ def Dashboard():
         return redirect(url_for("login"))
 
 
+############################### Whisper AI Functions ######################################
 minutes_count = 0
 minutes_total = 0
 
@@ -141,8 +153,6 @@ def Whisper():
 
 audioRecordedGlobal = None
 # Audio Upload through Mic
-
-
 @app.route('/upload', methods=['POST'])
 def upload():
     audio = request.files.get('audio').read()
@@ -152,8 +162,7 @@ def upload():
     return "Done"
 
 
-# function to convert the information into
-# some readable format
+# function to get the duration of the audio
 def audio_duration(length):
     hours = length / 3600  # calculate in hours
     length %= 3600
@@ -181,6 +190,17 @@ def WhisperAI():
     language = request.form['language']
     to_translate = request.form.get('to_translate') == 'on'
 
+    # Model Configuration Fetching from database
+    model = DBRead('whisper_config','model')
+    transcription = DBRead('whisper_config','transcription')
+    temp = DBRead('whisper_config','temperature')
+    # patience = DBRead('whisper_config','patience')
+    suppress = DBRead('whisper_config','suppress_tokens')
+    temperature = DBRead('whisper_config','temp_increment_on_fallback')
+    compression = DBRead('whisper_config','compression_ratio_threshold')
+    logprob = DBRead('whisper_config','logprob_threshold')
+    nospeech = DBRead('whisper_config','no_speech_threshold')
+
     if minutes_count <= float(minutes_total):
         if len(audioFile.read()) != 0:
 
@@ -189,8 +209,10 @@ def WhisperAI():
             audios = WAVE(audioFile)
             audio_length = audios.info.length
             minutes = str(audio_duration(audio_length))
-            minutes_to_update = float(minutes[0:4])
-            print(minutes_to_update)
+            minutes_to_update = float(minutes[0:5])
+            # print(minutes_to_update)
+            # print(minutes_count)
+            # print(minutes_total)
 
             update_minutes_query = f"UPDATE `user` SET `minutes_count` = '{minutes_to_update+minutes_count}' WHERE `email` = '{email}';"
             cursor.execute(update_minutes_query)
@@ -198,19 +220,19 @@ def WhisperAI():
             # Model Running
             output = replicate.run("openai/whisper:e39e354773466b955265e969568deb7da217804d8e771ea8c9cd0cef6591f8bc",
                                    input={"audio": audioFile,
-                                          "model": "large-v2",
-                                          "transcription": "plain text",
+                                          "model": model,
+                                          "transcription": transcription,
                                           "translate": to_translate,
                                           #   "language": language,
-                                          "temperature": 0,
-                                          #   "patience": 1.0,
-                                          "suppress_tokens": "-1",
-                                          "initial_prompt": "",
-                                          "condition_on_previous_text": False,
-                                          "temperature_increment_on_fallback": 0.2,
-                                          "compression_ratio_threshold": 2.4,
-                                          "logprob_threshold": -1,
-                                          "no_speech_threshold": 0.6})
+                                          "temperature": int(temp),
+                                        #   "patience": float(patience),
+                                          "suppress_tokens": suppress,
+                                        #   "initial_prompt": "",
+                                        #   "condition_on_previous_text": False,
+                                          "temperature_increment_on_fallback": float(temperature),
+                                          "compression_ratio_threshold": float(compression),
+                                          "logprob_threshold": int(logprob),
+                                          "no_speech_threshold": float(nospeech)})
 
             cnx.commit()
             cursor.close()
@@ -232,19 +254,19 @@ def WhisperAI():
             # Model Running
             output = replicate.run("openai/whisper:e39e354773466b955265e969568deb7da217804d8e771ea8c9cd0cef6591f8bc",
                                    input={"audio": audioRecords,
-                                          "model": "large-v2",
-                                          "transcription": "plain text",
+                                          "model": model,
+                                          "transcription": transcription,
                                           "translate": to_translate,
                                           #   "language": language,
-                                          "temperature": 0,
-                                          #   "patience": 1.0,
-                                          "suppress_tokens": "-1",
-                                          "initial_prompt": "",
-                                          "condition_on_previous_text": False,
-                                          "temperature_increment_on_fallback": 0.2,
-                                          "compression_ratio_threshold": 2.4,
-                                          "logprob_threshold": -1,
-                                          "no_speech_threshold": 0.6})
+                                          "temperature": int(temp),
+                                        #   "patience": float(patience),
+                                          "suppress_tokens": suppress,
+                                        #   "initial_prompt": "",
+                                        #   "condition_on_previous_text": False,
+                                          "temperature_increment_on_fallback": float(temperature),
+                                          "compression_ratio_threshold": float(compression),
+                                          "logprob_threshold": int(logprob),
+                                          "no_speech_threshold": float(nospeech)})
 
             cnx.commit()
             cursor.close()
@@ -254,6 +276,86 @@ def WhisperAI():
     else:
         return render_template('whisper-results.html', data=["", "", "", "", "", "You Have Used All Your Minutes"])
 
+########## Admin Panel ###########
+
+# Utility function for updating the form data to database
+def DBUpdate(table, field, value):
+    cnx = ms.connect(user='magic_register', password='Indira@2000',
+                     host='185.104.29.84', database='magic_register')
+    cursor = cnx.cursor()
+    query = f"UPDATE `{table}` SET `{field}` = '{value}'"
+    cursor.execute(query)
+    cnx.commit()
+    cursor.close()
+    cnx.close()
+
+def DBRead(table,field):
+    cnx = ms.connect(user='magic_register', password='Indira@2000',
+                     host='185.104.29.84', database='magic_register')
+    cursor = cnx.cursor(buffered=True)
+    query = f"SELECT `{field}` FROM `{table}`"
+    cursor.execute(query)
+    data = cursor.fetchone()[0]
+    cursor.close()
+    cnx.close()
+    return data
+
+
+@app.route('/admin',methods=['GET'])
+def Admin():
+    if 'get_user_email' in session: 
+        if 'Admin' == admin_name_validation:
+            #Get the Data
+            api_key = DBRead('whisper_config','API_Key')
+            model = DBRead('whisper_config','model')
+            transcription = DBRead('whisper_config','transcription')
+            temp = DBRead('whisper_config','temperature')
+            patience = DBRead('whisper_config','patience')
+            suppress = DBRead('whisper_config','suppress_tokens')
+            temperature = DBRead('whisper_config','temp_increment_on_fallback')
+            compression = DBRead('whisper_config','compression_ratio_threshold')
+            logprob = DBRead('whisper_config','logprob_threshold')
+            nospeech = DBRead('whisper_config','no_speech_threshold')
+
+            # data = [api_key,model,transcription,temp,patience,suppress,temperature,compression,logprob,nospeech]
+            
+            return render_template('admin.html',data = [api_key,transcription,temp,patience,suppress,temperature,compression,logprob,nospeech,model])
+
+        else:
+            return(redirect('/dashboard'))
+    
+    else:
+        return redirect(url_for('login.html'))
+
+
+@app.route('/admin-success', methods=["POST"])
+def AdminWhisper():
+    # Form Data
+    API_Key = request.form['API_Key']
+    Transcription = request.form['Transcription']
+    Temperature = request.form['Temperature']
+    Patience = request.form['Patience']
+    Suppress_Tokens = request.form['Suppress_Tokens']
+    Temperature_increment = request.form['Temperature_increment']
+    Compression = request.form['Compression']
+    Logprob = request.form['Logprob']
+    Speech = request.form['Speech']
+    Model = request.form['Model']
+
+    # Updation Database Queries and Executing Queries
+    DBUpdate('whisper_config','API_Key',API_Key)
+    DBUpdate('whisper_config','transcription',Transcription)
+    DBUpdate('whisper_config','temperature',Temperature)
+    DBUpdate('whisper_config','patience',Patience)
+    DBUpdate('whisper_config','suppress_tokens',Suppress_Tokens)
+    DBUpdate('whisper_config','temp_increment_on_fallback',Temperature_increment)
+    DBUpdate('whisper_config','compression_ratio_threshold',Compression)
+    DBUpdate('whisper_config','logprob_threshold',Logprob)
+    DBUpdate('whisper_config','no_speech_threshold',Speech)
+    DBUpdate('whisper_config','model',Model)
+
+    # print(API_Key,Transcription,Temperature,Patience,Suppress_Tokens,Temperature_increment,Compression,Logprob,Speech,Model)
+    return redirect('/admin')
 
 @app.errorhandler(404)
 def page_not_found(e):
@@ -263,7 +365,6 @@ def page_not_found(e):
 @app.errorhandler(500)
 def internal_server(e):
     return render_template('500.html'), 500
-
 
 if __name__ == "__main__":
     app.run(port=5000)
