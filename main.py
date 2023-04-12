@@ -232,7 +232,7 @@ def WhisperAI():
             cnx.commit()
             cursor.close()
             cnx.close()
-            return render_template('whisper-results.html', data=[output['transcription'], output['translation'], output['detected_language'], minutes_count, minutes_total])
+            return render_template('whisper-results.html', data=[output['transcription'], output['translation'], output['detected_language'], minutes_count+minutes_to_update, minutes_total])
 
         else:
             # Counting audio file minutes
