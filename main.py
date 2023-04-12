@@ -361,6 +361,8 @@ def page_not_found(e):
 def internal_server(e):
     return render_template('500.html'), 500
 
-  
+
 if __name__ == "__main__":
-    app.run(port=5000,debug=True)
+    app.run(debug=True,port=5000)
+
+# threaded=True
