@@ -116,16 +116,26 @@ def Dashboard():
         minutes_count_query = f"SELECT `minutes_count` FROM `user` WHERE `email` = '{email}'"
         cursor.execute(minutes_count_query)
         minutes_count = cursor.fetchone()[0]
+        minutes_to_show = custom_round(minutes_count)
 
         cursor.close()
         cnx.close()
-        return render_template("dashboard.html", data={'name': name, 'subscription_end': subscription_end, 'words_total': words_total, 'words_count': words_count, 'images_total': images_total, 'images_count': images_count, 'minutes_total':minutes_total, 'minutes_count':minutes_count})
+        return render_template("dashboard.html", data={'name': name, 'subscription_end': subscription_end, 'words_total': words_total, 'words_count': words_count, 'images_total': images_total, 'images_count': images_count, 'minutes_total':minutes_total, 'minutes_count':minutes_to_show})
 
     else:
         return redirect(url_for("login"))
 
 
 ############################### Whisper AI Functions ######################################
+
+from decimal import Decimal
+
+def custom_round(num, digits=2, Isstr=False):
+    tmp = Decimal(num)
+    x = ("{0:.%sf}" % digits).format(round(tmp, digits))
+    if Isstr:
+        return x
+    return Decimal(x)
 
 @app.route('/whisper')
 def Whisper():
@@ -138,7 +148,7 @@ def Whisper():
         minutes_count_query = f"SELECT `minutes_count` FROM `user` WHERE `email` = '{email}'"
         cursor.execute(minutes_count_query)
         minutes_count = cursor.fetchone()[0]
-        minutes_to_show = str(minutes_count)
+        minutes_to_show = custom_round(minutes_count)
 
         minutes_total_query = f"SELECT `minutes_total` FROM `user` WHERE `email` = '{email}'"
         cursor.execute(minutes_total_query)
@@ -146,7 +156,7 @@ def Whisper():
 
         cursor.close()
         cnx.close()
-        return render_template('whisper.html', data=[minutes_to_show[0:5], minutes_total])
+        return render_template('whisper.html', data=[minutes_to_show, minutes_total])
 
     else:
         return redirect(url_for("login"))
@@ -209,8 +219,7 @@ def WhisperAI():
     # nospeech = DBRead('whisper_config','no_speech_threshold')
     # print(minutes_to_update)
     global minutes_to_update
-    minutes_to_update = str(minutes_to_update)
-    minutes_to_update = float(minutes_to_update[0:5])
+    minutes_to_update = custom_round(minutes_to_update)
     print(minutes_to_update)
 
     if minutes_count <= float(minutes_total):
@@ -373,6 +382,6 @@ def internal_server(e):
 
 
 if __name__ == "__main__":
-    app.run(port=5000)
+    app.run(port=5000,debug=True)
 
 # threaded=True
