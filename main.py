@@ -6,10 +6,12 @@ from io import BytesIO
 
 
 
-# Setting the Environment of the application using the API token of Replicate from the database
 cnx = ms.connect(user='magic_register', password='Indira@2000',
                  host='185.104.29.84', database='magic_register')
 cursor = cnx.cursor()
+
+
+# Setting the Environment of the application using the API token of Replicate from the database
 get_API_key_query = "SELECT `API_KEY` FROM `whisper_config`"
 cursor.execute(get_API_key_query)
 get_API_key = cursor.fetchone()[0]
@@ -82,22 +84,29 @@ def Dashboard():
         subscription_end = cursor.fetchone()[0]
 
         # Words Usage
-        words_total_query = f"SELECT `words_total` FROM `user` WHERE `email` = '{email}'"
-        cursor.execute(words_total_query)
-        words_total = cursor.fetchone()[0]
+        # words_total_query = f"SELECT `words_total` FROM `user` WHERE `email` = '{email}'"
+        # cursor.execute(words_total_query)
+        # words_total = cursor.fetchone()[0]
 
-        words_count_query = f"SELECT `words_count` FROM `user` WHERE `email` = '{email}'"
-        cursor.execute(words_count_query)
-        words_count = cursor.fetchone()[0]
+        # words_count_query = f"SELECT `words_count` FROM `user` WHERE `email` = '{email}'"
+        # cursor.execute(words_count_query)
+        # words_count = cursor.fetchone()[0]
 
         # Image Usage
-        images_total_query = f"SELECT `images_total` FROM `user` WHERE `email` = '{email}'"
-        cursor.execute(images_total_query)
-        images_total = cursor.fetchone()[0]
+        # images_total_query = f"SELECT `images_total` FROM `user` WHERE `email` = '{email}'"
+        # cursor.execute(images_total_query)
+        # images_total = cursor.fetchone()[0]
 
-        images_count_query = f"SELECT `images_count` FROM `user` WHERE `email` = '{email}'"
-        cursor.execute(images_count_query)
-        images_count = cursor.fetchone()[0]
+        # images_count_query = f"SELECT `images_count` FROM `user` WHERE `email` = '{email}'"
+        # cursor.execute(images_count_query)
+        # images_count = cursor.fetchone()[0]
+
+        # Tmporary Things
+        words_total = 20000
+        words_count = 0
+        images_total = 20
+        images_count = 0
+
 
         #Minutes Usage Whisper
         minutes_total_query = f"SELECT `minutes_total` FROM `user` WHERE `email` = '{email}'"
@@ -117,9 +126,6 @@ def Dashboard():
 
 
 ############################### Whisper AI Functions ######################################
-minutes_count = 0
-minutes_total = 0
-
 
 @app.route('/whisper')
 def Whisper():
@@ -128,7 +134,6 @@ def Whisper():
                          host='185.104.29.84', database='magic_register')
         cursor = cnx.cursor()
 
-        global minutes_count, minutes_total
         email = session['get_user_email']
         minutes_count_query = f"SELECT `minutes_count` FROM `user` WHERE `email` = '{email}'"
         cursor.execute(minutes_count_query)
@@ -157,15 +162,24 @@ def upload():
     return "Done"
 
 
-# function to get the duration of the audio
-def audio_duration(length):
-    hours = length / 3600  # calculate in hours
-    length %= 3600
-    mins = length / 60  # calculate in minutes
-    length %= 60
-    seconds = length  # calculate in seconds
+# # function to get the duration of the audio
+# def audio_duration(length):
+#     hours = length // 3600  # calculate in hours
+#     length %= 3600
+#     mins = length // 60  # calculate in minutes
+#     length %= 60
+#     seconds = length  # calculate in seconds
 
-    return mins  # returns the duration
+#     return mins  # returns the duration
+
+minutes_to_update = 0
+@app.route('/duration', methods=['POST'])
+def duration():
+    global minutes_to_update
+    minutes_to_update = request.json['duration']
+    # do something with the duration data
+    return 'OK'
+
 
 
 @app.route('/whisper-results', methods=["POST"])
@@ -174,100 +188,102 @@ def WhisperAI():
                      host='185.104.29.84', database='magic_register')
     cursor = cnx.cursor()
     email = session['get_user_email']
-    # Reading the audio file and Converting the audio file in Bytes
 
+    minutes_count_query = f"SELECT `minutes_count` FROM `user` WHERE `email` = '{email}'"
+    cursor.execute(minutes_count_query)
+    minutes_count = float(cursor.fetchone()[0])
+
+    minutes_total_query = f"SELECT `minutes_total` FROM `user` WHERE `email` = '{email}'"
+    cursor.execute(minutes_total_query)
+    minutes_total = cursor.fetchone()[0]
+
+    # Reading the audio file and Converting the audio file in Bytes
     audioFile = BytesIO(request.files['audioFile'].read())
     # Or
     # Taking mic input
     audioRecords = BytesIO(audioRecordedGlobal)
-    # print(audioRecordedGlobal)
 
     # language = request.form['language']
     to_translate = request.form.get('to_translate') == 'on'
 
     # Model Configuration Fetching from database
-    model = DBRead('whisper_config','model')
+    # model = DBRead('whisper_config','model')
     transcription = DBRead('whisper_config','transcription')
-    temp = DBRead('whisper_config','temperature')
-    # patience = DBRead('whisper_config','patience')
-    suppress = DBRead('whisper_config','suppress_tokens')
-    temperature = DBRead('whisper_config','temp_increment_on_fallback')
-    compression = DBRead('whisper_config','compression_ratio_threshold')
-    logprob = DBRead('whisper_config','logprob_threshold')
-    nospeech = DBRead('whisper_config','no_speech_threshold')
+    # temp = DBRead('whisper_config','temperature')
+    # # patience = DBRead('whisper_config','patience')
+    # suppress = DBRead('whisper_config','suppress_tokens')
+    # temperature = DBRead('whisper_config','temp_increment_on_fallback')
+    # compression = DBRead('whisper_config','compression_ratio_threshold')
+    # logprob = DBRead('whisper_config','logprob_threshold')
+    # nospeech = DBRead('whisper_config','no_speech_threshold')
+    # print(minutes_to_update)
+    global minutes_to_update
+    minutes_to_update = str(minutes_to_update)
+    minutes_to_update = float(minutes_to_update[0:4])
 
     if minutes_count <= float(minutes_total):
         if len(audioFile.read()) != 0:
-
-            # Counting audio file minutes
-            from mutagen.wave import WAVE
-            audios = WAVE(audioFile)
-            audio_length = audios.info.length
-            minutes = str(audio_duration(audio_length))
-            minutes_to_update = float(minutes[0:5])
-            # print(minutes_to_update)
-            # print(minutes_count)
-            # print(minutes_total)
-
-            update_minutes_query = f"UPDATE `user` SET `minutes_count` = '{minutes_to_update+minutes_count}' WHERE `email` = '{email}';"
-            cursor.execute(update_minutes_query)
-
             # Model Running
-            output = replicate.run("openai/whisper:e39e354773466b955265e969568deb7da217804d8e771ea8c9cd0cef6591f8bc",
-                                   input={"audio": audioFile,
-                                          "model": model,
-                                          "transcription": transcription,
-                                          "translate": to_translate,
-                                          #   "language": language,
-                                          "temperature": int(temp),
-                                        #   "patience": float(patience),
-                                          "suppress_tokens": suppress,
-                                        #   "initial_prompt": "",
-                                        #   "condition_on_previous_text": False,
-                                          "temperature_increment_on_fallback": float(temperature),
-                                          "compression_ratio_threshold": float(compression),
-                                          "logprob_threshold": int(logprob),
-                                          "no_speech_threshold": float(nospeech)})
+            try: 
+                output = replicate.run("openai/whisper:e39e354773466b955265e969568deb7da217804d8e771ea8c9cd0cef6591f8bc",
+                                    input={"audio": audioFile,
+                                            # "model": model,
+                                            "transcription": transcription,
+                                            "translate": to_translate,
+                                            #   "language": language,
+                                            # "temperature": int(temp),
+                                            # #   "patience": float(patience),
+                                            # "suppress_tokens": suppress,
+                                            # #   "initial_prompt": "",
+                                            # #   "condition_on_previous_text": False,
+                                            # "temperature_increment_on_fallback": float(temperature),
+                                            # "compression_ratio_threshold": float(compression),
+                                            # "logprob_threshold": int(logprob),
+                                            # "no_speech_threshold": float(nospeech)
+                                            })
 
-            cnx.commit()
-            cursor.close()
-            cnx.close()
-            return render_template('whisper-results.html', data=[output['transcription'], output['translation'], output['detected_language'], minutes_count+minutes_to_update, minutes_total])
+                update_minutes_query = f"UPDATE `user` SET `minutes_count` = '{minutes_to_update+minutes_count}' WHERE `email` = '{email}';"
+                cursor.execute(update_minutes_query)
+                cnx.commit()
+                cursor.close()
+                cnx.close()
+                return render_template('whisper-results.html', data=[output['transcription'], output['translation'], output['detected_language'], minutes_count+minutes_to_update, minutes_total])
+            except Exception as e:
+                print(e)
+                return render_template("whisper-results.html",data=["There is some problems in AI Model or Your File Size is too large","","",minutes_count,minutes_total])
+            # return render_template('whisper.html',data=["","","","","",""])
 
         else:
-            # Counting audio file minutes
-            # from mutagen.wave import WAVE
-
-            # audios = WAVE(audioRecordedGlobal)
-            # audio_length = audios.info.length
-            # minutes = str(audio_duration(audio_length))
-            # minutes_to_update = float(minutes[0:4])
-
-            # update_minutes_query = f"UPDATE `user` SET `minutes_count` = '{minutes_to_update+minutes_count}' WHERE `email` = {email};"
-            # cursor.execute(update_minutes_query)
-
             # Model Running
-            output = replicate.run("openai/whisper:e39e354773466b955265e969568deb7da217804d8e771ea8c9cd0cef6591f8bc",
-                                   input={"audio": audioRecords,
-                                          "model": model,
-                                          "transcription": transcription,
-                                          "translate": to_translate,
-                                          #   "language": language,
-                                          "temperature": int(temp),
-                                        #   "patience": float(patience),
-                                          "suppress_tokens": suppress,
-                                        #   "initial_prompt": "",
-                                        #   "condition_on_previous_text": False,
-                                          "temperature_increment_on_fallback": float(temperature),
-                                          "compression_ratio_threshold": float(compression),
-                                          "logprob_threshold": int(logprob),
-                                          "no_speech_threshold": float(nospeech)})
+            try:
+                output = replicate.run("openai/whisper:e39e354773466b955265e969568deb7da217804d8e771ea8c9cd0cef6591f8bc",
+                                    input={"audio": audioRecords,
+                                            # "model": model,
+                                            "transcription": transcription,
+                                            "translate": to_translate,
+                                            # #   "language": language,
+                                            # "temperature": int(temp),
+                                            # #   "patience": float(patience),
+                                            # "suppress_tokens": suppress,
+                                            # #   "initial_prompt": "",
+                                            # #   "condition_on_previous_text": False,
+                                            # "temperature_increment_on_fallback": float(temperature),
+                                            # "compression_ratio_threshold": float(compression),
+                                            # "logprob_threshold": int(logprob),
+                                            # "no_speech_threshold": float(nospeech)
+                                             })
 
-            cnx.commit()
-            cursor.close()
-            cnx.close()
-            return render_template('whisper-results.html', data=[output['transcription'], output['translation'], output['detected_language'], minutes_count, minutes_total])
-            return "Done"
+                update_minutes_query = f"UPDATE `user` SET `minutes_count` = '{minutes_to_update+minutes_count}' WHERE `email` = '{email}';"
+                cursor.execute(update_minutes_query)
+                cnx.commit()
+                cursor.close()
+                cnx.close()
+                return render_template('whisper-results.html', data=[output['transcription'], output['translation'], output['detected_language'], minutes_count+minutes_to_update, minutes_total])
+            
+            except Exception as e:
+                print(e)
+                return render_template("whisper-results.html",data=["There is some problems in AI Model or Your Audio Record is too large","","",minutes_count,minutes_total])
+
     else:
         return render_template('whisper-results.html', data=["", "", "", "", "", "You Have Used All Your Minutes"])
 
