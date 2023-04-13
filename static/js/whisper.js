@@ -1,3 +1,5 @@
+// Voice Recorder with Duration to Server
+
 let startButton = document.getElementById("startButton");
 let stopButton = document.getElementById("stopButton");
 let mediaRecorder;
@@ -18,12 +20,8 @@ function startRecording() {
       let audioBlob = new Blob(chunks, { type: "audio/ogg; codecs=opus" });
       let audioUrl = URL.createObjectURL(audioBlob);
       const audioPlayer = document.getElementById('audio-player');
+      const audioElement = new Audio(audioUrl);
       audioPlayer.src = audioUrl;
-      // audioPlayer.play();
-      // let audio = new Audio(audioUrl);
-      // audio.controls = true;
-      // document.body.appendChild(audio);
-
       let formData = new FormData();
       formData.append("audio", audioBlob);
 
@@ -37,6 +35,44 @@ function startRecording() {
         .catch(function (error) {
           console.error("Error uploading audio file:", error);
         });
+      
+      // audioPlayer.play()
+      const audioContext = new AudioContext();
+      const fileReader = new FileReader();
+      fileReader.onload = function() {
+        audioContext.decodeAudioData(fileReader.result).then(function(decodedData) {
+          const duration = decodedData.duration;
+          var minutes = duration / 60;
+          var data = {'duration': minutes};
+          fetch('/duration', {
+          method: 'POST',
+          headers: {'Content-Type': 'application/json'},
+          body: JSON.stringify(data)
+        })
+        .then(response => response.text())
+        .then(response => console.log(response));
+          
+        });
+      };
+      fileReader.readAsArrayBuffer(audioBlob);
+        // Audio Duration Sending to Server
+      
+      //   audioPlayer.addEventListener('loadedmetadata', function() {
+      //   const duration = audioElement.duration;
+      //   // console.log(duration);
+      //   var minutes = duration / 60;
+      //   // var seconds = duration % 60;
+      //   // console.log(minutes)
+      //   var data = {'duration': minutes};
+      //   fetch('/duration', {
+      //     method: 'POST',
+      //     headers: {'Content-Type': 'application/json'},
+      //     body: JSON.stringify(data)
+      //   })
+      //   .then(response => response.text())
+      //   .then(response => console.log(response));
+      // });
+      
     };
   });
 }
@@ -51,6 +87,9 @@ function stopRecording() {
 startButton.addEventListener("click", startRecording);
 stopButton.addEventListener("click", stopRecording);
 
+
+// Audio Player for uploaded audio and duration to server
+
 const audioFile = document.getElementById('audioFile');
 const audioFilePlayer = document.getElementById('audio-upload-player')
 
@@ -59,3 +98,19 @@ audioFile.addEventListener('change', function(){
   const obj = URL.createObjectURL(file);
   audioFilePlayer.src = obj;
 })
+
+audioFilePlayer.addEventListener('loadedmetadata', function() {
+  var duration = audioFilePlayer.duration;
+  var minutes = duration / 60;
+  // var seconds = duration % 60;
+  console.log(minutes)
+  // var data = {'duration': minutes + ':' + (seconds < 10 ? '0' : '') + seconds};
+  var data = {'duration': minutes};
+  fetch('/duration', {
+    method: 'POST',
+    headers: {'Content-Type': 'application/json'},
+    body: JSON.stringify(data)
+  })
+  .then(response => response.text())
+  .then(response => console.log(response));
+});
