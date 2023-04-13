@@ -220,7 +220,7 @@ def WhisperAI():
     # print(minutes_to_update)
     global minutes_to_update
     minutes_to_update = custom_round(minutes_to_update)
-    print(minutes_to_update)
+    print("Uploaded Audio or File Size : ",minutes_to_update)
 
     if minutes_count <= float(minutes_total):
         if len(audioFile.read()) != 0:
@@ -280,6 +280,7 @@ def WhisperAI():
                 cnx.commit()
                 cursor.close()
                 cnx.close()
+                print("The total minutes will be : ",minutes_count+minutes_to_update)
                 minutes_to_show = str(minutes_count+minutes_to_update)
                 return render_template('whisper-results.html', data=[output['transcription'], output['translation'], output['detected_language'], minutes_to_show[0:5], minutes_total])
             
