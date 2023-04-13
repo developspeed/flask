@@ -1,6 +1,4 @@
 Flask==2.2.3
-mutagen==1.46.0
 mysql-connector==2.2.9
-pydub==0.25.1
 replicate==0.7.0
 gunicorn>=20.1.0
