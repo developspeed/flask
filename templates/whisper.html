@@ -31,10 +31,8 @@
     <div class="container" id="data_send_by_user">
         <div class="card">
             <div class="form-group">
-                <label for="audioFile"><b>Select Audio File: (Use WAV File Only)</b></label>
-                <input type="file" class="form-control-file" id="audioFile" name="audioFile">
-                <!-- <button type="button" onclick="playAudio()">Play Audio</button> -->
-                <a href="https://www.freeconvert.com/wav-converter" target="_blank">WAV Converter</a>
+                <label for="audioFile"><b>Select Audio File:</b></label>
+                <input type="file" class="form-control-file" id="audioFile" name="audioFile" accept="audio">
                 <br>
                 <br>
                 <audio id="audio-upload-player" controls align="center">
@@ -46,9 +44,9 @@
         <h4>or</h4>
         <div class="card">
             <label for="audioRecord"><b>Record Audio:</b></label>
-            <button type="button" id="startButton" class="btn btn-danger" style="margin: 5px;">Start Recording</button>
-            <button type="button" id="stopButton" class="btn btn-secondary" disabled style="margin: 5px;">Stop Recording</button>
-            <!-- <br> -->
+            <button type="button" id="startButton" class="btn btn-danger" style="margin: 1px;">Start Recording</button>
+            <button type="button" id="stopButton" class="btn btn-secondary" disabled style="margin: 1px;">Stop Recording</button>
+            <br>
             <audio id="audio-player" controls>
                 <source src="" type="audio/mpeg/wav">
                 Your browser does not support the audio tag.
