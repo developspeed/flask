@@ -248,6 +248,7 @@ def WhisperAI():
                 cnx.commit()
                 cursor.close()
                 cnx.close()
+                print("The total minutes will be : ",minutes_count+minutes_to_update)
                 minutes_to_show = str(minutes_count+minutes_to_update)
                 return render_template('whisper-results.html', data=[output['transcription'], output['translation'], output['detected_language'], minutes_to_show[0:5], minutes_total])
             except Exception as e:
