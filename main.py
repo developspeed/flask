@@ -135,7 +135,7 @@ def custom_round(num, digits=2, Isstr=False):
     x = ("{0:.%sf}" % digits).format(round(tmp, digits))
     if Isstr:
         return x
-    return Decimal(x)
+    return float(Decimal(x))
 
 @app.route('/whisper')
 def Whisper():
@@ -281,7 +281,7 @@ def WhisperAI():
                 cursor.close()
                 cnx.close()
                 minutes_to_show = str(minutes_count+minutes_to_update)
-                return render_template('whisper-results.html', data=[output['transcription'], output['translation'], output['detected_language'], minutes_to_show[0:4], minutes_total])
+                return render_template('whisper-results.html', data=[output['transcription'], output['translation'], output['detected_language'], minutes_to_show[0:5], minutes_total])
             
             except Exception as e:
                 print(e)
@@ -382,6 +382,6 @@ def internal_server(e):
 
 
 if __name__ == "__main__":
-    app.run(port=5000)
+    app.run(port=5000,debug=True)
 
 # threaded=True
