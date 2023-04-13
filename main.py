@@ -137,7 +137,8 @@ def Whisper():
         email = session['get_user_email']
         minutes_count_query = f"SELECT `minutes_count` FROM `user` WHERE `email` = '{email}'"
         cursor.execute(minutes_count_query)
-        minutes_count = float(cursor.fetchone()[0])
+        minutes_count = cursor.fetchone()[0]
+        minutes_to_show = str(minutes_count)
 
         minutes_total_query = f"SELECT `minutes_total` FROM `user` WHERE `email` = '{email}'"
         cursor.execute(minutes_total_query)
@@ -145,14 +146,14 @@ def Whisper():
 
         cursor.close()
         cnx.close()
-        return render_template('whisper.html', data=[minutes_count, minutes_total])
+        return render_template('whisper.html', data=[minutes_to_show[0:5], minutes_total])
 
     else:
         return redirect(url_for("login"))
 
 
-audioRecordedGlobal = None
 # Audio Upload through Mic
+audioRecordedGlobal = None
 @app.route('/upload', methods=['POST'])
 def upload():
     audio = request.files.get('audio').read()
@@ -161,16 +162,6 @@ def upload():
     audioRecordedGlobal = audio
     return "Done"
 
-
-# # function to get the duration of the audio
-# def audio_duration(length):
-#     hours = length // 3600  # calculate in hours
-#     length %= 3600
-#     mins = length // 60  # calculate in minutes
-#     length %= 60
-#     seconds = length  # calculate in seconds
-
-#     return mins  # returns the duration
 
 minutes_to_update = 0
 @app.route('/duration', methods=['POST'])
@@ -219,7 +210,8 @@ def WhisperAI():
     # print(minutes_to_update)
     global minutes_to_update
     minutes_to_update = str(minutes_to_update)
-    minutes_to_update = float(minutes_to_update[0:4])
+    minutes_to_update = float(minutes_to_update[0:5])
+    print(minutes_to_update)
 
     if minutes_count <= float(minutes_total):
         if len(audioFile.read()) != 0:
@@ -247,7 +239,8 @@ def WhisperAI():
                 cnx.commit()
                 cursor.close()
                 cnx.close()
-                return render_template('whisper-results.html', data=[output['transcription'], output['translation'], output['detected_language'], minutes_count+minutes_to_update, minutes_total])
+                minutes_to_show = str(minutes_count+minutes_to_update)
+                return render_template('whisper-results.html', data=[output['transcription'], output['translation'], output['detected_language'], minutes_to_show[0:5], minutes_total])
             except Exception as e:
                 print(e)
                 return render_template("whisper-results.html",data=["There is some problems in AI Model or Your File Size is too large","","",minutes_count,minutes_total])
@@ -278,7 +271,8 @@ def WhisperAI():
                 cnx.commit()
                 cursor.close()
                 cnx.close()
-                return render_template('whisper-results.html', data=[output['transcription'], output['translation'], output['detected_language'], minutes_count+minutes_to_update, minutes_total])
+                minutes_to_show = str(minutes_count+minutes_to_update)
+                return render_template('whisper-results.html', data=[output['transcription'], output['translation'], output['detected_language'], minutes_to_show[0:4], minutes_total])
             
             except Exception as e:
                 print(e)
