@@ -43,6 +43,7 @@ function startRecording() {
         audioContext.decodeAudioData(fileReader.result).then(function(decodedData) {
           const duration = decodedData.duration;
           var minutes = duration / 60;
+          console.log(minutes)
           var data = {'duration': minutes};
           fetch('/duration', {
           method: 'POST',
