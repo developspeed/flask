@@ -31,7 +31,7 @@
         </p>
     </div>
 </div>
-<form action="/whisper-results" method="POST" enctype="multipart/form-data">
+<!-- <form action="/whisper-results" method="POST" enctype="multipart/form-data">
     <div class="container" id="data_send_by_user">
         <div class="card">
             <div class="form-group">
@@ -53,7 +53,7 @@
     </div>
     <div class="container">
         <div class="card">
-            <!-- <input type="text" placeholder="Name of Language or Leave it for Language Detection" name="language"> -->
+
             <select class="form-select" aria-label="Default select example" style="width: 100%;">
                 <option selected>Select Language or Leave it for Automatic Detection</option>
                 <option value="af">af</option>
@@ -273,11 +273,9 @@
                 <label class="form-check-label" for="inlineCheckbox1">Translate</label>
             </div>
         </div>
-        <div class="card">
-            <a href="/whisper" class="btn btn-primary">Use Again</a>
-        </div>
+        
     </div>
-</form>
+</form> -->
 
 <form method="get">
     <div class="container">
@@ -291,10 +289,11 @@
             <p class="detected_language"><b>English :</b></p>
             <p class="translate" name="translate">{{data[1]}}</p>
         </div>
+    </div>
+    <div class="container">
+        <div class="card">
+            <a href="/whisper" class="btn btn-primary">New Transcription</a>
+        </div>
     </div>    
 </form>
-<script>
-
-</script>
-<script src="{{ url_for('static', filename='js/whisper.js') }}"></script>
 {% endblock %}
