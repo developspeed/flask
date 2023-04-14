@@ -222,6 +222,7 @@ def WhisperAI():
     minutes_to_update = custom_round(minutes_to_update)
     print("Uploaded Audio or File Size : ",minutes_to_update)
 
+    output = None
     if minutes_count <= float(minutes_total):
         if len(audioFile.read()) != 0:
             # Model Running
@@ -236,7 +237,7 @@ def WhisperAI():
                                             # #   "patience": float(patience),
                                             # "suppress_tokens": suppress,
                                             # #   "initial_prompt": "",
-                                            # #   "condition_on_previous_text": False,
+                                            #   "condition_on_previous_text": False,
                                             # "temperature_increment_on_fallback": float(temperature),
                                             # "compression_ratio_threshold": float(compression),
                                             # "logprob_threshold": int(logprob),
@@ -384,6 +385,6 @@ def internal_server(e):
 
 
 if __name__ == "__main__":
-    app.run(port=5000,debug=True)
+    app.run(port=5000)
 
 # threaded=True
