@@ -3,7 +3,7 @@ import mysql.connector as ms
 import os
 import replicate
 from io import BytesIO
-
+from flask_caching import Cache
 
 
 cnx = ms.connect(user='magic_register', password='Indira@2000',
@@ -24,7 +24,7 @@ cnx.close()
 
 app = Flask(__name__, static_url_path='/static')
 app.secret_key = 'my-secret-key'
-
+cache = Cache(app, config={'CACHE_TYPE': 'simple'})
 
 @app.route("/")
 # @app.route("/login")
@@ -84,28 +84,28 @@ def Dashboard():
         subscription_end = cursor.fetchone()[0]
 
         # Words Usage
-        # words_total_query = f"SELECT `words_total` FROM `user` WHERE `email` = '{email}'"
-        # cursor.execute(words_total_query)
-        # words_total = cursor.fetchone()[0]
+        words_total_query = f"SELECT `words_total` FROM `user` WHERE `email` = '{email}'"
+        cursor.execute(words_total_query)
+        words_total = cursor.fetchone()[0]
 
-        # words_count_query = f"SELECT `words_count` FROM `user` WHERE `email` = '{email}'"
-        # cursor.execute(words_count_query)
-        # words_count = cursor.fetchone()[0]
+        words_count_query = f"SELECT `words_count` FROM `user` WHERE `email` = '{email}'"
+        cursor.execute(words_count_query)
+        words_count = cursor.fetchone()[0]
 
         # Image Usage
-        # images_total_query = f"SELECT `images_total` FROM `user` WHERE `email` = '{email}'"
-        # cursor.execute(images_total_query)
-        # images_total = cursor.fetchone()[0]
+        images_total_query = f"SELECT `images_total` FROM `user` WHERE `email` = '{email}'"
+        cursor.execute(images_total_query)
+        images_total = cursor.fetchone()[0]
 
-        # images_count_query = f"SELECT `images_count` FROM `user` WHERE `email` = '{email}'"
-        # cursor.execute(images_count_query)
-        # images_count = cursor.fetchone()[0]
+        images_count_query = f"SELECT `images_count` FROM `user` WHERE `email` = '{email}'"
+        cursor.execute(images_count_query)
+        images_count = cursor.fetchone()[0]
 
         # Tmporary Things
-        words_total = 20000
-        words_count = 0
-        images_total = 20
-        images_count = 0
+        # words_total = 20000
+        # words_count = 0
+        # images_total = 20
+        # images_count = 0
 
 
         #Minutes Usage Whisper
@@ -210,14 +210,6 @@ def WhisperAI():
     # Model Configuration Fetching from database
     # model = DBRead('whisper_config','model')
     transcription = DBRead('whisper_config','transcription')
-    # temp = DBRead('whisper_config','temperature')
-    # # patience = DBRead('whisper_config','patience')
-    # suppress = DBRead('whisper_config','suppress_tokens')
-    # temperature = DBRead('whisper_config','temp_increment_on_fallback')
-    # compression = DBRead('whisper_config','compression_ratio_threshold')
-    # logprob = DBRead('whisper_config','logprob_threshold')
-    # nospeech = DBRead('whisper_config','no_speech_threshold')
-    # print(minutes_to_update)
     global minutes_to_update
     minutes_to_update = custom_round(minutes_to_update)
     print("Uploaded Audio or File Size : ",minutes_to_update)
@@ -232,16 +224,6 @@ def WhisperAI():
                                             # "model": model,
                                             "transcription": transcription,
                                             "translate": to_translate,
-                                            #   "language": language,
-                                            # "temperature": int(temp),
-                                            # #   "patience": float(patience),
-                                            # "suppress_tokens": suppress,
-                                            # #   "initial_prompt": "",
-                                            #   "condition_on_previous_text": False,
-                                            # "temperature_increment_on_fallback": float(temperature),
-                                            # "compression_ratio_threshold": float(compression),
-                                            # "logprob_threshold": int(logprob),
-                                            # "no_speech_threshold": float(nospeech)
                                             })
 
                 update_minutes_query = f"UPDATE `user` SET `minutes_count` = '{minutes_to_update+minutes_count}' WHERE `email` = '{email}';"
@@ -265,16 +247,6 @@ def WhisperAI():
                                             # "model": model,
                                             "transcription": transcription,
                                             "translate": to_translate,
-                                            # #   "language": language,
-                                            # "temperature": int(temp),
-                                            # #   "patience": float(patience),
-                                            # "suppress_tokens": suppress,
-                                            # #   "initial_prompt": "",
-                                            # #   "condition_on_previous_text": False,
-                                            # "temperature_increment_on_fallback": float(temperature),
-                                            # "compression_ratio_threshold": float(compression),
-                                            # "logprob_threshold": int(logprob),
-                                            # "no_speech_threshold": float(nospeech)
                                              })
 
                 update_minutes_query = f"UPDATE `user` SET `minutes_count` = '{minutes_to_update+minutes_count}' WHERE `email` = '{email}';"
@@ -290,9 +262,12 @@ def WhisperAI():
                 print(e)
                 return render_template("whisper-results.html",data=["There is some problems in AI Model or Your Audio Record is too large","","",minutes_count,minutes_total])
 
+
     else:
         return render_template('whisper-results.html', data=["", "", "", "", "", "You Have Used All Your Minutes"])
 
+
+cache.clear()
 ########## Admin Panel ###########
 
 # Utility function for updating the form data to database
@@ -385,6 +360,4 @@ def internal_server(e):
 
 
 if __name__ == "__main__":
-    app.run(port=5000,host='0.0.0.0')
-
-# threaded=True
+    app.run(port=5000)
