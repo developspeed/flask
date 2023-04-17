@@ -14,16 +14,7 @@
     <div class="card">
         <h1>Speech Recognizer</h1>
         <hr>
-        <p> Welcome to the automatic <i>Speech Recognition</i> application. It allows transcription in multiple
-            languages
-            (currently 99) as well as automatic translation from those <b> languages</b> to English. Click the
-            microphone to
-            record the audio recording, the color of the microphone will turn red. Click the microphone again to stop
-            recording and the "Transcribe Audio" button to convert the audio to text and translate it into English. The
-            first time you start the tool, it may take about 1 minute for the tool to load completely. The transcription
-            of the audio can take anywhere from 10 to 60 seconds, depending on the length of the recording. Try to limit
-            the recording to about 30 seconds to avoid the transcription taking too long. If the output or translation
-            is not good, you can click the "Transcribe Audio" button again to run the process again.
+        <p> {{data[2]}}
         </p>
     </div>
 </div>
@@ -33,10 +24,11 @@
             <div class="form-group">
                 <label for="audioFile"><b>Select Audio File:</b></label>
                 <input type="file" class="form-control-file" id="audioFile" name="audioFile" accept="audio/mp3/wav/m4a">
+                <div id="error-message" style="display: none;">Error: Only MP3, WAV, OGG, and M4A files are supported.</div>
                 <br>
                 <br>
-                <audio id="audio-upload-player" controls align="center" format='audio/mpeg'>
-                    <source src="">
+                <audio id="audio-upload-player" controls align="center" format="audio/mpeg">
+                    <source src="" type="audio">
                     Your browser does not support the audio tag.
                 </audio>
             </div>
@@ -48,8 +40,8 @@
             <button type="button" id="stopButton" class="btn btn-secondary" disabled style="margin: 1px;">Stop
                 Recording</button>
             <br>
-            <audio id="audio-player" controls format='audio/mpeg'>
-                <source src="">
+            <audio id="audio-player" controls format="audio/mpeg">
+                <source src="" type="audio">
                 Your browser does not support the audio tag.
             </audio>
         </div>
@@ -57,8 +49,9 @@
     <div class="container">
         <div class="card">
             <!-- <input type="text" placeholder="Name of Language or Leave it for Language Detection" name="language"> -->
-            <select class="form-select" aria-label="Default select example" style="width: 100%;">
-                <option selected>Select Language or Leave it for Automatic Detection</option>
+            <label for=""><b>Select Language or Leave it for Automatic Detection</b></label>
+            <select class="form-select" aria-label="Default select example" style="width: 80%; font-size: 10px;">
+                <option selected></option>
                 <option value="af">af</option>
                 <option value="am">am</option>
                 <option value="ar">ar</option>
@@ -277,7 +270,7 @@
             </div>
         </div>
         <div class="card">
-            <input type="submit" value="Transcribe" class="btn btn-primary" style="height: 50px;"
+            <input type="submit" value="Transcribe" class="btn btn-primary" id="transcribe" style="height: 50px;"
                 onclick="showLoader()">
             <br>
             <br>

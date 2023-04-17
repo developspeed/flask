@@ -1,5 +1,7 @@
 {% extends 'base.html' %}
 
+{% block title %}Admin{% endblock %}
+
 {% block content %}
 <link rel="stylesheet" href="{{ url_for('static', filename='css/admin.css') }}">
 
@@ -30,8 +32,9 @@
                         <div class="form-group col-sm-6 flex-column d-flex"> <label class="form-control-label px-3">No Speech Threshold<span class="text-danger"> *</span></label> <input type="text" id="Speech" name="Speech" value="{{data[8]}}"> </div>
                         <div class="form-group col-sm-6 flex-column d-flex"> <label class="form-control-label px-3">Model<span class="text-danger"> *</span></label> <input type="text" id="Model" name="Model" value="{{data[9]}}"> </div>
                     </div>
-                    <div class="row justify-content-end">
-                        <div class="form-group col-sm-6"> <input type="submit" class="btn btn-primary text-center"></input> </div>
+                    <div class="row justify-content-between text-left">
+                        <div class="form-group col-sm-6 flex-column d-flex"> <label class="form-control-label px-3">Whisper AI Text<span class="text-danger"> *</span></label> <textarea name="Whisper AI Text" id="whisperAIText" cols="20" rows="10" value="{{data[10]}}">{{data[10]}}</textarea> </div>
+                        <div class="form-group col-sm-6 my-5"> <input type="submit" class="btn btn-primary text-center"></input> </div>
                     </div>
                 </form>
             </div>
