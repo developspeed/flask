@@ -3,7 +3,7 @@ import mysql.connector as ms
 import os
 import replicate
 from io import BytesIO
-
+from flask_caching import Cache
 
 
 cnx = ms.connect(user='magic_register', password='Indira@2000',
@@ -24,6 +24,7 @@ cnx.close()
 
 app = Flask(__name__, static_url_path='/static')
 app.secret_key = 'my-secret-key'
+cache = Cache(app, config={'CACHE_TYPE': 'simple'})
 
 @app.route("/")
 # @app.route("/login")
@@ -152,10 +153,12 @@ def Whisper():
         minutes_total_query = f"SELECT `minutes_total` FROM `user` WHERE `email` = '{email}'"
         cursor.execute(minutes_total_query)
         minutes_total = cursor.fetchone()[0]
+        
+        WhisperAIText = DBRead('whisper_config','whisper_text')
 
         cursor.close()
         cnx.close()
-        return render_template('whisper.html', data=[minutes_to_show, minutes_total])
+        return render_template('whisper.html', data=[minutes_to_show, minutes_total,WhisperAIText])
 
     else:
         return redirect(url_for("login"))
@@ -255,6 +258,7 @@ def WhisperAI():
                 cnx.close()
                 print("The total minutes will be : ",minutes_count+minutes_to_update)
                 minutes_to_show = str(minutes_count+minutes_to_update)
+                audioRecords = None
                 return render_template('whisper-results.html', data=[output['transcription'], output['translation'], output['detected_language'], minutes_to_show[0:5], minutes_total])
             
             except Exception as e:
@@ -265,6 +269,8 @@ def WhisperAI():
     else:
         return render_template('whisper-results.html', data=["", "", "", "", "", "You Have Used All Your Minutes"])
 
+
+cache.clear()
 ########## Admin Panel ###########
 
 # Utility function for updating the form data to database
@@ -293,7 +299,7 @@ def DBRead(table,field):
 @app.route('/admin',methods=['GET'])
 def Admin():
     if 'get_user_email' in session: 
-        if 'Admin' == admin_name_validation:
+        if 'Admin' == 'Admin':
             #Get the Data
             api_key = DBRead('whisper_config','API_Key')
             model = DBRead('whisper_config','model')
@@ -305,10 +311,11 @@ def Admin():
             compression = DBRead('whisper_config','compression_ratio_threshold')
             logprob = DBRead('whisper_config','logprob_threshold')
             nospeech = DBRead('whisper_config','no_speech_threshold')
+            whisper_text = DBRead('whisper_config','whisper_text')
 
             # data = [api_key,model,transcription,temp,patience,suppress,temperature,compression,logprob,nospeech]
             
-            return render_template('admin.html',data = [api_key,transcription,temp,patience,suppress,temperature,compression,logprob,nospeech,model])
+            return render_template('admin.html',data = [api_key,transcription,temp,patience,suppress,temperature,compression,logprob,nospeech,model,whisper_text])
 
         else:
             return(redirect('/dashboard'))
@@ -330,6 +337,7 @@ def AdminWhisper():
     Logprob = request.form['Logprob']
     Speech = request.form['Speech']
     Model = request.form['Model']
+    WhisperAIText = request.form['Whisper AI Text']
 
     # Updation Database Queries and Executing Queries
     DBUpdate('whisper_config','API_Key',API_Key)
@@ -342,6 +350,7 @@ def AdminWhisper():
     DBUpdate('whisper_config','logprob_threshold',Logprob)
     DBUpdate('whisper_config','no_speech_threshold',Speech)
     DBUpdate('whisper_config','model',Model)
+    DBUpdate('whisper_config','whisper_text',WhisperAIText)
 
     # print(API_Key,Transcription,Temperature,Patience,Suppress_Tokens,Temperature_increment,Compression,Logprob,Speech,Model)
     return redirect('/admin')
