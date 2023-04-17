@@ -43,7 +43,6 @@ function startRecording() {
         audioContext.decodeAudioData(fileReader.result).then(function(decodedData) {
           const duration = decodedData.duration;
           var minutes = duration / 60;
-          console.log(minutes)
           var data = {'duration': minutes};
           fetch('/duration', {
           method: 'POST',
@@ -55,25 +54,7 @@ function startRecording() {
           
         });
       };
-      fileReader.readAsArrayBuffer(audioBlob);
-        // Audio Duration Sending to Server
-      
-      //   audioPlayer.addEventListener('loadedmetadata', function() {
-      //   const duration = audioElement.duration;
-      //   // console.log(duration);
-      //   var minutes = duration / 60;
-      //   // var seconds = duration % 60;
-      //   // console.log(minutes)
-      //   var data = {'duration': minutes};
-      //   fetch('/duration', {
-      //     method: 'POST',
-      //     headers: {'Content-Type': 'application/json'},
-      //     body: JSON.stringify(data)
-      //   })
-      //   .then(response => response.text())
-      //   .then(response => console.log(response));
-      // });
-      
+      fileReader.readAsArrayBuffer(audioBlob);      
     };
   });
 }
@@ -93,11 +74,24 @@ stopButton.addEventListener("click", stopRecording);
 
 const audioFile = document.getElementById('audioFile');
 const audioFilePlayer = document.getElementById('audio-upload-player')
-
+const errorMessage = document.getElementById('error-message');
 audioFile.addEventListener('change', function(){
   const file = audioFile.files[0];
   const obj = URL.createObjectURL(file);
   audioFilePlayer.src = obj;
+  const fileExtension = file.name.split('.').pop().toLowerCase();
+  const supportedExtensions = ['mp3', 'wav', 'ogg', 'm4a'];
+  const transcribeButton = document.getElementById('transcribe');
+    if (supportedExtensions.includes(fileExtension)) {
+      errorMessage.style.display = 'none';
+      audioPlayer.style.display = 'block';
+      transcribeButton.disabled = false;
+    } else {
+      errorMessage.style.display = 'block';
+      errorMessage.style.color = 'red'
+      audioPlayer.style.display = 'none';
+      transcribeButton.disabled = true;
+    }
 })
 
 audioFilePlayer.addEventListener('loadedmetadata', function() {
@@ -115,5 +109,3 @@ audioFilePlayer.addEventListener('loadedmetadata', function() {
   .then(response => response.text())
   .then(response => console.log(response));
 });
-
-//hello
