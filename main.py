@@ -3,7 +3,7 @@ import mysql.connector as ms
 import os
 import replicate
 from io import BytesIO
-from flask_caching import Cache
+# from flask_caching import Cache
 
 
 cnx = ms.connect(user='magic_register', password='Indira@2000',
@@ -24,7 +24,7 @@ cnx.close()
 
 app = Flask(__name__, static_url_path='/static')
 app.secret_key = 'my-secret-key'
-cache = Cache(app, config={'CACHE_TYPE': 'simple'})
+# cache = Cache(app, config={'CACHE_TYPE': 'simple'})
 
 @app.route("/")
 # @app.route("/login")
@@ -270,7 +270,7 @@ def WhisperAI():
         return render_template('whisper-results.html', data=["", "", "", "", "", "You Have Used All Your Minutes"])
 
 
-cache.clear()
+# cache.clear()
 ########## Admin Panel ###########
 
 # Utility function for updating the form data to database
@@ -366,4 +366,4 @@ def internal_server(e):
 
 
 if __name__ == "__main__":
-    app.run(port=5000)
+    app.run(port=5000,debug=True,host="0.0.0.0")
