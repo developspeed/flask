@@ -299,7 +299,7 @@ def DBRead(table,field):
 @app.route('/admin',methods=['GET'])
 def Admin():
     if 'get_user_email' in session: 
-        if 'Admin' == 'Admin':
+        if 'Admin' == admin_name_validation:
             #Get the Data
             api_key = DBRead('whisper_config','API_Key')
             model = DBRead('whisper_config','model')
