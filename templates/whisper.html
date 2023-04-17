@@ -27,8 +27,8 @@
                 <div id="error-message" style="display: none;">Error: Only MP3, WAV, OGG, and M4A files are supported.</div>
                 <br>
                 <br>
-                <audio id="audio-upload-player" controls align="center" format="audio/mpeg">
-                    <source src="" type="audio">
+                <audio id="audio-upload-player" controls align="center">
+                    <source src="" type="audio" format="audio/wav">
                     Your browser does not support the audio tag.
                 </audio>
             </div>
@@ -37,11 +37,10 @@
         <div class="card">
             <label for="audioRecord"><b>Record Audio:</b></label>
             <button type="button" id="startButton" class="btn btn-danger" style="margin: 1px;">Start Recording</button>
-            <button type="button" id="stopButton" class="btn btn-secondary" disabled style="margin: 1px;">Stop
-                Recording</button>
+            <button type="button" id="stopButton" class="btn btn-secondary" disabled style="margin: 1px;">Stop Recording</button>
             <br>
-            <audio id="audio-player" controls format="audio/mpeg">
-                <source src="" type="audio">
+            <audio id="audio-player" controls>
+                <source src="" type="audio" format="audio/mpeg">
                 Your browser does not support the audio tag.
             </audio>
         </div>
