@@ -215,6 +215,8 @@ def WhisperAI():
     global minutes_to_update
     minutes_to_update = custom_round(minutes_to_update)
     print("Uploaded Audio or File Size : ",minutes_to_update)
+    cursor.close()
+    cnx.close()
 
     output = None
     if minutes_count <= float(minutes_total):
@@ -227,7 +229,11 @@ def WhisperAI():
                                             "transcription": transcription,
                                             "translate": to_translate,
                                             })
-
+                
+                # We are again establishing a connection because large file give connection lost error
+                cnx = ms.connect(user='magic_register', password='Indira@2000',
+                     host='185.104.29.84', database='magic_register')
+                cursor = cnx.cursor()
                 update_minutes_query = f"UPDATE `user` SET `minutes_count` = '{minutes_to_update+minutes_count}' WHERE `email` = '{email}';"
                 cursor.execute(update_minutes_query)
                 cnx.commit()
@@ -250,7 +256,9 @@ def WhisperAI():
                                             "transcription": transcription,
                                             "translate": to_translate,
                                              })
-
+                cnx = ms.connect(user='magic_register', password='Indira@2000',
+                     host='185.104.29.84', database='magic_register')
+                cursor = cnx.cursor()
                 update_minutes_query = f"UPDATE `user` SET `minutes_count` = '{minutes_to_update+minutes_count}' WHERE `email` = '{email}';"
                 cursor.execute(update_minutes_query)
                 cnx.commit()
@@ -366,4 +374,4 @@ def internal_server(e):
 
 
 if __name__ == "__main__":
-    app.run(port=5000,debug=True,host="0.0.0.0")
+    app.run(port=5000)
