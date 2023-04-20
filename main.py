@@ -149,8 +149,8 @@ def upload():
     minutes_to_update = request.form.get('duration')
     
     to_translate = request.form.get('checkbox_value')
-    # print("Without submit results")
-    # print(audioRecordedGlobal,minutes_to_update)
+    print("Without submit results")
+    print(minutes_to_update)
     return "Done"
 
 
@@ -217,7 +217,7 @@ def WhisperAI():
     cnx.close()
     
     to_translate = request.form.get('to_translate') == 'on'
-    # print(to_translate)
+    print(to_translate)
 
     # Model Configuration Fetching from database
     model = DBRead('whisper_config','model')
@@ -227,13 +227,14 @@ def WhisperAI():
         if len(audioFile.read()) != 0:
             # Model Running
             try: 
+                print("Model Runnning")
                 output = replicate.run("openai/whisper:e39e354773466b955265e969568deb7da217804d8e771ea8c9cd0cef6591f8bc",
                                     input={"audio": audioFile,
                                             # "model": model,
                                             "transcription": transcription,
                                             "translate": to_translate,
                                             })
-                
+                print("Done")
                 # We are again establishing a connection because large file give connection lost error
                 cnx = ms.connect(user='magic_register', password='Indira@2000',
                      host='185.104.29.84', database='magic_register')
