@@ -136,30 +136,33 @@ const to_translate = document.getElementById("inlineCheckbox1").value;
 // console.log(to_translate)
 const formData = new FormData()
 formData.append('to_translate',to_translate);
+
 async function WhisperAI() {
   // Collect user input data
   // Send HTTP request to Python backend
-  const response = await fetch("/whisper-results", {
-    method: "POST",
-    body: formData,
-  })
+  try {
+    const response = await fetch("/whisper-results", {
+      method: "POST",
+      body: formData,
+      timeout: 30000000 // Set timeout to 30 seconds
+    });
     const data = await response.json();
-    // .then((response) => response.json())
-    // .then((data) => {
-      // Update HTML with output data returned by Python function
-      const outputData = document.getElementById("outputData");
-      const translated = document.getElementById("translated");
-      const language_detect = document.getElementById("language_detect");
-      const loader = document.getElementById("loader");
-      const minutesUpdate = document.getElementById('minutesUpdate');
-      const ouputDisplay = document.getElementById('outputToggle');
+    // Update HTML with output data returned by Python function
+    const outputData = document.getElementById("outputData");
+    const translated = document.getElementById("translated");
+    const language_detect = document.getElementById("language_detect");
+    const loader = document.getElementById("loader");
+    const minutesUpdate = document.getElementById('minutesUpdate');
+    const ouputDisplay = document.getElementById('outputToggle');
 
-      ouputDisplay.style.display = 'flex';
-      loader.style.display = 'none';
-      outputData.innerHTML = data.outputData;
-      translated.innerHTML = data.translate;
-      language_detect.innerHTML = "Detected Language : "+data.language_detect;
-      minutesUpdate.innerHTML = data.minutes_count +" / "+ data.minutes_total;
-      // console.log(data)
-    // });
+    ouputDisplay.style.display = 'flex';
+    loader.style.display = 'none';
+    outputData.innerHTML = data.outputData;
+    translated.innerHTML = data.translate;
+    language_detect.innerHTML = "Detected Language : "+data.language_detect;
+    minutesUpdate.innerHTML = data.minutes_count +" / "+ data.minutes_total;
+    // console.log(data)
+  } catch (error) {
+    // Handle the error response here
+  }
 }
