@@ -19,42 +19,42 @@ function startRecording() {
     mediaRecorder.onstop = function (e) {
       let audioBlob = new Blob(chunks, { type: "audio/ogg; codecs=opus" });
       let audioUrl = URL.createObjectURL(audioBlob);
-      const audioPlayer = document.getElementById('audio-player');
+      const audioPlayer = document.getElementById("audio-player");
       const audioElement = new Audio(audioUrl);
       audioPlayer.src = audioUrl;
       let formData = new FormData();
       formData.append("audio", audioBlob);
 
-      fetch("/upload", {
-        method: "POST",
-        body: formData,
-      })
-        .then(function (response) {
-          console.log("Audio file uploaded successfully!");
-        })
-        .catch(function (error) {
-          console.error("Error uploading audio file:", error);
-        });
-      
-      // audioPlayer.play()
+      //   Duration Getting
+
       const audioContext = new AudioContext();
       const fileReader = new FileReader();
-      fileReader.onload = function() {
-        audioContext.decodeAudioData(fileReader.result).then(function(decodedData) {
-          const duration = decodedData.duration;
-          var minutes = duration / 60;
-          var data = {'duration': minutes};
-          fetch('/duration', {
-          method: 'POST',
-          headers: {'Content-Type': 'application/json'},
-          body: JSON.stringify(data)
-        })
-        .then(response => response.text())
-        .then(response => console.log(response));
-          
-        });
-      };
-      fileReader.readAsArrayBuffer(audioBlob);      
+      var minutes = 0;
+      fileReader.onload = function () {
+        audioContext
+          .decodeAudioData(fileReader.result)
+          .then(function (decodedData) {
+            const duration = decodedData.duration;
+            minutes = duration / 60;
+            // var data = { duration: minutes };
+            formData.append('duration',minutes)
+            console.log(minutes)
+            fetch("/upload", {
+              method: "POST",
+              body: formData,
+            })
+              .then(function (response) {
+                console.log("Audio file uploaded successfully!");
+              })
+              .catch(function (error) {
+                console.error("Error uploading audio file:", error);
+              });
+            });
+          };
+
+      // audio duration send to server
+      
+      fileReader.readAsArrayBuffer(audioBlob);
     };
   });
 }
@@ -65,47 +65,100 @@ function stopRecording() {
   stopButton.disabled = true;
 }
 
-
 startButton.addEventListener("click", startRecording);
 stopButton.addEventListener("click", stopRecording);
 
-
 // Audio Player for uploaded audio and duration to server
+const audioFile = document.getElementById("audioFile");
+const audioFilePlayer = document.getElementById("audio-upload-player");
+audioFile.addEventListener('change',function(){
+  const file = audioFile.files[0];
+  // console.log(file)
+  let formData = new FormData();
+  formData.append('audio',file);
+  audioFilePlayer.addEventListener("loadedmetadata", function () {
+      var duration = audioFilePlayer.duration;
+      var minutes = duration / 60;
+      // var seconds = duration % 60;
+      console.log(minutes);
+      
+      formData.append('duration',minutes);
+      fetch("/upload", {
+        method: "POST",
+        body: formData,
+      })
+        .then((response) => response.text())
+        .then((response) => console.log(response));
+    });
+})
 
-const audioFile = document.getElementById('audioFile');
-const audioFilePlayer = document.getElementById('audio-upload-player')
-const errorMessage = document.getElementById('error-message');
-audioFile.addEventListener('change', function(){
+
+
+// Audio file validation
+const errorMessage = document.getElementById("error-message");
+audioFile.addEventListener("change", function () {
   const file = audioFile.files[0];
   const obj = URL.createObjectURL(file);
   audioFilePlayer.src = obj;
-  const fileExtension = file.name.split('.').pop().toLowerCase();
-  const supportedExtensions = ['mp3', 'wav', 'ogg', 'm4a'];
-  const transcribeButton = document.getElementById('transcribe');
-    if (supportedExtensions.includes(fileExtension)) {
-      errorMessage.style.display = 'none';
-      audioPlayer.style.display = 'block';
-      transcribeButton.disabled = false;
-    } else {
-      errorMessage.style.display = 'block';
-      errorMessage.style.color = 'red'
-      audioPlayer.style.display = 'none';
-      transcribeButton.disabled = true;
-    }
-})
-
-audioFilePlayer.addEventListener('loadedmetadata', function() {
-  var duration = audioFilePlayer.duration;
-  var minutes = duration / 60;
-  // var seconds = duration % 60;
-  console.log(minutes)
-  // var data = {'duration': minutes + ':' + (seconds < 10 ? '0' : '') + seconds};
-  var data = {'duration': minutes};
-  fetch('/duration', {
-    method: 'POST',
-    headers: {'Content-Type': 'application/json'},
-    body: JSON.stringify(data)
-  })
-  .then(response => response.text())
-  .then(response => console.log(response));
+  const fileExtension = file.name.split(".").pop().toLowerCase();
+  const supportedExtensions = ["mp3", "wav", "ogg", "m4a"];
+  const transcribeButton = document.getElementById("transcribe");
+  if (supportedExtensions.includes(fileExtension)) {
+    errorMessage.style.display = "none";
+    // audioPlayer.style.display = "block";
+    transcribeButton.disabled = false;
+  } else {
+    errorMessage.style.display = "block";
+    errorMessage.style.color = "red";
+    // audioPlayer.style.display = "none";
+    transcribeButton.disabled = true;
+  }
 });
+
+document.getElementById('upload-form').addEventListener('submit', function (event) {
+  // prevent the default form submission behavior
+  event.preventDefault();
+});
+
+function WhisperAI() {
+  // Send HTTP request to run Python function
+  fetch('/run_python_function').then(function(response) {
+    return response.text();
+  }).then(function(outputData) {
+    // Update outputDiv with the output of the Python function
+    document.getElementById('outputDiv').innerHTML = outputData;
+  });
+}
+
+
+// Getting Function output through WhisperAI endpoint in python
+const to_translate = document.getElementById("inlineCheckbox1").value;
+// console.log(to_translate)
+const formData = new FormData()
+formData.append('to_translate',to_translate);
+function WhisperAI() {
+  // Collect user input data
+  // Send HTTP request to Python backend
+  fetch("/whisper-results", {
+    method: "POST",
+    body: formData,
+  })
+    .then((response) => response.json())
+    .then((data) => {
+      // Update HTML with output data returned by Python function
+      const outputData = document.getElementById("outputData");
+      const translated = document.getElementById("translated");
+      const language_detect = document.getElementById("language_detect");
+      const loader = document.getElementById("loader");
+      const minutesUpdate = document.getElementById('minutesUpdate');
+      const ouputDisplay = document.getElementById('outputToggle');
+
+      ouputDisplay.style.display = 'flex';
+      loader.style.display = 'none';
+      outputData.innerHTML = data.outputData;
+      translated.innerHTML = data.translate;
+      language_detect.innerHTML = "Detected Language : "+data.language_detect;
+      minutesUpdate.innerHTML = data.minutes_count +" / "+ data.minutes_total;
+      // console.log(data)
+    });
+}
