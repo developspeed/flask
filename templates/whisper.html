@@ -7,7 +7,7 @@
 <div class="sticky-card btn-success">
     <!-- <h3>Minutes Usage</h3> -->
     <p>Minutes Used</p>
-    <p style="text-align:center;">{{data[0]}} / {{data[1]}}</p>
+    <p style="text-align:center;" id="minutesUpdate">{{data[0]}} / {{data[1]}}</p>
 </div>
 
 <div class="container">
@@ -18,13 +18,15 @@
         </p>
     </div>
 </div>
-<form action="whisper-results" method="POST" enctype="multipart/form-data">
+<form method="POST" enctype="multipart/form-data" id="upload-form">
     <div class="container" id="data_send_by_user">
         <div class="card">
             <div class="form-group">
                 <label for="audioFile"><b>Select Audio File:</b></label>
-                <input type="file" class="form-control-file" id="audioFile" name="audioFile" accept="audio/mp3/wav/m4a">
-                <div id="error-message" style="display: none;">Error: Only MP3, WAV, OGG, and M4A files are supported.</div>
+                <input type="file" class="form-control-file" id="audioFile" name="audioFile"
+                    accept="audio/mp3/wav/m4a/ogg">
+                <div id="error-message" style="display: none;">Error: Only MP3, WAV, OGG, and M4A files are supported.
+                </div>
                 <br>
                 <br>
                 <audio id="audio-upload-player" controls align="center" format="audio/mpeg">
@@ -270,8 +272,7 @@
             </div>
         </div>
         <div class="card">
-            <input type="submit" value="Transcribe" class="btn btn-primary" id="transcribe" style="height: 50px;"
-                onclick="showLoader()">
+            <button class="btn btn-primary" type="submit" onclick="showLoader(); WhisperAI()" id="transcribe">Transcribe</button>
             <br>
             <br>
             <img src="{{ url_for('static', filename='img/loader.gif') }}" id="loader" style="
@@ -284,16 +285,32 @@
     </div>
     </div>
 </form>
+<div class="container" id="outputToggle" style="display: none;">
+    <div class="card">
+        <h2>Ouptut</h2>
+        <b><p class="detected_language" id="language_detect"></p></b>
+        <p class="output" name="output" id="outputData"></p>
+    </div>
+    <div class="card">
+        <h2>Translation</h2>
+        <p class="detected_language"><b>English :</b></p>
+        <p class="translate" name="translate" id="translated"></p>
+    </div>
+    <div class="container">
+        <div class="card">
+            <a href="/whisper" class="btn btn-primary">New Transcription</a>
+        </div>
+    </div> 
+</div>
 <script src="{{ url_for('static', filename='js/whisper.js') }}"></script>
 <script>
     // Transcribe Button Loading Gif
     function showLoader() {
         const loader = document.querySelector('#loader');
         loader.style.display = 'inline';
-
+    }
         // your code here to perform the action triggered by the button click
 
         // loader.style.display = 'none';
-    }
 </script>
 {% endblock %}
