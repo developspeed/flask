@@ -134,51 +134,42 @@ function WhisperAI() {
 
 
 
-async function WhisperAI() {
-  const submitButton = document.getElementById("transcribe");
-  submitButton.disabled = true;
-  // Collect user input data
-  // Send HTTP request to Python backend
-  const to_translate = document.getElementById("inlineCheckbox1").value;
-  // console.log(to_translate)
-  const formData = new FormData();
-  formData.append("to_translate", to_translate);
-  const retryCount = 5;
-  let attempt = 1;
-  let lastError;
-  while (attempt <= retryCount) {
-    try {
-      const response = await fetch("/whisper-results", {
-        method: "POST",
-        body: formData,
-        timeout: 30000000, // Set timeout to 30 seconds
-      });
-      if (!response.ok) {
-        throw new Error("Request failed");
-      }
-      const data = await response.json();
-      // Update HTML with output data returned by Python function
-      const outputData = document.getElementById("outputData");
-      const translated = document.getElementById("translated");
-      const language_detect = document.getElementById("language_detect");
-      const loader = document.getElementById("loader");
-      const minutesUpdate = document.getElementById("minutesUpdate");
-      const ouputDisplay = document.getElementById("outputToggle");
+const maxRetries = 3; // Set maximum number of retries
+let retryCount = 0;
 
-      ouputDisplay.style.display = "flex";
-      loader.style.display = "none";
-      outputData.innerHTML = data.outputData;
-      translated.innerHTML = data.translate;
-      language_detect.innerHTML = "Detected Language : " + data.language_detect;
-      minutesUpdate.innerHTML = data.minutes_count + " / " + data.minutes_total;
-      // console.log(data)
-      return;
-    } catch (error) {
-      // Handle the error response here
-      lastError = error;
-      attempt++;
+async function WhisperAI() {
+  try {
+    const response = await fetch("/whisper-results", {
+      method: "POST",
+      body: formData,
+      // timeout: 30000000 // Set timeout to 30 seconds
+    });
+    const data = await response.json();
+    // Update HTML with output data returned by Python function
+    const outputData = document.getElementById("outputData");
+    const translated = document.getElementById("translated");
+    const language_detect = document.getElementById("language_detect");
+    const loader = document.getElementById("loader");
+    const minutesUpdate = document.getElementById('minutesUpdate');
+    const ouputDisplay = document.getElementById('outputToggle');
+
+    ouputDisplay.style.display = 'flex';
+    loader.style.display = 'none';
+    outputData.innerHTML = data.outputData;
+    translated.innerHTML = data.translate;
+    language_detect.innerHTML = "Detected Language : "+data.language_detect;
+    minutesUpdate.innerHTML = data.minutes_count +" / "+ data.minutes_total;
+    // console.log(data)
+  } catch (error) {
+    // Handle the error response here
+    if (error.status === 504 && retryCount < maxRetries) {
+      // If the error is a 504 error and we haven't reached the maximum number of retries, retry the request
+      retryCount++;
+      await WhisperAI(); // Call the function again recursively
+    } else {
+      console.log("Failed to fetch data:", error);
     }
   }
-  console.error(`Failed after ${retryCount} attempts: ${lastError}`);
-  submitButton.disabled = false;
 }
+
+WhisperAI(); // Call the function to start the request
