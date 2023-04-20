@@ -136,15 +136,16 @@ const to_translate = document.getElementById("inlineCheckbox1").value;
 // console.log(to_translate)
 const formData = new FormData()
 formData.append('to_translate',to_translate);
-function WhisperAI() {
+async function WhisperAI() {
   // Collect user input data
   // Send HTTP request to Python backend
-  fetch("/whisper-results", {
+  const response = await fetch("/whisper-results", {
     method: "POST",
     body: formData,
   })
-    .then((response) => response.json())
-    .then((data) => {
+    const data = await response.json();
+    // .then((response) => response.json())
+    // .then((data) => {
       // Update HTML with output data returned by Python function
       const outputData = document.getElementById("outputData");
       const translated = document.getElementById("translated");
@@ -160,5 +161,5 @@ function WhisperAI() {
       language_detect.innerHTML = "Detected Language : "+data.language_detect;
       minutesUpdate.innerHTML = data.minutes_count +" / "+ data.minutes_total;
       // console.log(data)
-    });
+    // });
 }
