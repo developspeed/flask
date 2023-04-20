@@ -134,7 +134,11 @@ function WhisperAI() {
 
 
 
-const maxRetries = 3; // Set maximum number of retries
+const to_translate = document.getElementById("inlineCheckbox1").value;
+// console.log(to_translate)
+const formData = new FormData()
+formData.append('to_translate',to_translate);
+const maxRetries = 4; // Set maximum number of retries
 let retryCount = 0;
 
 async function WhisperAI() {
@@ -173,3 +177,4 @@ async function WhisperAI() {
 }
 
 WhisperAI(); // Call the function to start the request
+
