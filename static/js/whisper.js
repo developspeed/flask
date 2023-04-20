@@ -37,8 +37,8 @@ function startRecording() {
             const duration = decodedData.duration;
             minutes = duration / 60;
             // var data = { duration: minutes };
-            formData.append('duration',minutes)
-            console.log(minutes)
+            formData.append("duration", minutes);
+            console.log(minutes);
             fetch("/upload", {
               method: "POST",
               body: formData,
@@ -49,11 +49,11 @@ function startRecording() {
               .catch(function (error) {
                 console.error("Error uploading audio file:", error);
               });
-            });
-          };
+          });
+      };
 
       // audio duration send to server
-      
+
       fileReader.readAsArrayBuffer(audioBlob);
     };
   });
@@ -71,28 +71,26 @@ stopButton.addEventListener("click", stopRecording);
 // Audio Player for uploaded audio and duration to server
 const audioFile = document.getElementById("audioFile");
 const audioFilePlayer = document.getElementById("audio-upload-player");
-audioFile.addEventListener('change',function(){
+audioFile.addEventListener("change", function () {
   const file = audioFile.files[0];
   // console.log(file)
   let formData = new FormData();
-  formData.append('audio',file);
+  formData.append("audio", file);
   audioFilePlayer.addEventListener("loadedmetadata", function () {
-      var duration = audioFilePlayer.duration;
-      var minutes = duration / 60;
-      // var seconds = duration % 60;
-      console.log(minutes);
-      
-      formData.append('duration',minutes);
-      fetch("/upload", {
-        method: "POST",
-        body: formData,
-      })
-        .then((response) => response.text())
-        .then((response) => console.log(response));
-    });
-})
+    var duration = audioFilePlayer.duration;
+    var minutes = duration / 60;
+    // var seconds = duration % 60;
+    console.log(minutes);
 
-
+    formData.append("duration", minutes);
+    fetch("/upload", {
+      method: "POST",
+      body: formData,
+    })
+      .then((response) => response.text())
+      .then((response) => console.log(response));
+  });
+});
 
 // Audio file validation
 const errorMessage = document.getElementById("error-message");
@@ -115,54 +113,72 @@ audioFile.addEventListener("change", function () {
   }
 });
 
-document.getElementById('upload-form').addEventListener('submit', function (event) {
-  // prevent the default form submission behavior
-  event.preventDefault();
-});
+document
+  .getElementById("upload-form")
+  .addEventListener("submit", function (event) {
+    // prevent the default form submission behavior
+    event.preventDefault();
+  });
 
 function WhisperAI() {
   // Send HTTP request to run Python function
-  fetch('/run_python_function').then(function(response) {
-    return response.text();
-  }).then(function(outputData) {
-    // Update outputDiv with the output of the Python function
-    document.getElementById('outputDiv').innerHTML = outputData;
-  });
+  fetch("/run_python_function")
+    .then(function (response) {
+      return response.text();
+    })
+    .then(function (outputData) {
+      // Update outputDiv with the output of the Python function
+      document.getElementById("outputDiv").innerHTML = outputData;
+    });
 }
 
 
-// Getting Function output through WhisperAI endpoint in python
-const to_translate = document.getElementById("inlineCheckbox1").value;
-// console.log(to_translate)
-const formData = new FormData()
-formData.append('to_translate',to_translate);
 
 async function WhisperAI() {
+  const submitButton = document.getElementById("transcribe");
+  submitButton.disabled = true;
   // Collect user input data
   // Send HTTP request to Python backend
-  try {
-    const response = await fetch("/whisper-results", {
-      method: "POST",
-      body: formData,
-      timeout: 30000000 // Set timeout to 30 seconds
-    });
-    const data = await response.json();
-    // Update HTML with output data returned by Python function
-    const outputData = document.getElementById("outputData");
-    const translated = document.getElementById("translated");
-    const language_detect = document.getElementById("language_detect");
-    const loader = document.getElementById("loader");
-    const minutesUpdate = document.getElementById('minutesUpdate');
-    const ouputDisplay = document.getElementById('outputToggle');
+  const to_translate = document.getElementById("inlineCheckbox1").value;
+  // console.log(to_translate)
+  const formData = new FormData();
+  formData.append("to_translate", to_translate);
+  const retryCount = 5;
+  let attempt = 1;
+  let lastError;
+  while (attempt <= retryCount) {
+    try {
+      const response = await fetch("/whisper-results", {
+        method: "POST",
+        body: formData,
+        timeout: 30000000, // Set timeout to 30 seconds
+      });
+      if (!response.ok) {
+        throw new Error("Request failed");
+      }
+      const data = await response.json();
+      // Update HTML with output data returned by Python function
+      const outputData = document.getElementById("outputData");
+      const translated = document.getElementById("translated");
+      const language_detect = document.getElementById("language_detect");
+      const loader = document.getElementById("loader");
+      const minutesUpdate = document.getElementById("minutesUpdate");
+      const ouputDisplay = document.getElementById("outputToggle");
 
-    ouputDisplay.style.display = 'flex';
-    loader.style.display = 'none';
-    outputData.innerHTML = data.outputData;
-    translated.innerHTML = data.translate;
-    language_detect.innerHTML = "Detected Language : "+data.language_detect;
-    minutesUpdate.innerHTML = data.minutes_count +" / "+ data.minutes_total;
-    // console.log(data)
-  } catch (error) {
-    // Handle the error response here
+      ouputDisplay.style.display = "flex";
+      loader.style.display = "none";
+      outputData.innerHTML = data.outputData;
+      translated.innerHTML = data.translate;
+      language_detect.innerHTML = "Detected Language : " + data.language_detect;
+      minutesUpdate.innerHTML = data.minutes_count + " / " + data.minutes_total;
+      // console.log(data)
+      return;
+    } catch (error) {
+      // Handle the error response here
+      lastError = error;
+      attempt++;
+    }
   }
+  console.error(`Failed after ${retryCount} attempts: ${lastError}`);
+  submitButton.disabled = false;
 }
