@@ -170,53 +170,37 @@ function WhisperAI() {
 //   }
 // }
 
-async function GetData() {
-   
-  let retryCount = 0;
-  const maxRetries = 20;
-  const retryInterval = 120000; // 5 seconds
-  
-  while (retryCount < maxRetries) {
-    try {
-      const response = await fetch("/whisper-results", {
-        method: "POST",
-        timeout: 30000000 // Set timeout to 30 seconds
-      });
-      const data = await response.json();
-      
-      // Check if the response was successful
-      if (response.ok) {
-        const outputData = document.getElementById("outputData");
-        const translated = document.getElementById("translated");
-        const language_detect = document.getElementById("language_detect");
-        const loader = document.getElementById("loader");
-        const minutesUpdate = document.getElementById('minutesUpdate');
-        const ouputDisplay = document.getElementById('outputToggle');
 
-        ouputDisplay.style.display = 'flex';
-        loader.style.display = 'none';
-        outputData.innerHTML = data.outputData;
-        translated.innerHTML = data.translate;
-        language_detect.innerHTML = "Detected Language : "+data.language_detect;
-        minutesUpdate.innerHTML = data.minutes_count +" / "+ data.minutes_total;
-        
-        console.log(data);
-        return; // Exit the function on successful response
-      } else {
-        throw new Error('Server response not ok');
-      }
-    } catch (error) {
-      console.log(`Error: ${error.message}`);
-      retryCount++;
-      if (retryCount === maxRetries) {
-        console.log(`Reached max retry limit of ${maxRetries}.`);
-        // Handle error message here
-        return;
-      } else {
-        console.log(`Retrying in ${retryInterval / 1000} seconds...`);
-        await new Promise(resolve => setTimeout(resolve, retryInterval));
-      }
-    }
+// const axios = require('axios').default; // Import Axios library
+
+async function WhisperAI() {
+  // Collect user input data
+  const formData = new FormData(document.getElementById("myForm"));
+
+  // Send HTTP request to Python backend
+  try {
+    const response = await axios.post('/whisper-results', formData, {
+      timeout: 15 * 60 * 1000, // Set timeout to 15 minutes (in milliseconds)
+    });
+    const data = response.data;
+
+    // Update HTML with output data returned by Python function
+    const outputData = document.getElementById("outputData");
+    const translated = document.getElementById("translated");
+    const language_detect = document.getElementById("language_detect");
+    const loader = document.getElementById("loader");
+    const minutesUpdate = document.getElementById('minutesUpdate');
+    const ouputDisplay = document.getElementById('outputToggle');
+
+    ouputDisplay.style.display = 'flex';
+    loader.style.display = 'none';
+    outputData.innerHTML = data.outputData;
+    translated.innerHTML = data.translate;
+    language_detect.innerHTML = "Detected Language : "+data.language_detect;
+    minutesUpdate.innerHTML = data.minutes_count +" / "+ data.minutes_total;
+    // console.log(data)
+  } catch (error) {
+    console.log(`Error: ${error}`);
+    // Handle error here
   }
 }
-
