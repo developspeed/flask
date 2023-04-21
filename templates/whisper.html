@@ -272,7 +272,8 @@
             </div>
         </div>
         <div class="card">
-            <button class="btn btn-primary" type="submit" onclick="showLoader(); GetData()" id="transcribe">Transcribe</button>
+            <button class="btn btn-primary" type="submit" onclick="showLoader(); WhisperAI()"
+                id="transcribe">Transcribe</button>
             <br>
             <br>
             <img src="{{ url_for('static', filename='img/loader.gif') }}" id="loader" style="
@@ -288,7 +289,9 @@
 <div class="container" id="outputToggle" style="display: none;">
     <div class="card">
         <h2>Ouptut</h2>
-        <b><p class="detected_language" id="language_detect"></p></b>
+        <b>
+            <p class="detected_language" id="language_detect"></p>
+        </b>
         <p class="output" name="output" id="outputData"></p>
     </div>
     <div class="card">
@@ -300,17 +303,53 @@
         <div class="card">
             <a href="/whisper" class="btn btn-primary">New Transcription</a>
         </div>
-    </div> 
+    </div>
 </div>
 <script src="{{ url_for('static', filename='js/whisper.js') }}"></script>
+<script src="https://unpkg.com/axios/dist/axios.min.js"></script>
+<!-- <script src="https://requirejs.org/docs/release/2.3.5/minified/require.js"></script> -->
 <script>
     // Transcribe Button Loading Gif
     function showLoader() {
         const loader = document.querySelector('#loader');
         loader.style.display = 'inline';
     }
-        // your code here to perform the action triggered by the button click
+    
+    const to_translate = document.getElementById("inlineCheckbox1").value;
+    // console.log(to_translate)
+    const formData = new FormData()
+    formData.append('to_translate', to_translate);
+    async function WhisperAI() {
+        // Collect user input data
+        // const formData = new FormData(document.getElementById("myForm"));
 
-        // loader.style.display = 'none';
+        // Send HTTP request to Python backend
+        try {
+            const response = await axios.post('/whisper-results', formData, {
+                timeout: 15 * 60 * 1000, // Set timeout to 15 minutes (in milliseconds)
+            });
+            const data = response.data;
+
+            // Update HTML with output data returned by Python function
+            const outputData = document.getElementById("outputData");
+            const translated = document.getElementById("translated");
+            const language_detect = document.getElementById("language_detect");
+            const loader = document.getElementById("loader");
+            const minutesUpdate = document.getElementById('minutesUpdate');
+            const ouputDisplay = document.getElementById('outputToggle');
+
+            ouputDisplay.style.display = 'flex';
+            loader.style.display = 'none';
+            outputData.innerHTML = data.outputData;
+            translated.innerHTML = data.translate;
+            language_detect.innerHTML = "Detected Language : " + data.language_detect;
+            minutesUpdate.innerHTML = data.minutes_count + " / " + data.minutes_total;
+            // console.log(data)
+        } catch (error) {
+            console.log(`Error: ${error}`);
+            // Handle error here
+        }
+    }
+    ;
 </script>
 {% endblock %}
