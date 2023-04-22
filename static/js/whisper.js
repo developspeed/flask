@@ -71,6 +71,7 @@ stopButton.addEventListener("click", stopRecording);
 // Audio Player for uploaded audio and duration to server
 const audioFile = document.getElementById("audioFile");
 const audioFilePlayer = document.getElementById("audio-upload-player");
+const uploader = document.getElementById('upload-message');
 audioFile.addEventListener("change", function () {
   const file = audioFile.files[0];
   // console.log(file)
@@ -81,7 +82,7 @@ audioFile.addEventListener("change", function () {
     var minutes = duration / 60;
     // var seconds = duration % 60;
     console.log(minutes);
-
+    uploader.style.display = 'flex';
     formData.append("duration", minutes);
     fetch("/upload", {
       method: "POST",
@@ -89,6 +90,7 @@ audioFile.addEventListener("change", function () {
     })
       .then((response) => response.text())
       .then((response) => console.log(response));
+      uploader.innerText = "Uploaded Successfully !"
   });
 });
 
