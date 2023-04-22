@@ -132,58 +132,32 @@ function WhisperAI() {
     });
 }
 
+
 // Getting Function output through WhisperAI endpoint in python
-// const to_translate = document.getElementById("inlineCheckbox1").value;
-// // console.log(to_translate)
-// const formData = new FormData()
-// formData.append('to_translate',to_translate);
+function fetchWithTimeout(url, options, timeout = 300000000) {
+  return Promise.race([
+    fetch(url, options),
+    new Promise((_, reject) =>
+      setTimeout(() => reject(new Error('Request timed out')), timeout)
+    ),
+  ]);
+}
 
-// function WhisperAI() {
-//   // Collect user input data
-//   // Send HTTP request to Python backend
-//   try {
-//     fetch("/whisper-results", {
-//       method: "POST",
-//       body: formData,
-//       // timeout: 30000000 // Set timeout to 30 seconds
-//     });
-//     console.log("Success")
-//     // const data = await response.json();
-//     // // Update HTML with output data returned by Python function
-//     // const outputData = document.getElementById("outputData");
-//     // const translated = document.getElementById("translated");
-//     // const language_detect = document.getElementById("language_detect");
-//     // const loader = document.getElementById("loader");
-//     // const minutesUpdate = document.getElementById('minutesUpdate');
-//     // const ouputDisplay = document.getElementById('outputToggle');
-
-//     // ouputDisplay.style.display = 'flex';
-//     // loader.style.display = 'none';
-//     // outputData.innerHTML = data.outputData;
-//     // translated.innerHTML = data.translate;
-//     // language_detect.innerHTML = "Detected Language : "+data.language_detect;
-//     // minutesUpdate.innerHTML = data.minutes_count +" / "+ data.minutes_total;
-//     // console.log(data)
-//   } catch (error) {
-//     // Handle the error response here
-//     console.log("Error",error)
-//   }
-// }
-
-
-// const axios = require('axios').default; // Import Axios library
+const to_translate = document.getElementById("inlineCheckbox1").value;
+// console.log(to_translate)
+const formData = new FormData()
+formData.append('to_translate',to_translate);
 
 async function WhisperAI() {
   // Collect user input data
-  const formData = new FormData(document.getElementById("myForm"));
-
   // Send HTTP request to Python backend
   try {
-    const response = await axios.post('/whisper-results', formData, {
-      timeout: 15 * 60 * 1000, // Set timeout to 15 minutes (in milliseconds)
-    });
-    const data = response.data;
-
+    const response = await fetchWithTimeout("/whisper-results", {
+      method: "POST",
+      body: formData,
+    }, 30000000); // Set timeout to 5 minutes (300000 milliseconds)
+    console.log("Success")
+    const data = await response.json();
     // Update HTML with output data returned by Python function
     const outputData = document.getElementById("outputData");
     const translated = document.getElementById("translated");
@@ -198,9 +172,9 @@ async function WhisperAI() {
     translated.innerHTML = data.translate;
     language_detect.innerHTML = "Detected Language : "+data.language_detect;
     minutesUpdate.innerHTML = data.minutes_count +" / "+ data.minutes_total;
-    // console.log(data)
+    console.log(data)
   } catch (error) {
-    console.log(`Error: ${error}`);
-    // Handle error here
+    // Handle the error response here
+    console.log("Error",error)
   }
 }
