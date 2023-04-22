@@ -141,14 +141,14 @@ def custom_round(num, digits=2, Isstr=False):
 # Audio Upload through Mic and files with duration and other options
 audioRecordedGlobal = None
 minutes_to_update = 0
-@app.route('/upload', methods=['POST'])
+@app.route('/upload', methods=['POST','GET'])
 def upload():
     global audioRecordedGlobal
-    audioRecordedGlobal = request.files.get('audio').read()
+    audioRecordedGlobal = request.files.get('audio').read(1024*1024)
     global minutes_to_update
     minutes_to_update = request.form.get('duration')
     
-    to_translate = request.form.get('checkbox_value')
+    # to_translate = request.form.get('checkbox_value')
     # print("Without submit results")
     # print(audioRecordedGlobal,minutes_to_update)
     return "Done"
@@ -207,7 +207,7 @@ def WhisperAI():
     audioFile = BytesIO(audioRecordedGlobal)
     # Or
     # Taking mic input
-    audioRecords = BytesIO(audioRecordedGlobal)
+    # audioRecords = BytesIO(audioRecordedGlobal)
 
     # language = request.form['language']
     global minutes_to_update
@@ -217,21 +217,20 @@ def WhisperAI():
     cnx.close()
     
     to_translate = request.form.get('to_translate') == 'on'
-    # print(to_translate)
+    print(to_translate)
 
     # Model Configuration Fetching from database
-    model = DBRead('whisper_config','model')
+    # model = DBRead('whisper_config','model')
     transcription = DBRead('whisper_config','transcription')
 
     if minutes_count <= float(minutes_total):
-        if len(audioFile.read()) != 0:
             # Model Running
             try: 
                 output = replicate.run("openai/whisper:e39e354773466b955265e969568deb7da217804d8e771ea8c9cd0cef6591f8bc",
                                     input={"audio": audioFile,
                                             # "model": model,
                                             "transcription": transcription,
-                                            "translate": True,
+                                            "translate": to_translate,
                                             })
                 
                 # We are again establishing a connection because large file give connection lost error
@@ -251,33 +250,6 @@ def WhisperAI():
                 print(e)
                 return jsonify({"outputData":"There is some problem in Whisper Model or Your Audio is too Large",'translate':"",'language_detect':"",'minutes_count':minutes_count,"minutes_total":minutes_total})
             # return render_template('whisper.html',data=["","","","","",""])
-
-        else:
-            # Model Running
-            try:
-                output = replicate.run("openai/whisper:e39e354773466b955265e969568deb7da217804d8e771ea8c9cd0cef6591f8bc",
-                                    input={"audio": audioRecords,
-                                            "model": 'large-v2',
-                                            "transcription": transcription,
-                                            "translate": to_translate,
-                                             })
-                cnx = ms.connect(user='magic_register', password='Indira@2000',
-                     host='185.104.29.84', database='magic_register')
-                cursor = cnx.cursor()
-                update_minutes_query = f"UPDATE `user` SET `minutes_count` = '{minutes_to_update+minutes_count}' WHERE `email` = '{email}';"
-                cursor.execute(update_minutes_query)
-                cnx.commit()
-                cursor.close()
-                cnx.close()
-                print("The total minutes will be : ",minutes_count+minutes_to_update)
-                minutes_to_show = str(minutes_count+minutes_to_update)
-                return jsonify({"outputData":output['transcription'],'translate':output['translation'],'language_detect':output['detected_language'],'minutes_count':minutes_to_show,"minutes_total":minutes_total})
-                # return render_template('whisper-results.html', data=[output['transcription'], output['translation'], output['detected_language'], minutes_to_show[0:5], minutes_total])
-            
-            except Exception as e:
-                print(e)
-                return jsonify({"outputData":"There is some problem in Whisper Model or Your Audio is too Large",'translate':"",'language_detect':"",'minutes_count':minutes_count,"minutes_total":minutes_total})
-
 
     else:
         return render_template('whisper-results.html', data=["", "", "", "", "", "You Have Used All Your Minutes"])
