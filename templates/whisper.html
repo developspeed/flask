@@ -314,42 +314,6 @@
         const loader = document.querySelector('#loader');
         loader.style.display = 'inline';
     }
-    
-    const to_translate = document.getElementById("inlineCheckbox1").value;
-    // console.log(to_translate)
-    const formData = new FormData()
-    formData.append('to_translate', to_translate);
-    async function WhisperAI() {
-        // Collect user input data
-        // const formData = new FormData(document.getElementById("myForm"));
 
-        // Send HTTP request to Python backend
-        try {
-            const response = await axios.post('/whisper-results', formData, {
-                timeout: 15 * 60 * 1000, // Set timeout to 15 minutes (in milliseconds)
-            });
-            const data = response.data;
-
-            // Update HTML with output data returned by Python function
-            const outputData = document.getElementById("outputData");
-            const translated = document.getElementById("translated");
-            const language_detect = document.getElementById("language_detect");
-            const loader = document.getElementById("loader");
-            const minutesUpdate = document.getElementById('minutesUpdate');
-            const ouputDisplay = document.getElementById('outputToggle');
-
-            ouputDisplay.style.display = 'flex';
-            loader.style.display = 'none';
-            outputData.innerHTML = data.outputData;
-            translated.innerHTML = data.translate;
-            language_detect.innerHTML = "Detected Language : " + data.language_detect;
-            minutesUpdate.innerHTML = data.minutes_count + " / " + data.minutes_total;
-            // console.log(data)
-        } catch (error) {
-            console.log(`Error: ${error}`);
-            // Handle error here
-        }
-    }
-    ;
 </script>
 {% endblock %}
