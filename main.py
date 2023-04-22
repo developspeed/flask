@@ -144,7 +144,7 @@ minutes_to_update = 0
 @app.route('/upload', methods=['POST','GET'])
 def upload():
     global audioRecordedGlobal
-    audioRecordedGlobal = request.files.get('audio').read(10000000)
+    audioRecordedGlobal = request.files.get('audio').read(8500000)
     global minutes_to_update
     minutes_to_update = request.form.get('duration')
     
