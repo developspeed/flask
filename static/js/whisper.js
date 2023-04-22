@@ -74,6 +74,8 @@ const audioFilePlayer = document.getElementById("audio-upload-player");
 const uploader = document.getElementById('upload-message');
 audioFile.addEventListener("change", function () {
   const file = audioFile.files[0];
+  uploader.style.display = 'flex';
+  uploader.style.color = 'yellow';
   // console.log(file)
   let formData = new FormData();
   formData.append("audio", file);
@@ -82,15 +84,17 @@ audioFile.addEventListener("change", function () {
     var minutes = duration / 60;
     // var seconds = duration % 60;
     console.log(minutes);
-    uploader.style.display = 'flex';
     formData.append("duration", minutes);
     fetch("/upload", {
       method: "POST",
       body: formData,
     })
       .then((response) => response.text())
-      .then((response) => console.log(response));
-      uploader.innerText = "Uploaded Successfully !"
+      .then((response) => {
+        console.log(response)
+        uploader.innerText = "Uploaded Successfully !"
+        uploader.style.color = "green";
+      });
   });
 });
 
@@ -122,17 +126,6 @@ document
     event.preventDefault();
   });
 
-function WhisperAI() {
-  // Send HTTP request to run Python function
-  fetch("/run_python_function")
-    .then(function (response) {
-      return response.text();
-    })
-    .then(function (outputData) {
-      // Update outputDiv with the output of the Python function
-      document.getElementById("outputDiv").innerHTML = outputData;
-    });
-}
 
 // Getting Function output through WhisperAI endpoint in python
 const to_translate = document.getElementById("inlineCheckbox1").value;
