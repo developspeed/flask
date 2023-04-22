@@ -132,17 +132,7 @@ function WhisperAI() {
     });
 }
 
-
 // Getting Function output through WhisperAI endpoint in python
-function fetchWithTimeout(url, options, timeout = 300000000) {
-  return Promise.race([
-    fetch(url, options),
-    new Promise((_, reject) =>
-      setTimeout(() => reject(new Error('Request timed out')), timeout)
-    ),
-  ]);
-}
-
 const to_translate = document.getElementById("inlineCheckbox1").value;
 // console.log(to_translate)
 const formData = new FormData()
@@ -152,10 +142,11 @@ async function WhisperAI() {
   // Collect user input data
   // Send HTTP request to Python backend
   try {
-    const response = await fetchWithTimeout("/whisper-results", {
+    const response = await fetch("/whisper-results", {
       method: "POST",
       body: formData,
-    }, 30000000); // Set timeout to 5 minutes (300000 milliseconds)
+      // timeout: 30000000 // Set timeout to 30 seconds
+    });
     console.log("Success")
     const data = await response.json();
     // Update HTML with output data returned by Python function
@@ -178,3 +169,4 @@ async function WhisperAI() {
     console.log("Error",error)
   }
 }
+
