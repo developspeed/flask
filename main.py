@@ -1,9 +1,9 @@
-from flask import Flask, render_template, request, redirect, session, url_for
+from flask import Flask, render_template, request, redirect, session, url_for , jsonify
 import mysql.connector as ms
 import os
 import replicate
 from io import BytesIO
-# from flask_caching import Cache
+
 
 
 cnx = ms.connect(user='magic_register', password='Indira@2000',
@@ -24,7 +24,7 @@ cnx.close()
 
 app = Flask(__name__, static_url_path='/static')
 app.secret_key = 'my-secret-key'
-# cache = Cache(app, config={'CACHE_TYPE': 'simple'})
+
 
 @app.route("/")
 # @app.route("/login")
@@ -137,9 +137,31 @@ def custom_round(num, digits=2, Isstr=False):
         return x
     return float(Decimal(x))
 
-@app.route('/whisper')
+
+# Audio Upload through Mic and files with duration and other options
+audioRecordedGlobal = None
+minutes_to_update = 0
+@app.route('/upload', methods=['POST','GET'])
+def upload():
+    global audioRecordedGlobal
+    audioRecordedGlobal = request.files.get('audio').read(10000000)
+    global minutes_to_update
+    minutes_to_update = request.form.get('duration')
+    
+    # to_translate = request.form.get('checkbox_value')
+    # print("Without submit results")
+    # print(audioRecordedGlobal,minutes_to_update)
+    return "Done"
+
+
+to_translate = None
+@app.route('/whisper',methods=['POST','GET'])
 def Whisper():
     if 'get_user_email' in session:
+        if request.method == 'POST':
+            global to_translate
+            to_translate = request.form.get('checkbox_value')
+            print(to_translate)
         cnx = ms.connect(user='magic_register', password='Indira@2000',
                          host='185.104.29.84', database='magic_register')
         cursor = cnx.cursor()
@@ -164,27 +186,8 @@ def Whisper():
         return redirect(url_for("login"))
 
 
-# Audio Upload through Mic
-audioRecordedGlobal = None
-@app.route('/upload', methods=['POST'])
-def upload():
-    audio = request.files.get('audio').read()
-    # print(audio)
-    global audioRecordedGlobal
-    audioRecordedGlobal = audio
-    return "Done"
 
-
-minutes_to_update = 0
-@app.route('/duration', methods=['POST'])
-def duration():
-    global minutes_to_update
-    minutes_to_update = request.json['duration']
-    # do something with the duration data
-    return 'OK'
-
-
-
+# @celery.task(bind=True)
 @app.route('/whisper-results', methods=["POST"])
 def WhisperAI():
     cnx = ms.connect(user='magic_register', password='Indira@2000',
@@ -201,26 +204,26 @@ def WhisperAI():
     minutes_total = cursor.fetchone()[0]
 
     # Reading the audio file and Converting the audio file in Bytes
-    audioFile = BytesIO(request.files['audioFile'].read())
+    audioFile = BytesIO(audioRecordedGlobal)
     # Or
     # Taking mic input
-    audioRecords = BytesIO(audioRecordedGlobal)
+    # audioRecords = BytesIO(audioRecordedGlobal)
 
     # language = request.form['language']
-    to_translate = request.form.get('to_translate') == 'on'
-
-    # Model Configuration Fetching from database
-    # model = DBRead('whisper_config','model')
-    transcription = DBRead('whisper_config','transcription')
     global minutes_to_update
     minutes_to_update = custom_round(minutes_to_update)
     print("Uploaded Audio or File Size : ",minutes_to_update)
     cursor.close()
     cnx.close()
+    
+    to_translate = request.form.get('to_translate') == 'on'
+    print(to_translate)
 
-    output = None
+    # Model Configuration Fetching from database
+    # model = DBRead('whisper_config','model')
+    transcription = DBRead('whisper_config','transcription')
+
     if minutes_count <= float(minutes_total):
-        if len(audioFile.read()) != 0:
             # Model Running
             try: 
                 output = replicate.run("openai/whisper:e39e354773466b955265e969568deb7da217804d8e771ea8c9cd0cef6591f8bc",
@@ -241,38 +244,12 @@ def WhisperAI():
                 cnx.close()
                 print("The total minutes will be : ",minutes_count+minutes_to_update)
                 minutes_to_show = str(minutes_count+minutes_to_update)
-                return render_template('whisper-results.html', data=[output['transcription'], output['translation'], output['detected_language'], minutes_to_show[0:5], minutes_total])
+                return jsonify({"outputData":output['transcription'],'translate':output['translation'],'language_detect':output['detected_language'],'minutes_count':minutes_to_show,"minutes_total":minutes_total})
+                # return render_template('whisper-results.html', data=[output['transcription'], output['translation'], output['detected_language'], minutes_to_show[0:5], minutes_total])
             except Exception as e:
                 print(e)
-                return render_template("whisper-results.html",data=["There is some problems in AI Model or Your File Size is too large","","",minutes_count,minutes_total])
+                return jsonify({"outputData":"There is some problem in Whisper Model or Your Audio is too Large",'translate':"",'language_detect':"",'minutes_count':minutes_count,"minutes_total":minutes_total})
             # return render_template('whisper.html',data=["","","","","",""])
-
-        else:
-            # Model Running
-            try:
-                output = replicate.run("openai/whisper:e39e354773466b955265e969568deb7da217804d8e771ea8c9cd0cef6591f8bc",
-                                    input={"audio": audioRecords,
-                                            # "model": model,
-                                            "transcription": transcription,
-                                            "translate": to_translate,
-                                             })
-                cnx = ms.connect(user='magic_register', password='Indira@2000',
-                     host='185.104.29.84', database='magic_register')
-                cursor = cnx.cursor()
-                update_minutes_query = f"UPDATE `user` SET `minutes_count` = '{minutes_to_update+minutes_count}' WHERE `email` = '{email}';"
-                cursor.execute(update_minutes_query)
-                cnx.commit()
-                cursor.close()
-                cnx.close()
-                print("The total minutes will be : ",minutes_count+minutes_to_update)
-                minutes_to_show = str(minutes_count+minutes_to_update)
-                audioRecords = None
-                return render_template('whisper-results.html', data=[output['transcription'], output['translation'], output['detected_language'], minutes_to_show[0:5], minutes_total])
-            
-            except Exception as e:
-                print(e)
-                return render_template("whisper-results.html",data=["There is some problems in AI Model or Your Audio Record is too large","","",minutes_count,minutes_total])
-
 
     else:
         return render_template('whisper-results.html', data=["", "", "", "", "", "You Have Used All Your Minutes"])
@@ -374,4 +351,4 @@ def internal_server(e):
 
 
 if __name__ == "__main__":
-    app.run(port=5000,debug=True,host="0.0.0.0")
+    app.run(port=5000)
