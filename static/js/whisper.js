@@ -75,7 +75,7 @@ const uploader = document.getElementById('upload-message');
 audioFile.addEventListener("change", function () {
   const file = audioFile.files[0];
   uploader.style.display = 'flex';
-  uploader.style.color = 'blue';
+  uploader.style.color = 'yellow';
   // console.log(file)
   let formData = new FormData();
   formData.append("audio", file);
@@ -133,35 +133,42 @@ const to_translate = document.getElementById("inlineCheckbox1").value;
 const formData = new FormData()
 formData.append('to_translate',to_translate);
 
-async function WhisperAI() {
+function WhisperAI() {
   // Collect user input data
   // Send HTTP request to Python backend
-  try {
-    const response = await fetch("/whisper-results", {
-      method: "POST",
-      body: formData,
-      // timeout: 30000000 // Set timeout to 30 seconds
-    });
-    console.log("Success")
-    const data = await response.json();
-    // Update HTML with output data returned by Python function
-    const outputData = document.getElementById("outputData");
-    const translated = document.getElementById("translated");
-    const language_detect = document.getElementById("language_detect");
-    const loader = document.getElementById("loader");
-    const minutesUpdate = document.getElementById('minutesUpdate');
-    const ouputDisplay = document.getElementById('outputToggle');
+  const xhr = new XMLHttpRequest();
+  xhr.open("POST", "/whisper-results");
+  xhr.timeout = 300000; // Set timeout to 5 minutes in milliseconds
+  xhr.onload = function() {
+    if (xhr.status === 200) {
+      console.log("Success");
+      const data = JSON.parse(xhr.responseText);
+      // Update HTML with output data returned by Python function
+      const outputData = document.getElementById("outputData");
+      const translated = document.getElementById("translated");
+      const language_detect = document.getElementById("language_detect");
+      const loader = document.getElementById("loader");
+      const minutesUpdate = document.getElementById('minutesUpdate');
+      const ouputDisplay = document.getElementById('outputToggle');
 
-    ouputDisplay.style.display = 'flex';
-    loader.style.display = 'none';
-    outputData.innerHTML = data.outputData;
-    translated.innerHTML = data.translate;
-    language_detect.innerHTML = "Detected Language : "+data.language_detect;
-    minutesUpdate.innerHTML = data.minutes_count +" / "+ data.minutes_total;
-    console.log(data)
-  } catch (error) {
-    // Handle the error response here
-    console.log("Error",error)
-  }
+      ouputDisplay.style.display = 'flex';
+      loader.style.display = 'none';
+      outputData.innerHTML = data.outputData;
+      translated.innerHTML = data.translate;
+      language_detect.innerHTML = "Detected Language : "+data.language_detect;
+      minutesUpdate.innerHTML = data.minutes_count +" / "+ data.minutes_total;
+      console.log(data)
+    } else {
+      console.log("Request failed");
+    }
+  };
+  xhr.onerror = function() {
+    console.log("Error");
+  };
+  xhr.ontimeout = function() {
+    console.log("Request timed out");
+  };
+  xhr.send(formData);
 }
+
 
