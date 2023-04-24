@@ -138,7 +138,7 @@ function WhisperAI() {
   // Send HTTP request to Python backend
   const xhr = new XMLHttpRequest();
   xhr.open("POST", "/whisper-results");
-  xhr.timeout = 300000; // Set timeout to 5 minutes in milliseconds
+  xhr.timeout = 30000000; // Set timeout to 500 minutes in milliseconds
   xhr.onload = function() {
     if (xhr.status === 200) {
       console.log("Success");
