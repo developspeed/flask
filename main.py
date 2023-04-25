@@ -23,7 +23,7 @@ cursor.close()
 cnx.close()
 
 app = Flask(__name__, static_url_path='/static')
-app.secret_key = 'my-secret-key'
+app.secret_key = '5gfdfdsdr345dgfs45dgfdgdfg09043532%##$h2h340adsf9'
 
 
 @app.route("/")
@@ -144,7 +144,7 @@ minutes_to_update = 0
 @app.route('/upload', methods=['POST','GET'])
 def upload():
     global audioRecordedGlobal
-    audioRecordedGlobal = request.files.get('audio').read(8500000)
+    audioRecordedGlobal = request.files.get('audio').read(10000000)
     global minutes_to_update
     minutes_to_update = request.form.get('duration')
     
@@ -158,10 +158,7 @@ to_translate = None
 @app.route('/whisper',methods=['POST','GET'])
 def Whisper():
     if 'get_user_email' in session:
-        if request.method == 'POST':
-            global to_translate
-            to_translate = request.form.get('checkbox_value')
-            print(to_translate)
+        
         cnx = ms.connect(user='magic_register', password='Indira@2000',
                          host='185.104.29.84', database='magic_register')
         cursor = cnx.cursor()
@@ -243,7 +240,7 @@ def WhisperAI():
                 cursor.close()
                 cnx.close()
                 print("The total minutes will be : ",minutes_count+minutes_to_update)
-                minutes_to_show = str(minutes_count+minutes_to_update)
+                minutes_to_show = custom_round(minutes_count+minutes_to_update)
                 return jsonify({"outputData":output['transcription'],'translate':output['translation'],'language_detect':output['detected_language'],'minutes_count':minutes_to_show,"minutes_total":minutes_total})
                 # return render_template('whisper-results.html', data=[output['transcription'], output['translation'], output['detected_language'], minutes_to_show[0:5], minutes_total])
             except Exception as e:
@@ -252,10 +249,38 @@ def WhisperAI():
             # return render_template('whisper.html',data=["","","","","",""])
 
     else:
-        return render_template('whisper-results.html', data=["", "", "", "", "", "You Have Used All Your Minutes"])
+        return render_template('whisper.html', data=["", "", "", "", "", "You Have Used All Your Minutes"])
 
 
-# cache.clear()
+@app.route("/image-edit", methods = ["GET","POST"])
+def ImageEdit():
+    if 'get_user_email' in session:
+        
+        cnx = ms.connect(user='magic_register', password='Indira@2000',
+                         host='185.104.29.84', database='magic_register')
+        cursor = cnx.cursor()
+
+        email = session['get_user_email']
+        images_count_query = f"SELECT `images_count` FROM `user` WHERE `email` = '{email}'"
+        cursor.execute(images_count_query)
+        images_count = cursor.fetchone()[0]
+        
+
+        images_total_query = f"SELECT `images_total` FROM `user` WHERE `email` = '{email}'"
+        cursor.execute(images_total_query)
+        images_total = cursor.fetchone()[0]
+        
+        ImageEditText = DBRead('image_edit_config','image_edit_text')
+
+        cursor.close()
+        cnx.close()
+        return render_template('imagedit.html', data=[images_count, images_total,ImageEditText])
+
+    else:
+        return redirect(url_for("login"))
+
+
+
 ########## Admin Panel ###########
 
 # Utility function for updating the form data to database
