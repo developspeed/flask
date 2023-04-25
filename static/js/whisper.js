@@ -75,7 +75,7 @@ const uploader = document.getElementById('upload-message');
 audioFile.addEventListener("change", function () {
   const file = audioFile.files[0];
   uploader.style.display = 'flex';
-  uploader.style.color = 'yellow';
+  uploader.style.color = 'blue';
   // console.log(file)
   let formData = new FormData();
   formData.append("audio", file);
