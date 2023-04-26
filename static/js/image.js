@@ -43,19 +43,18 @@ captureButton.addEventListener("click", function () {
 
 // For uploading and sending image to server
 const previewImage = (event) => {
-  const imageFiles = event.target.files[0];
+  const imageFiles = event.target.files;
   const imageFilesLength = imageFiles.length;
   if (imageFilesLength > 0) {
-    var imageSrc = URL.createObjectURL(imageFiles);
-    const imagePreviewElement = document.querySelector(
-      "#preview-selected-image"
-    );
-    imagePreviewElement.src = imageSrc;
-    imagePreviewElement.style.display = "block";
+      const imageSrc = URL.createObjectURL(imageFiles[0]);
+      const imagePreviewElement = document.querySelector("#preview-selected-image");
+      imagePreviewElement.src = imageSrc;
+      imagePreviewElement.style.display = "block";
   }
+
   
   let formData = new FormData();
-  formData.append('imageFile',imageFiles)
+  formData.append('imageFile',imageFiles[0])
   fetch('/upload-image',{
     method:"POST",
     body: formData
@@ -63,13 +62,3 @@ const previewImage = (event) => {
 };
 
 
-// Submiting the Form
-let submitBtn = document.getElementById('submit')
-
-submitBtn.addEventListener('click', function(){
-  let formData = new FormData();
-  formData.append('imageFile',imgfile);
-
-  fetch('/image-edit-results',{method:'POST',body:imgfile})
-  .then(response => console.log("Done"))
-})
