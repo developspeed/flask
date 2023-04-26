@@ -1,9 +1,9 @@
-from flask import Flask, render_template, request, redirect, session, url_for , jsonify
+from decimal import Decimal
+from flask import Flask, render_template, request, redirect, session, url_for, jsonify
 import mysql.connector as ms
 import os
 import replicate
 from io import BytesIO
-
 
 
 cnx = ms.connect(user='magic_register', password='Indira@2000',
@@ -48,7 +48,7 @@ def Authenticate():
     session['get_user_email'] = email
 
     auth_code = cursor.fetchone()[0]
-    
+
     cursor.close()
     cnx.close()
     if login_code != auth_code:
@@ -62,7 +62,10 @@ def logout():
     session.pop('get_user_email', None)  # remove the email from the session
     return redirect(url_for('login'))
 
+
 admin_name_validation = ""
+
+
 @app.route("/dashboard")
 def Dashboard():
     if 'get_user_email' in session:
@@ -107,8 +110,7 @@ def Dashboard():
         # images_total = 20
         # images_count = 0
 
-
-        #Minutes Usage Whisper
+        # Minutes Usage Whisper
         minutes_total_query = f"SELECT `minutes_total` FROM `user` WHERE `email` = '{email}'"
         cursor.execute(minutes_total_query)
         minutes_total = cursor.fetchone()[0]
@@ -120,7 +122,7 @@ def Dashboard():
 
         cursor.close()
         cnx.close()
-        return render_template("dashboard.html", data={'name': name, 'subscription_end': subscription_end, 'words_total': words_total, 'words_count': words_count, 'images_total': images_total, 'images_count': images_count, 'minutes_total':minutes_total, 'minutes_count':minutes_to_show})
+        return render_template("dashboard.html", data={'name': name, 'subscription_end': subscription_end, 'words_total': words_total, 'words_count': words_count, 'images_total': images_total, 'images_count': images_count, 'minutes_total': minutes_total, 'minutes_count': minutes_to_show})
 
     else:
         return redirect(url_for("login"))
@@ -128,7 +130,6 @@ def Dashboard():
 
 ############################### Whisper AI Functions ######################################
 
-from decimal import Decimal
 
 def custom_round(num, digits=2, Isstr=False):
     tmp = Decimal(num)
@@ -141,13 +142,15 @@ def custom_round(num, digits=2, Isstr=False):
 # Audio Upload through Mic and files with duration and other options
 audioRecordedGlobal = None
 minutes_to_update = 0
-@app.route('/upload', methods=['POST','GET'])
+
+
+@app.route('/upload', methods=['POST', 'GET'])
 def upload():
     global audioRecordedGlobal
     audioRecordedGlobal = request.files.get('audio').read(10000000)
     global minutes_to_update
     minutes_to_update = request.form.get('duration')
-    
+
     # to_translate = request.form.get('checkbox_value')
     # print("Without submit results")
     # print(audioRecordedGlobal,minutes_to_update)
@@ -155,10 +158,12 @@ def upload():
 
 
 to_translate = None
-@app.route('/whisper',methods=['POST','GET'])
+
+
+@app.route('/whisper', methods=['POST', 'GET'])
 def Whisper():
     if 'get_user_email' in session:
-        
+
         cnx = ms.connect(user='magic_register', password='Indira@2000',
                          host='185.104.29.84', database='magic_register')
         cursor = cnx.cursor()
@@ -172,16 +177,15 @@ def Whisper():
         minutes_total_query = f"SELECT `minutes_total` FROM `user` WHERE `email` = '{email}'"
         cursor.execute(minutes_total_query)
         minutes_total = cursor.fetchone()[0]
-        
-        WhisperAIText = DBRead('whisper_config','whisper_text')
+
+        WhisperAIText = DBRead('whisper_config', 'whisper_text')
 
         cursor.close()
         cnx.close()
-        return render_template('whisper.html', data=[minutes_to_show, minutes_total,WhisperAIText])
+        return render_template('whisper.html', data=[minutes_to_show, minutes_total, WhisperAIText])
 
     else:
         return redirect(url_for("login"))
-
 
 
 # @celery.task(bind=True)
@@ -202,60 +206,52 @@ def WhisperAI():
 
     # Reading the audio file and Converting the audio file in Bytes
     audioFile = BytesIO(audioRecordedGlobal)
-    # Or
-    # Taking mic input
-    # audioRecords = BytesIO(audioRecordedGlobal)
-
-    # language = request.form['language']
     global minutes_to_update
     minutes_to_update = custom_round(minutes_to_update)
-    print("Uploaded Audio or File Size : ",minutes_to_update)
+    print("Uploaded Audio or File Size : ", minutes_to_update)
     cursor.close()
     cnx.close()
-    
     to_translate = request.form.get('to_translate') == 'on'
     print(to_translate)
-
-    # Model Configuration Fetching from database
-    # model = DBRead('whisper_config','model')
-    transcription = DBRead('whisper_config','transcription')
+    transcription = DBRead('whisper_config', 'transcription')
 
     if minutes_count <= float(minutes_total):
-            # Model Running
-            try: 
-                output = replicate.run("openai/whisper:e39e354773466b955265e969568deb7da217804d8e771ea8c9cd0cef6591f8bc",
-                                    input={"audio": audioFile,
-                                            # "model": model,
-                                            "transcription": transcription,
-                                            "translate": to_translate,
-                                            })
-                
-                # We are again establishing a connection because large file give connection lost error
-                cnx = ms.connect(user='magic_register', password='Indira@2000',
-                     host='185.104.29.84', database='magic_register')
-                cursor = cnx.cursor()
-                update_minutes_query = f"UPDATE `user` SET `minutes_count` = '{minutes_to_update+minutes_count}' WHERE `email` = '{email}';"
-                cursor.execute(update_minutes_query)
-                cnx.commit()
-                cursor.close()
-                cnx.close()
-                print("The total minutes will be : ",minutes_count+minutes_to_update)
-                minutes_to_show = custom_round(minutes_count+minutes_to_update)
-                return jsonify({"outputData":output['transcription'],'translate':output['translation'],'language_detect':output['detected_language'],'minutes_count':minutes_to_show,"minutes_total":minutes_total})
-                # return render_template('whisper-results.html', data=[output['transcription'], output['translation'], output['detected_language'], minutes_to_show[0:5], minutes_total])
-            except Exception as e:
-                print(e)
-                return jsonify({"outputData":"There is some problem in Whisper Model or Your Audio is too Large",'translate':"",'language_detect':"",'minutes_count':minutes_count,"minutes_total":minutes_total})
-            # return render_template('whisper.html',data=["","","","","",""])
+        # Model Running
+        try:
+            output = replicate.run("openai/whisper:e39e354773466b955265e969568deb7da217804d8e771ea8c9cd0cef6591f8bc",
+                                   input={"audio": audioFile,
+                                          # "model": model,
+                                          "transcription": transcription,
+                                          "translate": to_translate,
+                                          })
+
+            # We are again establishing a connection because large file give connection lost error
+            cnx = ms.connect(user='magic_register', password='Indira@2000',
+                             host='185.104.29.84', database='magic_register')
+            cursor = cnx.cursor()
+            update_minutes_query = f"UPDATE `user` SET `minutes_count` = '{minutes_to_update+minutes_count}' WHERE `email` = '{email}';"
+            cursor.execute(update_minutes_query)
+            cnx.commit()
+            cursor.close()
+            cnx.close()
+            print("The total minutes will be : ",
+                  minutes_count+minutes_to_update)
+            minutes_to_show = custom_round(minutes_count+minutes_to_update)
+            return jsonify({"outputData": output['transcription'], 'translate': output['translation'], 'language_detect': output['detected_language'], 'minutes_count': minutes_to_show, "minutes_total": minutes_total})
+            # return render_template('whisper-results.html', data=[output['transcription'], output['translation'], output['detected_language'], minutes_to_show[0:5], minutes_total])
+        except Exception as e:
+            print(e)
+            return jsonify({"outputData": "There is some problem in Whisper Model or Your Audio is too Large", 'translate': "", 'language_detect': "", 'minutes_count': minutes_count, "minutes_total": minutes_total})
+        # return render_template('whisper.html',data=["","","","","",""])
 
     else:
         return render_template('whisper.html', data=["", "", "", "", "", "You Have Used All Your Minutes"])
 
 
-@app.route("/image-edit", methods = ["GET","POST"])
+@app.route("/image-edit")
 def ImageEdit():
     if 'get_user_email' in session:
-        
+
         cnx = ms.connect(user='magic_register', password='Indira@2000',
                          host='185.104.29.84', database='magic_register')
         cursor = cnx.cursor()
@@ -264,23 +260,71 @@ def ImageEdit():
         images_count_query = f"SELECT `images_count` FROM `user` WHERE `email` = '{email}'"
         cursor.execute(images_count_query)
         images_count = cursor.fetchone()[0]
-        
 
         images_total_query = f"SELECT `images_total` FROM `user` WHERE `email` = '{email}'"
         cursor.execute(images_total_query)
         images_total = cursor.fetchone()[0]
-        
-        ImageEditText = DBRead('image_edit_config','image_edit_text')
+
+        ImageEditText = DBRead('image_edit_config', 'image_edit_text')
 
         cursor.close()
         cnx.close()
-        return render_template('imagedit.html', data=[images_count, images_total,ImageEditText])
+        return render_template('imagedit.html', data=[images_count, images_total, ImageEditText])
 
     else:
         return redirect(url_for("login"))
 
+imageFile = None
+@app.route('/upload-image',methods=["GET","POST"])
+def upload_image():
+    global imageFile
+    imageFile = request.files.get('imageFile').read()
+    return "Uploaded Successfully"
+
+@app.route('/image-edit-results', methods=["POST"])
+def ImageEditResults():
+    cnx = ms.connect(user='magic_register', password='Indira@2000',
+                     host='185.104.29.84', database='magic_register')
+    cursor = cnx.cursor()
+    email = session['get_user_email']
+
+    images_count_query = f"SELECT `images_count` FROM `user` WHERE `email` = '{email}'"
+    cursor.execute(images_count_query)
+    images_count = int(cursor.fetchone()[0])
+
+    images_total_query = f"SELECT `images_total` FROM `user` WHERE `email` = '{email}'"
+    cursor.execute(images_total_query)
+    images_total = int(cursor.fetchone()[0])
+    
+    userprompt = request.form.get('prompt')
+    user_neg_prompt = request.form.get('neg_prompt')
+    user_output_images = request.form.get('output_images')
+    print(userprompt,user_neg_prompt,user_output_images)
 
 
+    if images_count <= images_total:
+        try:
+            output = replicate.run(
+                    "timothybrooks/instruct-pix2pix:30c1d0b916a6f8efce20493f5d61ee27491ab2a60437c13c588468b9810ec23f",
+                    input={"image": BytesIO(imageFile),
+                            'prompt':userprompt,
+                            'negative_prompt':user_neg_prompt,
+                            'num_outputs':int(user_output_images)
+                            }
+                )
+            # print(output)
+            print("Done")
+            updated_images = images_count+1
+            images_update_query = f"UPDATE `user` SET `images_count` = '{updated_images}' WHERE `email` = '{email}';"
+            cursor.execute(images_update_query)
+            cnx.commit()
+            cursor.close()
+            cnx.close()
+            return render_template('imagedit-results.html',data=[updated_images,images_total,output])
+        except Exception:
+            return render_template('imagedit-results.html',data=[images_count,images_total,"There's some problems in your image"])
+    else:
+        return render_template('imagedit-results.html',images_count,images_total,"","You have used all your images")
 ########## Admin Panel ###########
 
 # Utility function for updating the form data to database
@@ -294,7 +338,8 @@ def DBUpdate(table, field, value):
     cursor.close()
     cnx.close()
 
-def DBRead(table,field):
+
+def DBRead(table, field):
     cnx = ms.connect(user='magic_register', password='Indira@2000',
                      host='185.104.29.84', database='magic_register')
     cursor = cnx.cursor(buffered=True)
@@ -306,30 +351,32 @@ def DBRead(table,field):
     return data
 
 
-@app.route('/admin',methods=['GET'])
+@app.route('/admin', methods=['GET'])
 def Admin():
-    if 'get_user_email' in session: 
+    if 'get_user_email' in session:
         if 'Admin' == admin_name_validation:
-            #Get the Data
-            api_key = DBRead('whisper_config','API_Key')
-            model = DBRead('whisper_config','model')
-            transcription = DBRead('whisper_config','transcription')
-            temp = DBRead('whisper_config','temperature')
-            patience = DBRead('whisper_config','patience')
-            suppress = DBRead('whisper_config','suppress_tokens')
-            temperature = DBRead('whisper_config','temp_increment_on_fallback')
-            compression = DBRead('whisper_config','compression_ratio_threshold')
-            logprob = DBRead('whisper_config','logprob_threshold')
-            nospeech = DBRead('whisper_config','no_speech_threshold')
-            whisper_text = DBRead('whisper_config','whisper_text')
+            # Get the Data
+            api_key = DBRead('whisper_config', 'API_Key')
+            model = DBRead('whisper_config', 'model')
+            transcription = DBRead('whisper_config', 'transcription')
+            temp = DBRead('whisper_config', 'temperature')
+            patience = DBRead('whisper_config', 'patience')
+            suppress = DBRead('whisper_config', 'suppress_tokens')
+            temperature = DBRead(
+                'whisper_config', 'temp_increment_on_fallback')
+            compression = DBRead(
+                'whisper_config', 'compression_ratio_threshold')
+            logprob = DBRead('whisper_config', 'logprob_threshold')
+            nospeech = DBRead('whisper_config', 'no_speech_threshold')
+            whisper_text = DBRead('whisper_config', 'whisper_text')
 
             # data = [api_key,model,transcription,temp,patience,suppress,temperature,compression,logprob,nospeech]
-            
-            return render_template('admin.html',data = [api_key,transcription,temp,patience,suppress,temperature,compression,logprob,nospeech,model,whisper_text])
+
+            return render_template('admin.html', data=[api_key, transcription, temp, patience, suppress, temperature, compression, logprob, nospeech, model, whisper_text])
 
         else:
-            return(redirect('/dashboard'))
-    
+            return (redirect('/dashboard'))
+
     else:
         return redirect(url_for('login.html'))
 
@@ -350,20 +397,22 @@ def AdminWhisper():
     WhisperAIText = request.form['Whisper AI Text']
 
     # Updation Database Queries and Executing Queries
-    DBUpdate('whisper_config','API_Key',API_Key)
-    DBUpdate('whisper_config','transcription',Transcription)
-    DBUpdate('whisper_config','temperature',Temperature)
-    DBUpdate('whisper_config','patience',Patience)
-    DBUpdate('whisper_config','suppress_tokens',Suppress_Tokens)
-    DBUpdate('whisper_config','temp_increment_on_fallback',Temperature_increment)
-    DBUpdate('whisper_config','compression_ratio_threshold',Compression)
-    DBUpdate('whisper_config','logprob_threshold',Logprob)
-    DBUpdate('whisper_config','no_speech_threshold',Speech)
-    DBUpdate('whisper_config','model',Model)
-    DBUpdate('whisper_config','whisper_text',WhisperAIText)
+    DBUpdate('whisper_config', 'API_Key', API_Key)
+    DBUpdate('whisper_config', 'transcription', Transcription)
+    DBUpdate('whisper_config', 'temperature', Temperature)
+    DBUpdate('whisper_config', 'patience', Patience)
+    DBUpdate('whisper_config', 'suppress_tokens', Suppress_Tokens)
+    DBUpdate('whisper_config', 'temp_increment_on_fallback',
+             Temperature_increment)
+    DBUpdate('whisper_config', 'compression_ratio_threshold', Compression)
+    DBUpdate('whisper_config', 'logprob_threshold', Logprob)
+    DBUpdate('whisper_config', 'no_speech_threshold', Speech)
+    DBUpdate('whisper_config', 'model', Model)
+    DBUpdate('whisper_config', 'whisper_text', WhisperAIText)
 
     # print(API_Key,Transcription,Temperature,Patience,Suppress_Tokens,Temperature_increment,Compression,Logprob,Speech,Model)
     return redirect('/admin')
+
 
 @app.errorhandler(404)
 def page_not_found(e):
