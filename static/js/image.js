@@ -17,8 +17,16 @@ captureButton.addEventListener("click", function () {
     const dataURL = canvas.toDataURL("image/png");
     image.style.display = "flex";
     photo.setAttribute("src", dataURL);
-    var imgfile = new File([dataURL], 'image.jpg',{type:dataURL.type});
+    const base64String = dataURL.split(',')[1];
 
+    // Decode the Base64-encoded data
+    const decodedData = atob(base64String);
+    console.log(decodedData)
+    // Convert the decoded data to a Blob
+    const blob = new Blob([decodedData], { type: 'image/png' });
+
+    // Create a new File object from the Blob
+    const imgfile = new File([blob], 'image.png', { type: 'image/png' });
     let formData = new FormData();
     formData.append('imageFile',imgfile)
     fetch('/upload-image',{
@@ -50,6 +58,7 @@ const previewImage = (event) => {
       const imagePreviewElement = document.querySelector("#preview-selected-image");
       imagePreviewElement.src = imageSrc;
       imagePreviewElement.style.display = "block";
+      console.log(imageFiles[0])
   }
 
   
