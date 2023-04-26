@@ -314,7 +314,11 @@ def ImageEditResults():
                 )
             # print(output)
             print("Done")
-            updated_images = images_count+1
+            updated_images = 0
+            if int(user_output_images) == 1:
+                updated_images = images_count+1
+            else:
+                updated_images = images_count+4
             images_update_query = f"UPDATE `user` SET `images_count` = '{updated_images}' WHERE `email` = '{email}';"
             cursor.execute(images_update_query)
             cnx.commit()
