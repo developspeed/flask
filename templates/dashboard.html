@@ -7,17 +7,29 @@
 		<div class="card">
 			<h2>Welcome {{data['name']}}</h2>
 			<p>You can use AI models here.</p>
-			<a href="#" class="cta">View Models</a>
-		</div>
-		<div class="card">
-			<h2>Whisper AI</h2>
-			<p>Used to transcribe a given audio.</p>
-			<a href="/whisper" class="cta">View Models</a>
+			<!-- <a href="#" class="cta">View Models</a> -->
 		</div>
 		<div class="card">
 			<h2>Subscription Details</h2>
 			<p>Your Subscription will end on {{data['subscription_end']}}</p>
 			<a href="https://magicaibox.site" target="_blank" class="cta">Renew</a>
+		</div>
+	</div>
+	<div class="container">
+		<div class="card">
+			<h2>Speech Recognizer</h2>
+			<p>Used to transcribe a given audio using Whisper AI model.</p>
+			<a href="/whisper" class="cta">View Model</a>
+		</div>
+		<div class="card">
+			<h2>Edit Image</h2>
+			<p>Takes prompt from user and Edit it according to prompt.</p>
+			<a href="/image-edit" class="cta">View Model</a>
+		</div>
+		<div class="card">
+			<h2>B/W Image</h2>
+			<p>Turns old and blurry images into new ones.</p>
+			<a href="/image-edit" class="cta">View Model</a>
 		</div>
 	</div>
 	<div class="container">

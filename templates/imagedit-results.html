@@ -1,0 +1,32 @@
+{% extends 'base.html' %}
+
+{% block title %} Image Edit {% endblock %}
+
+{% block content %}
+
+<link rel="stylesheet" href="{{ url_for('static', filename='css/image.css') }}">
+<div class="sticky-card btn-success">
+    <p>Images Used</p>
+    <p style="text-align:center;" id="minutesUpdate">{{data[0]}} / {{data[1]}}</p>
+</div>
+<div class="sticky-card btn-warning">
+    <!-- <h3>Minutes Usage</h3> -->
+    <!-- <p>Minutes Used</p> -->
+    <p style="text-align:center;">{{data[3]}}</p>
+</div>
+<div class="container">
+    <div class="card">
+        <h2>Output Images</h2>
+        {% for i in data[2] %}
+        <hr>
+        <img src="{{i}}" class="img-fluid" alt="Generated Images" srcset="">
+        <a href="{{i}}" download class="btn btn-success" style="margin: auto;">Download</a>
+        <hr>
+        {% endfor %}
+    </div>
+</div>
+<div class="container">
+    <a href="/image-edit" type="button" class="btn btn-primary" style="margin: auto;">Generate New Image</a>
+</div>
+
+{% endblock %}
