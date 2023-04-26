@@ -324,11 +324,12 @@ def ImageEditResults():
             cnx.commit()
             cursor.close()
             cnx.close()
-            return render_template('imagedit-results.html',data=[updated_images,images_total,output])
-        except Exception:
-            return render_template('imagedit-results.html',data=[images_count,images_total,"There's some problems in your image"])
+            return render_template('imagedit-results.html',data=[updated_images,images_total,output,"",""])
+        except Exception as e:
+            print(e)
+            return render_template('imagedit-results.html',data=[images_count,images_total,"","There's some problems in your image",""])
     else:
-        return render_template('imagedit-results.html',images_count,images_total,"","You have used all your images")
+        return render_template('imagedit-results.html',images_count,images_total,"","","You have used all your images")
 ########## Admin Panel ###########
 
 # Utility function for updating the form data to database
