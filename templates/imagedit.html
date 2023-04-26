@@ -41,7 +41,7 @@
     </div>
 </div>
 <!-- <hr> -->
-<form action="{{ url_for('ImageEditResults') }}" method="POST" id="upload-form">
+<form action="{{ url_for('ImageEditResults') }}" enctype="multipart/form-data" method="POST" id="upload-form">
     <div class="container">
         <div class="card">
             <h3>Image Settings</h3>
