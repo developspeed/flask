@@ -6,6 +6,7 @@ import replicate
 from io import BytesIO
 
 
+
 cnx = ms.connect(user='magic_register', password='Indira@2000',
                  host='185.104.29.84', database='magic_register')
 cursor = cnx.cursor()
@@ -278,7 +279,7 @@ imageFile = None
 @app.route('/upload-image',methods=["GET","POST"])
 def upload_image():
     global imageFile
-    imageFile = request.files.get('imageFile').read()
+    imageFile = BytesIO(request.files.get('imageFile').read())
     return "Uploaded Successfully"
 
 @app.route('/image-edit-results', methods=["POST"])
@@ -300,13 +301,12 @@ def ImageEditResults():
     user_neg_prompt = request.form.get('neg_prompt')
     user_output_images = request.form.get('output_images')
     print(userprompt,user_neg_prompt,user_output_images)
-
-
+    print(imageFile)
     if images_count <= images_total:
         try:
             output = replicate.run(
                     "timothybrooks/instruct-pix2pix:30c1d0b916a6f8efce20493f5d61ee27491ab2a60437c13c588468b9810ec23f",
-                    input={"image": BytesIO(imageFile),
+                    input={"image": imageFile,
                             'prompt':userprompt,
                             'negative_prompt':user_neg_prompt,
                             'num_outputs':int(user_output_images)
