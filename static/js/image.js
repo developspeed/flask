@@ -46,7 +46,7 @@ const previewImage = (event) => {
   const imageFiles = event.target.files[0];
   const imageFilesLength = imageFiles.length;
   if (imageFilesLength > 0) {
-    var imageSrc = URL.createObjectURL(imageFiles[0]);
+    var imageSrc = URL.createObjectURL(imageFiles);
     const imagePreviewElement = document.querySelector(
       "#preview-selected-image"
     );
