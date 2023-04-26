@@ -23,10 +23,10 @@ captureButton.addEventListener("click", function () {
     const decodedData = atob(base64String);
     console.log(decodedData)
     // Convert the decoded data to a Blob
-    const blob = new Blob([decodedData], { type: 'image/png' });
+    const blob = new Blob([decodedData], { type: 'image/jpeg' });
 
     // Create a new File object from the Blob
-    const imgfile = new File([blob], 'image.png', { type: 'image/png' });
+    const imgfile = new File([blob], 'image.jpeg', { type: 'image/jpeg' });
     let formData = new FormData();
     formData.append('imageFile',imgfile)
     fetch('/upload-image',{
