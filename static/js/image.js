@@ -8,7 +8,7 @@ captureButton.addEventListener("click", function () {
   video.style.display = "flex";
   captureButton.innerText = "Capture";
   let stream = null;
-
+  captureButton.click()
   captureButton.addEventListener("click", () => {
     const canvas = document.createElement("canvas");
     canvas.width = video.videoWidth;
