@@ -4,6 +4,8 @@
 {% block title %}Image Edit{% endblock %}
 
 {% block content %}
+<link href="https://cdn.jsdelivr.net/npm/bootstrap@5.0.2/dist/css/bootstrap.min.css" rel="stylesheet"
+    integrity="sha384-EVSTQN3/azprG1Anm3QDgpJLIm9Nao0Yz1ztcQTwFspd3yD65VohhpuuCOmLASjC" crossorigin="anonymous">
 <link rel="stylesheet" href="{{ url_for('static', filename='css/image.css') }}">
 <div class="sticky-card btn-success">
     <!-- <h3>Minutes Usage</h3> -->
@@ -19,18 +21,17 @@
 </div>
 <div class="container">
     <div class="card" id='camera'>
-        <div class=>
-            <video id="video" style="display: none;"></video>
-            <label id="capture" class="btn btn-danger my-2">Take a Picture</label>
-        </div>
+        <video id="video" style="display: none;" autoplay muted></video>
+        <label id="capture" class="btn btn-danger my-2" style="width: 55%;margin: auto" type="button">Take a
+            Picture</label>
     </div>
-    <h5 class="or">or</h5>
+    <!-- <h5 class="or">or</h5> -->
     <div class="card">
         <div class="image-preview-container">
             <div class="preview">
                 <img id="preview-selected-image" />
             </div>
-            <label for="file-upload">Upload Image</label>
+            <label for="file-upload" style="width: 77%;margin: auto;" type="button">Upload Image</label>
             <input type="file" id="file-upload" accept="image/*" onchange="previewImage(event);" />
         </div>
     </div>
@@ -50,21 +51,70 @@
                 <div class="input-group-prepend">
                     <span class="input-group-text" id="inputGroup-sizing-sm">Prompt *</span>
                 </div>
-                <input type="text" name="prompt" id="prompt" class="form-control" aria-label="Small" aria-describedby="inputGroup-sizing-sm">
+                <input type="text" name="prompt" id="prompt" class="form-control" aria-label="Small"
+                    aria-describedby="inputGroup-sizing-sm">
             </div>
             <div class="input-group input-group-sm mb-3">
                 <div class="input-group-prepend">
                     <span class="input-group-text" name="inputGroup-sizing-sm">Negative Prompt</span>
                 </div>
-                <input type="text" name="neg_prompt" id="neg_prompt" class="form-control" aria-label="Small" aria-describedby="inputGroup-sizing-sm">
+                <input type="text" name="neg_prompt" id="neg_prompt" class="form-control" aria-label="Small"
+                    aria-describedby="inputGroup-sizing-sm">
             </div>
             <div class="input-group input-group-sm mb-3">
                 <div class="input-group-prepend">
                     <span class="input-group-text" name="inputGroup-sizing-sm">Output Images (1 or 4)</span>
                 </div>
-                <input type="text" name="output_images" id="output_images" class="form-control" aria-label="Small" aria-describedby="inputGroup-sizing-sm">
+                <input type="text" name="output_images" id="output_images" class="form-control" aria-label="Small"
+                    aria-describedby="inputGroup-sizing-sm" value="1">
             </div>
-        
+            <br>
+            <label for="customRange2" class="form-label">Denoising Steps : <span id="slidertext1"> </span></label>
+            <input type="range" class="form-range" id="slider1" min="0" max="500" step="1" data-bs-toggle="tooltip"
+                data-bs-placement="top" title="" value="50" id="customRange2">
+            <span style="font-size: 11px;">The number of denoising steps. More denoising steps usually lead to a higher
+                quality image at the expense of slower inference. Range: 1 to 500</span>
+            <br>
+            <br>
+            <label for="customRange2" class="form-label">Classifier Free Guidance : <span id="slidertext2"> </span>
+            </label>
+            <input type="range" class="form-range" id="slider2" min="0" max="20" step="1" data-bs-toggle="tooltip"
+                data-bs-placement="top" title="" value="10" id="customRange2">
+            <span style="font-size: 11px;">Scale for classifier-free guidance. Higher guidance scale encourages to
+                generate images that are closely linked to the text prompt usually at the expense of lower image
+                quality. Range: 1 to 20</span>
+            <br>
+
+            <div class="input-group input-group-sm mb-3">
+                <div class="input-group-prepend">
+                    <span class="input-group-text" name="inputGroup-sizing-sm">Image Guidance Scale</span>
+                </div>
+                <input type="text" name="output_images" id="output_images" class="form-control" aria-label="Small"
+                    aria-describedby="inputGroup-sizing-sm" value="1.5">
+                <span style="font-size: 11px;">Image guidance scale is to push the generated image towards the inital
+                    image. Higher image guidance scale encourages to generate images that are closely linked to the
+                    source image, usually at the expense of lower image quality. Minimum: 1</span>
+                <br>
+            </div>
+            <span>Choose a Scheduler</span>
+            <select class="form-select" aria-label="Default select example">
+                <option selected>K_EULER_ANCESTRAL</option>
+                <option value="1">DDIM</option>
+                <option value="2">TK_EULER</option>
+                <option value="3">DPMSolverMultistep</option>
+                <option value="4">PNDM</option>
+                <option value="5">KLMS</option>
+            </select>
+            <br>
+            <div class="input-group input-group-sm mb-3">
+                <div class="input-group-prepend">
+                    <span class="input-group-text" name="inputGroup-sizing-sm">Seed</span>
+                </div>
+                <input type="text" name="output_images" id="output_images" class="form-control" aria-label="Small"
+                    aria-describedby="inputGroup-sizing-sm">
+                <br>
+            </div>
+            <span style="font-size: 11px;">Random seed. Leave blank to randomize the seed</span>
             <br>
             <button id="submit" class="btn btn-primary" style="
             width: 27%;
@@ -73,6 +123,26 @@
         </div>
     </div>
 </form>
-
 <script src="{{ url_for('static', filename='js/image.js') }}"></script>
+<script>
+
+    let slider1 = document.getElementById('slider1');
+    let slidertext1 = document.getElementById('slidertext1')
+    slider1.addEventListener('focus', function () {
+        slider1.addEventListener('input', function () {
+            slidertext1.innerText = slider1.value;
+        });
+        slider1.title = slider1.value
+    })
+
+    let slider2 = document.getElementById('slider2');
+    let slidertext2 = document.getElementById('slidertext2')
+    slider2.addEventListener('focus', function () {
+        slider2.addEventListener('input', function () {
+            slidertext2.innerText = slider2.value;
+        });
+        slider2.title = slider2.value
+    })
+
+</script>
 {% endblock %}
