@@ -87,16 +87,17 @@ h1 {
     display: flex;
     justify-content: center;
 }
-
-@media screen and (max-width: 640px) {
-  .camera {
-    max-width: 50%;
-    padding-bottom: 50%;
+@media screen and (max-width: 768px) {
+  #video {
+    display: flex;
+    height: 55%;
+    margin: auto;
   }
 
-  .camera button {
-    padding: 16px;
+  #capture {
+    /* padding: 16px; */
     font-size: 20px;
+    width: 50%;
   }
 
   #photo{
