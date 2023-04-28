@@ -305,7 +305,7 @@ def ImageEditResults():
     user_output_images = request.form.get('output_images')
     print(userprompt,user_neg_prompt,user_output_images)
     print("Working")
-    if images_count <= images_total:
+    if images_count < images_total:
         try:
             output = replicate.run(
                     "timothybrooks/instruct-pix2pix:30c1d0b916a6f8efce20493f5d61ee27491ab2a60437c13c588468b9810ec23f",
@@ -332,7 +332,7 @@ def ImageEditResults():
             print(e)
             return render_template('imagedit-results.html',data=[images_count,images_total,"","There's some problems in your image",""])
     else:
-        return render_template('imagedit-results.html',images_count,images_total,"","","You have used all your images")
+        return render_template('imagedit-results.html',data=[images_count,images_total,"","","You have used all your images"])
 ########## Admin Panel ###########
 
 # Utility function for updating the form data to database
