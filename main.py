@@ -6,9 +6,6 @@ import replicate
 from io import BytesIO
 
 
-
-
-
 cnx = ms.connect(user='magic_register', password='Indira@2000',
                  host='185.104.29.84', database='magic_register')
 cursor = cnx.cursor()
@@ -27,6 +24,7 @@ cnx.close()
 
 app = Flask(__name__, static_url_path='/static')
 app.secret_key = '5gfdfdsdr345dgfs45dgfdgdfg09043532%##$h2h340adsf9'
+
 
 
 @app.route("/")
@@ -107,13 +105,7 @@ def Dashboard():
         cursor.execute(images_count_query)
         images_count = cursor.fetchone()[0]
 
-        # Tmporary Things
-        # words_total = 20000
-        # words_count = 0
-        # images_total = 20
-        # images_count = 0
-
-        # Minutes Usage Whisper
+        # Minutes Usage
         minutes_total_query = f"SELECT `minutes_total` FROM `user` WHERE `email` = '{email}'"
         cursor.execute(minutes_total_query)
         minutes_total = cursor.fetchone()[0]
@@ -191,7 +183,6 @@ def Whisper():
         return redirect(url_for("login"))
 
 
-# @celery.task(bind=True)
 @app.route('/whisper-results', methods=["POST"])
 def WhisperAI():
     cnx = ms.connect(user='magic_register', password='Indira@2000',
@@ -241,15 +232,15 @@ def WhisperAI():
                   minutes_count+minutes_to_update)
             minutes_to_show = custom_round(minutes_count+minutes_to_update)
             return jsonify({"outputData": output['transcription'], 'translate': output['translation'], 'language_detect': output['detected_language'], 'minutes_count': minutes_to_show, "minutes_total": minutes_total})
-            # return render_template('whisper-results.html', data=[output['transcription'], output['translation'], output['detected_language'], minutes_to_show[0:5], minutes_total])
         except Exception as e:
             print(e)
             return jsonify({"outputData": "There is some problem in Whisper Model or Your Audio is too Large", 'translate': "", 'language_detect': "", 'minutes_count': minutes_count, "minutes_total": minutes_total})
-        # return render_template('whisper.html',data=["","","","","",""])
 
     else:
         return render_template('whisper.html', data=["", "", "", "", "", "You Have Used All Your Minutes"])
 
+
+# Image Edit Model and Functions
 
 @app.route("/image-edit")
 def ImageEdit():
@@ -333,6 +324,70 @@ def ImageEditResults():
             return render_template('imagedit-results.html',data=[images_count,images_total,"","There's some problems in your image",""])
     else:
         return render_template('imagedit-results.html',data=[images_count,images_total,"","","You have used all your images"])
+    
+
+@app.route('/bw-image',methods=['GET',"POST"])
+def BWImage():
+    if 'get_user_email' in session:
+        cnx = ms.connect(user='magic_register', password='Indira@2000',
+                         host='185.104.29.84', database='magic_register')
+        cursor = cnx.cursor()
+
+        email = session['get_user_email']
+        images_count_query = f"SELECT `images_count` FROM `user` WHERE `email` = '{email}'"
+        cursor.execute(images_count_query)
+        images_count = cursor.fetchone()[0]
+
+        images_total_query = f"SELECT `images_total` FROM `user` WHERE `email` = '{email}'"
+        cursor.execute(images_total_query)
+        images_total = cursor.fetchone()[0]
+
+        ImageEditText = DBRead('bw_config', 'text')
+
+        cursor.close()
+        cnx.close()
+        return render_template('bwimage.html', data=[images_count, images_total, ImageEditText])
+
+    else:
+        return redirect(url_for("login"))
+
+@app.route('/bw-image-results',methods=['POST'])
+def BWResults():
+    cnx = ms.connect(user='magic_register', password='Indira@2000',
+                     host='185.104.29.84', database='magic_register')
+    cursor = cnx.cursor()
+    email = session['get_user_email']
+
+    images_count_query = f"SELECT `images_count` FROM `user` WHERE `email` = '{email}'"
+    cursor.execute(images_count_query)
+    images_count = int(cursor.fetchone()[0])
+
+    images_total_query = f"SELECT `images_total` FROM `user` WHERE `email` = '{email}'"
+    cursor.execute(images_total_query)
+    images_total = int(cursor.fetchone()[0])
+
+    model = request.form.get('model')
+    render_factor = request.form.get('render_factor')
+    print("Working..")
+    if images_count < images_total:
+        try:
+            output = replicate.run("arielreplicate/deoldify_image:0da600fab0c45a66211339f1c16b71345d22f26ef5fea3dca1bb90bb5711e950",input={"input_image": FilePath,'render_factor':int(render_factor),'model_name':model})
+            # print(output)
+            print("Done")
+            images_update_query = f"UPDATE `user` SET `images_count` = '{images_count+1}' WHERE `email` = '{email}';"
+            cursor.execute(images_update_query)
+            cnx.commit()
+            cursor.close()
+            cnx.close()
+            return render_template('bwimage-results.html',data=[images_count+1,images_total,output,"",""])
+        except Exception as e:
+            print(e)
+            return render_template('bwimage-results.html',data=[images_count,images_total,"","There's some problems in your image",""])
+    else:
+        return render_template('bwimage-results.html',data=[images_count,images_total,"","","You have used all your images"])
+
+
+
 ########## Admin Panel ###########
 
 # Utility function for updating the form data to database
