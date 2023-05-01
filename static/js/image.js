@@ -64,12 +64,12 @@ const previewImage = (event) => {
     // console.log(imageFiles[0]);
   }
 
-  let formData = new FormData();
-  formData.append("imageFile", imageFiles[0]);
-  fetch("/upload-image", {
-    method: "POST",
-    body: formData,
-  }).then((response) => {
-    console.log("Done");
-  });
+  // let formData = new FormData();
+  // formData.append("imageFile", imageFiles[0]);
+  // fetch("/upload-image", {
+  //   method: "POST",
+  //   body: formData,
+  // }).then((response) => {
+  //   console.log("Done");
+  // });
 };

@@ -17,7 +17,7 @@ const previewImage = (event) => {
   
     let formData = new FormData();
     formData.append("imageFile", imageFiles[0]);
-    fetch("/upload-image", {
+    fetch("/upload-bw-image", {
       method: "POST",
       body: formData,
     }).then((response) => {
