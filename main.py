@@ -370,9 +370,9 @@ def BWResults():
     render_factor = request.form.get('render_factor')
     print("Working..")
     if images_count < images_total:
+        print(FilePath)
         try:
             output = replicate.run("arielreplicate/deoldify_image:0da600fab0c45a66211339f1c16b71345d22f26ef5fea3dca1bb90bb5711e950",input={"input_image": FilePath,'render_factor':int(render_factor),'model_name':model})
-            # print(output)
             print("Done")
             images_update_query = f"UPDATE `user` SET `images_count` = '{images_count+1}' WHERE `email` = '{email}';"
             cursor.execute(images_update_query)
