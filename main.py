@@ -351,6 +351,7 @@ def BWImage():
     else:
         return redirect(url_for("login"))
 
+
 @app.route('/bw-image-results',methods=['POST'])
 def BWResults():
     cnx = ms.connect(user='magic_register', password='Indira@2000',
@@ -366,19 +367,26 @@ def BWResults():
     cursor.execute(images_total_query)
     images_total = int(cursor.fetchone()[0])
 
+    ImgFile = request.files['imageFile']
+    cwd = os.getcwd()
+    destination = os.path.join(cwd,ImgFile.filename)
+    ImgFile.save(destination)
+    print(ImgFile.filename)
+
     model = request.form.get('model')
     render_factor = request.form.get('render_factor')
     print("Working..")
     if images_count < images_total:
-        print(FilePath)
+        # print(ImgPath)
         try:
-            output = replicate.run("arielreplicate/deoldify_image:0da600fab0c45a66211339f1c16b71345d22f26ef5fea3dca1bb90bb5711e950",input={"input_image": FilePath,'render_factor':int(render_factor),'model_name':model})
+            output = replicate.run("arielreplicate/deoldify_image:0da600fab0c45a66211339f1c16b71345d22f26ef5fea3dca1bb90bb5711e950",input={"input_image": open(ImgFile.filename,'rb+'),'model_name':model,'render_factor':int(render_factor)})
             print("Done")
             images_update_query = f"UPDATE `user` SET `images_count` = '{images_count+1}' WHERE `email` = '{email}';"
             cursor.execute(images_update_query)
             cnx.commit()
             cursor.close()
             cnx.close()
+            os.remove(ImgFile.filename)
             return render_template('bwimage-results.html',data=[images_count+1,images_total,output,"",""])
         except Exception as e:
             print(e)
