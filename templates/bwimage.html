@@ -1,0 +1,70 @@
+{% extends 'base.html' %}
+
+{% block title %}B/W Image{% endblock %}
+
+{% block content %}
+<link rel="stylesheet" href="{{ url_for('static', filename='css/bwimage.css') }}">
+<div class="sticky-card btn-success">
+    <!-- <h3>Minutes Usage</h3> -->
+    <p>Images Used</p>
+    <p style="text-align:center;" id="minutesUpdate">{{data[0]}} / {{data[1]}}</p>
+</div>
+<div class="container">
+    <div class="card">
+        <div class="h1">B/W Image to Color</div>
+        <hr>
+        <p class="para">{{data[2]}}</p>
+    </div>
+</div>
+
+<div class="container">
+    <div class="card">
+        <div class="image-preview-container">
+            <div class="preview">
+                <img id="preview-selected-image" class="img-fluid" />
+            </div>
+            <label for="file-upload" style="width: 40%;margin: auto;" type="button">Upload Image</label>
+            <p id="size" style="font-size: 12px; color: rgb(77, 77, 77);position: absolute; left: 5px; display: none; ">
+                Size of Image - </p>
+            <input type="file" id="file-upload" accept="image/*" onchange="previewImage(event);" />
+        </div>
+    </div>
+</div>
+<div class="container">
+    <form class="form" action="/bw-image-results" method="POST">
+        <div class="card">
+            <span style="font-size: 12px;"><b>Choose model to use:</b> Artistic has more vibrant color but may leave
+                important parts of the image gray.Stable is better for nature scenery and is less prone to leaving gray
+                human parts</span>
+            <select class="form-select my-2" name='model' aria-label="Default select example" style="outline: none;">
+                <option selected value="Artistic">Artistic</option>
+                <option value="Stable">Stable</option>
+            </select>
+            <br>
+            <span style="font-size: 11px;">The default value of 35 has been carefully chosen and should work -ok- for
+                most scenarios (but
+                probably won't be the -best-). This determines resolution at which the color portion of the
+                image is rendered. Lower resolution will render faster, and colors also tend to look more
+                vibrant. Older and lower quality images in particular will generally benefit by lowering the
+                render factor. Higher render factors are often better for higher quality images, but the colors
+                may get slightly washed out.</span>
+
+            <div class="input-group input-group-sm mb-3 my-2">
+                <div class="input-group-prepend">
+                    <span class="input-group-text" name="inputGroup-sizing-sm">Render Factor</span>
+                </div>
+                <input type="text" name="render_factor" id="render_factor" class="form-control" aria-label="Small"
+                    aria-describedby="inputGroup-sizing-sm" value="35">
+                <br>
+            </div>
+            <br>
+            <button id="submit" class="btn btn-primary" style="
+            width: 27%;
+            margin: auto;
+            ">Submit</button>
+        </div>
+    </form>
+</div>
+<script src="{{ url_for('static', filename='js/bwimage.js') }}"></script>
+
+{%endblock%}

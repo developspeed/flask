@@ -9,14 +9,11 @@
     integrity="sha384-EVSTQN3/azprG1Anm3QDgpJLIm9Nao0Yz1ztcQTwFspd3yD65VohhpuuCOmLASjC" crossorigin="anonymous">
 <link rel="stylesheet" href="{{ url_for('static', filename='css/image.css') }}">
 <div class="sticky-card btn-success">
-    <!-- <h3>Minutes Usage</h3> -->
     <p>Images Used</p>
     <p style="text-align:center;" id="minutesUpdate">{{data[0]}} / {{data[1]}}</p>
 </div>
 <div class="sticky-card-left btn-warning">
-    <!-- <h3>Minutes Usage</h3> -->
     <a href="https://imageresizer.com/" target="_blank" style="text-decoration: none; color: white;">Image Resize</a>
-    <!-- <p style="text-align:center;" id="minutesUpdate">{{data[0]}} / {{data[1]}}</p> -->
 </div>
 <div class="container">
     <div class="card">
@@ -27,7 +24,8 @@
 </div>
 <div class="container">
     <div class="card" id='camera'>
-        <label id="capture" class="btn btn-danger my-2" style="width: 55%;margin: auto" type="button">Take a Picture</label>
+        <label id="capture" class="btn btn-danger my-2" style="width: 55%;margin: auto" type="button">Take a
+            Picture</label>
         <video id="video" style="display: none;" muted playsinline class="img-fluid"></video>
     </div>
     <!-- <h5 class="or">or</h5> -->
@@ -37,7 +35,8 @@
                 <img id="preview-selected-image" class="img-fluid" />
             </div>
             <label for="file-upload" style="width: 77%;margin: auto;" type="button">Upload Image</label>
-            <p id="size" style="font-size: 12px; color: rgb(77, 77, 77);position: absolute; left: 5px; display: none; ">Size of Image - </p>
+            <p id="size" style="font-size: 12px; color: rgb(77, 77, 77);position: absolute; left: 5px; display: none; ">
+                Size of Image - </p>
             <input type="file" id="file-upload" accept="image/*" onchange="previewImage(event);" />
         </div>
     </div>
