@@ -1,0 +1,68 @@
+
+.sticky-card {
+  position: fixed;
+  bottom: 10px;
+  right: 20px;
+  /* background-color: rgb(243, 212, 186); */
+  padding: 10px;
+  border-radius: 100px;
+  box-shadow: 2px 2px 5px rgba(0, 0, 0, 0.3);
+  transform: rotate(0deg);
+  z-index: 1;
+}
+.sticky-card-left {
+  position: fixed;
+  bottom: 10px;
+  left: 20px;
+  /* background-color: rgb(243, 212, 186); */
+  padding: 10px;
+  border-radius: 100px;
+  box-shadow: 2px 2px 5px rgba(0, 0, 0, 0.3);
+  transform: rotate(0deg);
+  z-index: 1;
+}
+
+.sticky-card p {
+  margin: 0;
+  font-size: 16px;
+  /* font-family: Arial, sans-serif; */
+  line-height: 1.5;
+}
+
+.sticky-card:hover {
+  transform: scale(1.1);
+  transition: 100ms ease-in-out;
+}
+
+.image-preview-container {
+  width: 70%;
+  margin: 0 auto;
+}
+
+.image-preview-container img {
+  width: 100%;
+  display: none;
+  margin-bottom: 30px;
+}
+.image-preview-container input {
+  display: none;
+}
+
+.image-preview-container label {
+  display: block;
+  width: 60%;
+  height: 40px;
+  margin-left: 25%;
+  text-align: center;
+  background: #8338ec;
+  color: #fff;
+  font-size: 15px;
+  text-transform: Uppercase;
+  font-weight: 400;
+  border-radius: 5px;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin-top: 6px;
+}
