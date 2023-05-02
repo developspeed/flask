@@ -58,8 +58,8 @@
                 <br>
             </div>
             <br>
-            <button id="submit" type="submit" class="btn btn-primary" style="width: 27%; margin: auto;">Submit</button>
-            <img src="{{ url_for('static', filename='img/loader.gif') }}" id="loader" style="display: none;width: 10rem;height: 3rem;margin: auto;">
+            <button id="submit" type="submit" class="btn btn-primary" style="width: 27%; margin: auto;" onclick="showLoader()">Submit</button>
+            <img src="{{ url_for('static', filename='img/loader.gif') }}" id="loader" class="my-2" style="display: none;width: 10rem;height: 3rem;margin: auto;">
     </div>
 </form>
 </div>
