@@ -422,69 +422,6 @@ def DBRead(table, field):
     return data
 
 
-@app.route('/admin', methods=['GET'])
-def Admin():
-    if 'get_user_email' in session:
-        if 'Admin' == admin_name_validation:
-            # Get the Data
-            api_key = DBRead('whisper_config', 'API_Key')
-            model = DBRead('whisper_config', 'model')
-            transcription = DBRead('whisper_config', 'transcription')
-            temp = DBRead('whisper_config', 'temperature')
-            patience = DBRead('whisper_config', 'patience')
-            suppress = DBRead('whisper_config', 'suppress_tokens')
-            temperature = DBRead(
-                'whisper_config', 'temp_increment_on_fallback')
-            compression = DBRead(
-                'whisper_config', 'compression_ratio_threshold')
-            logprob = DBRead('whisper_config', 'logprob_threshold')
-            nospeech = DBRead('whisper_config', 'no_speech_threshold')
-            whisper_text = DBRead('whisper_config', 'whisper_text')
-
-            # data = [api_key,model,transcription,temp,patience,suppress,temperature,compression,logprob,nospeech]
-
-            return render_template('admin.html', data=[api_key, transcription, temp, patience, suppress, temperature, compression, logprob, nospeech, model, whisper_text])
-
-        else:
-            return (redirect('/dashboard'))
-
-    else:
-        return redirect(url_for('login.html'))
-
-
-@app.route('/admin-success', methods=["POST"])
-def AdminWhisper():
-    # Form Data
-    API_Key = request.form['API_Key']
-    Transcription = request.form['Transcription']
-    Temperature = request.form['Temperature']
-    Patience = request.form['Patience']
-    Suppress_Tokens = request.form['Suppress_Tokens']
-    Temperature_increment = request.form['Temperature_increment']
-    Compression = request.form['Compression']
-    Logprob = request.form['Logprob']
-    Speech = request.form['Speech']
-    Model = request.form['Model']
-    WhisperAIText = request.form['Whisper AI Text']
-
-    # Updation Database Queries and Executing Queries
-    DBUpdate('whisper_config', 'API_Key', API_Key)
-    DBUpdate('whisper_config', 'transcription', Transcription)
-    DBUpdate('whisper_config', 'temperature', Temperature)
-    DBUpdate('whisper_config', 'patience', Patience)
-    DBUpdate('whisper_config', 'suppress_tokens', Suppress_Tokens)
-    DBUpdate('whisper_config', 'temp_increment_on_fallback',
-             Temperature_increment)
-    DBUpdate('whisper_config', 'compression_ratio_threshold', Compression)
-    DBUpdate('whisper_config', 'logprob_threshold', Logprob)
-    DBUpdate('whisper_config', 'no_speech_threshold', Speech)
-    DBUpdate('whisper_config', 'model', Model)
-    DBUpdate('whisper_config', 'whisper_text', WhisperAIText)
-
-    # print(API_Key,Transcription,Temperature,Patience,Suppress_Tokens,Temperature_increment,Compression,Logprob,Speech,Model)
-    return redirect('/admin')
-
-
 @app.errorhandler(404)
 def page_not_found(e):
     return render_template('404.html'), 404
@@ -496,4 +433,4 @@ def internal_server(e):
 
 
 if __name__ == "__main__":
-    app.run(port=5000)
+    app.run(port=5000,debug=True,host="0.0.0.0")
