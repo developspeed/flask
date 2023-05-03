@@ -273,7 +273,7 @@ FilePath = None
 def upload_image():
     global FilePath
     FilePath = BytesIO(request.files.get('imageFile').read())
-    print(FilePath)
+    print("The File",FilePath)
     return "Uploaded Successfully"
 
 @app.route('/image-edit-results', methods=["POST"])
