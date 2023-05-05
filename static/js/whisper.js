@@ -128,14 +128,12 @@ document
 
 
 // Getting Function output through WhisperAI endpoint in python
-const to_translate = document.getElementById("inlineCheckbox1").value;
-// console.log(to_translate)
 const formData = new FormData()
-formData.append('to_translate',to_translate);
 
-function WhisperAI() {
+function WhisperAITranscribe() {
   // Collect user input data
   // Send HTTP request to Python backend
+  formData.append('task','transcribe');
   const xhr = new XMLHttpRequest();
   xhr.open("POST", "/whisper-results");
   xhr.timeout = 3000000; // Set timeout to 5 minutes in milliseconds
@@ -145,7 +143,6 @@ function WhisperAI() {
       const data = JSON.parse(xhr.responseText);
       // Update HTML with output data returned by Python function
       const outputData = document.getElementById("outputData");
-      const translated = document.getElementById("translated");
       const language_detect = document.getElementById("language_detect");
       const loader = document.getElementById("loader");
       const minutesUpdate = document.getElementById('minutesUpdate');
@@ -154,10 +151,10 @@ function WhisperAI() {
       ouputDisplay.style.display = 'flex';
       loader.style.display = 'none';
       outputData.innerHTML = data.outputData;
-      translated.innerHTML = data.translate;
+      // translated.innerHTML += '';
       language_detect.innerHTML = "Detected Language : "+data.language_detect;
       minutesUpdate.innerHTML = data.minutes_count +" / "+ data.minutes_total;
-      console.log(data)
+      // console.log(data)
     } else {
       console.log("Request failed");
     }
@@ -169,6 +166,45 @@ function WhisperAI() {
     console.log("Request timed out");
   };
   xhr.send(formData);
+}
+
+const formData2 = new FormData()
+function WhisperAITranslate() {
+  // Collect user input data
+  // Send HTTP request to Python backend
+  formData2.append('task','translate');
+  const xhr = new XMLHttpRequest();
+  xhr.open("POST", "/whisper-results");
+  xhr.timeout = 3000000; // Set timeout to 5 minutes in milliseconds
+  xhr.onload = function() {
+    if (xhr.status === 200) {
+      console.log("Success");
+      const data = JSON.parse(xhr.responseText);
+      // Update HTML with output data returned by Python function
+      const translated = document.getElementById("translated");
+      const language_detect = document.getElementById("language_detect");
+      const loader = document.getElementById("loader");
+      const minutesUpdate = document.getElementById('minutesUpdate');
+      const ouputDisplay = document.getElementById('outputToggle');
+
+      ouputDisplay.style.display = 'flex';
+      loader.style.display = 'none';
+      // outputData.innerHTML += '';
+      translated.innerHTML = data.translate;
+      language_detect.innerHTML = "Detected Language : ";
+      minutesUpdate.innerHTML = data.minutes_count +" / "+ data.minutes_total;
+      // console.log(data)
+    } else {
+      console.log("Request failed");
+    }
+  };
+  xhr.onerror = function() {
+    console.log("Error");
+  };
+  xhr.ontimeout = function() {
+    console.log("Request timed out");
+  };
+  xhr.send(formData2);
 }
 
 
