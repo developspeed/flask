@@ -3,3 +3,5 @@ mysql-connector==2.2.9
 replicate==0.7.0
 gunicorn>=20.1.0
 urllib3==1.25.11
+chill==0.9.0
+openai==0.27.6
