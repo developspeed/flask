@@ -254,8 +254,6 @@ def WhisperAI():
                 print("The total minutes will be : ",minutes_count+minutes_to_update)
                 # print(output['text'])
                 minutes_to_show = custom_round(minutes_count+minutes_to_update)
-                audioFile.close()
-                os.remove(audioRecordedGlobal.filename)
                 return jsonify({'outputData': output['text'], 'language_detect': language, 'minutes_count': minutes_to_show, "minutes_total": minutes_total})
             else:
                 # We are again establishing a connection because large file give connection lost error
@@ -271,17 +269,15 @@ def WhisperAI():
                 print("The total minutes will be : ",minutes_count+minutes_to_update)
                 # print(output_translate['text'])
                 minutes_to_show = custom_round(minutes_count+minutes_to_update)
-                audioFile.close()
-                os.remove(audioRecordedGlobal.filename)
                 return jsonify({'translate': output_translate['text'], 'minutes_count': minutes_to_show, "minutes_total": minutes_total})
             
-            
+         
         except Exception as e:
             print(e)
             return jsonify({"outputData": e, 'translate': "", 'language_detect': '', 'minutes_count': minutes_count, "minutes_total": minutes_total})
     else:
         return render_template('whisper.html', data=["", "", "", "", "", "You Have Used All Your Minutes"])
-# os.remove(audioRecordedGlobal.filename)
+
 
 # Image Edit Model and Functions
 
