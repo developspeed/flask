@@ -5,8 +5,6 @@ import os
 import replicate
 from io import BytesIO
 import openai
-from langdetect import detect
-from iso639 import to_name
 
 
 cnx = ms.connect(user='magic_register', password='Indira@2000',
