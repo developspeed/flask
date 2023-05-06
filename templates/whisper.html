@@ -33,9 +33,11 @@
                 <label for="audioFile"><b>Select Audio File:</b></label>
                 <input type="file" class="form-control-file" id="audioFile" name="audioFile"
                     accept="audio/mp3/wav/m4a/ogg">
-                <div id="error-message" style="display: none;">Error: Only MP3, WAV, OGG, and M4A files are supported.
+                <div id="error-message" style="display: none; font-size: 15px;">Error: Only MP3, WAV, OGG, and M4A files are supported.
                 </div>
-                <div id="upload-message" style="display: none;">Uploading File, please wait.....</div>
+                <div id="size-message" style="display: none; font-size: 15px;">Error: Upto 25MB size audio file supported, reload page and Upload again.
+                </div>
+                <div id="upload-message" style="display: none; font-size: 15px;">Uploading File, please wait.....</div>
                 <br>
                 <br>
                 <audio id="audio-upload-player" controls align="center" format="audio/wav">
@@ -63,7 +65,7 @@
                 id="transcribe">Transcribe</button>
                 <br>
             <button class="btn btn-primary" type="submit" onclick="showLoader(); WhisperAITranslate()"
-                id="transcribe">Translate</button>
+                id="translate">Translate</button>
             <br>
             <br>
             <img src="{{ url_for('static', filename='img/loader.gif') }}" id="loader" style="
