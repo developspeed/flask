@@ -103,22 +103,39 @@ audioFile.addEventListener("change", function () {
 
 // Audio file validation
 const errorMessage = document.getElementById("error-message");
+const sizeMessage = document.getElementById("size-message");
+const transcribeButton = document.getElementById("transcribe");
+const translateButton = document.getElementById("translate");
 audioFile.addEventListener("change", function () {
   const file = audioFile.files[0];
   const obj = URL.createObjectURL(file);
+  let fileSize = file.size;
+  fileSize = fileSize/(1024*1024);
+  if (fileSize>25){
+    sizeMessage.style.color = 'red';
+    sizeMessage.style.display = "flex";
+    transcribeButton.disabled = true;
+    translateButton.disabled = true;
+  }else{
+    transcribeButton.disabled = false;
+    translateButton.disabled = false;
+    sizeMessage.style.display = 'none';
+  }
   audioFilePlayer.src = obj;
   const fileExtension = file.name.split(".").pop().toLowerCase();
   const supportedExtensions = ["mp3", "wav", "ogg", "m4a"];
-  const transcribeButton = document.getElementById("transcribe");
+
   if (supportedExtensions.includes(fileExtension)) {
     errorMessage.style.display = "none";
     // audioPlayer.style.display = "block";
     transcribeButton.disabled = false;
+    translateButton.disabled = false;
   } else {
     errorMessage.style.display = "block";
     errorMessage.style.color = "red";
     // audioPlayer.style.display = "none";
     transcribeButton.disabled = true;
+    translateButton.disabled = true;
   }
 });
 
