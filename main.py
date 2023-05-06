@@ -156,14 +156,8 @@ def upload():
     print(audioRecordedGlobal.filename)
     global minutes_to_update
     minutes_to_update = request.form.get('duration')
-
-    # to_translate = request.form.get('checkbox_value')
-    # print("Without submit results")
-    # print(audioRecordedGlobal,minutes_to_update)
     return "Done"
 
-
-to_translate = None
 
 
 @app.route('/whisper', methods=['POST', 'GET'])
@@ -251,10 +245,15 @@ def WhisperAI():
                 cnx.commit()
                 cursor.close()
                 cnx.close()
+
                 print("The total minutes will be : ",minutes_count+minutes_to_update)
-                # print(output['text'])
+                
                 minutes_to_show = custom_round(minutes_count+minutes_to_update)
+                # audioFile.close()
+                # os.remove(audioRecordedGlobal.filename)
+
                 return jsonify({'outputData': output['text'], 'language_detect': language, 'minutes_count': minutes_to_show, "minutes_total": minutes_total})
+
             else:
                 # We are again establishing a connection because large file give connection lost error
                 output_translate =  openai.Audio.translate("whisper-1", audioFile)
@@ -266,12 +265,15 @@ def WhisperAI():
                 cnx.commit()
                 cursor.close()
                 cnx.close()
+
                 print("The total minutes will be : ",minutes_count+minutes_to_update)
-                # print(output_translate['text'])
+
                 minutes_to_show = custom_round(minutes_count+minutes_to_update)
+                # audioFile.close()
+                # os.remove(audioRecordedGlobal.filename)
+
                 return jsonify({'translate': output_translate['text'], 'minutes_count': minutes_to_show, "minutes_total": minutes_total})
-            
-         
+
         except Exception as e:
             print(e)
             return jsonify({"outputData": e, 'translate': "", 'language_detect': '', 'minutes_count': minutes_count, "minutes_total": minutes_total})
@@ -435,7 +437,6 @@ def BWResults():
 
 
 
-########## Admin Panel ###########
 
 # Utility function for updating the form data to database
 def DBUpdate(table, field, value):
