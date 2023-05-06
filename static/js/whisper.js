@@ -23,14 +23,17 @@ function startRecording() {
       const audioElement = new Audio(audioUrl);
       audioPlayer.src = audioUrl;
       let formData = new FormData();
-      formData.append("audio", audioBlob);
+      
 
       //   Duration Getting
 
       const audioContext = new AudioContext();
       const fileReader = new FileReader();
       var minutes = 0;
+      
       fileReader.onload = function () {
+        let audioFile = new File([fileReader.result], "recording.mp3", {type: "audio/mp3",});
+        formData.append("audio", audioFile);
         audioContext
           .decodeAudioData(fileReader.result)
           .then(function (decodedData) {
