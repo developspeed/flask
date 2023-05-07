@@ -17,7 +17,7 @@ function startRecording() {
     };
 
     mediaRecorder.onstop = function (e) {
-      let audioBlob = new Blob(chunks, { type: "audio/ogg; codecs=opus" });
+      let audioBlob = new Blob(chunks, { type: "audio/mp3; codecs=opus" });
       let audioUrl = URL.createObjectURL(audioBlob);
       const audioPlayer = document.getElementById("audio-player");
       const audioElement = new Audio(audioUrl);
@@ -32,7 +32,7 @@ function startRecording() {
       var minutes = 0;
       
       fileReader.onload = function () {
-        let audioFile = new File([fileReader.result], "recording.mp3", {type: "audio/mp3",});
+        let audioFile = new File([fileReader.result], "recording.wav", {type: "audio/wav",});
         formData.append("audio", audioFile);
         audioContext
           .decodeAudioData(fileReader.result)
