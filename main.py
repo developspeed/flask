@@ -253,7 +253,8 @@ def WhisperAI():
                 minutes_to_show = custom_round(minutes_count+minutes_to_update)
                 # audioFile.close()
                 # os.remove(audioRecordedGlobal.filename)
-
+                print(output['text'])
+                
                 return jsonify({'outputData': output['text'], 'language_detect': language, 'minutes_count': minutes_to_show, "minutes_total": minutes_total})
 
             else:
