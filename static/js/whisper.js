@@ -4,7 +4,7 @@ let startButton = document.getElementById("startButton");
 let stopButton = document.getElementById("stopButton");
 let mediaRecorder;
 let chunks = [];
-
+ 
 function startRecording() {
   navigator.mediaDevices.getUserMedia({ audio: true }).then(function (stream) {
     mediaRecorder = new MediaRecorder(stream);
