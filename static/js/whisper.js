@@ -22,6 +22,7 @@ function startRecording() {
       const audioPlayer = document.getElementById("audio-player");
       const audioElement = new Audio(audioUrl);
       audioPlayer.src = audioUrl;
+      audioPlayer.volume = 100;
       let formData = new FormData();
       
 
