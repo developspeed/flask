@@ -17,7 +17,7 @@ function startRecording() {
     };
 
     mediaRecorder.onstop = function (e) {
-      let audioBlob = new Blob(chunks, { type: "audio/ogg; codecs=opus" });
+      let audioBlob = new Blob(chunks, { type: "audio/wav; codecs=opus" });
       let audioUrl = URL.createObjectURL(audioBlob);
       const audioPlayer = document.getElementById("audio-player");
       const audioElement = new Audio(audioUrl);
