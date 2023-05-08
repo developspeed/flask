@@ -4,7 +4,7 @@ let startButton = document.getElementById("startButton");
 let stopButton = document.getElementById("stopButton");
 let mediaRecorder;
 let chunks = [];
- 
+
 function startRecording() {
   navigator.mediaDevices.getUserMedia({ audio: true }).then(function (stream) {
     mediaRecorder = new MediaRecorder(stream);
@@ -17,7 +17,7 @@ function startRecording() {
     };
 
     mediaRecorder.onstop = function (e) {
-      let audioBlob = new Blob(chunks, { type: "audio/wav; codecs=opus" });
+      let audioBlob = new Blob(chunks, { type: "audio/mp3; codecs=opus" });
       let audioUrl = URL.createObjectURL(audioBlob);
       const audioPlayer = document.getElementById("audio-player");
       const audioElement = new Audio(audioUrl);
@@ -32,8 +32,8 @@ function startRecording() {
       var minutes = 0;
       
       fileReader.onload = function () {
-        // let audioFile = new File([fileReader.result], "recording.mp3", {type: "audio/mp3",});
-        formData.append("audio", audioBlob);
+        let audioFile = new File([fileReader.result], "recording.mp3", {type: "audio/mp3",});
+        formData.append("audio", audioFile);
         audioContext
           .decodeAudioData(fileReader.result)
           .then(function (decodedData) {
