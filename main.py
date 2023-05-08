@@ -156,6 +156,7 @@ def upload():
     print(audioRecordedGlobal.filename)
     global minutes_to_update
     minutes_to_update = request.form.get('duration')
+    print(minutes_to_update)
     return "Done"
 
 
@@ -218,6 +219,7 @@ def WhisperAI():
 
     if minutes_count <= float(minutes_total):
         # Model Running
+        print("Working")
         try:
             # Transcribing the audio    
             if task == "transcribe":
