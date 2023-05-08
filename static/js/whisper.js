@@ -67,6 +67,7 @@ function stopRecording() {
   mediaRecorder.stop();
   startButton.disabled = false;
   stopButton.disabled = true;
+  mediaRecorder.stream.getTracks().forEach(track => track.stop());
 }
 
 startButton.addEventListener("click", startRecording);
