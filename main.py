@@ -150,13 +150,12 @@ minutes_to_update = 0
 def upload():
     global audioRecordedGlobal
     audioRecordedGlobal = request.files.get('audio')
-    cwd = os.getcwd()
-    destination = os.path.join(cwd,audioRecordedGlobal.filename)
-    audioRecordedGlobal.save(destination)
+    # Save the audio file to the current directory
+    file_path = os.path.join(os.getcwd(), 'audio.mp3')
+    audioRecordedGlobal.save(file_path)
     print(audioRecordedGlobal.filename)
     global minutes_to_update
     minutes_to_update = request.form.get('duration')
-    print(minutes_to_update)
     return "Done"
 
 
@@ -206,10 +205,9 @@ def WhisperAI():
 
     cursor.close()
     cnx.close()
-
     # Reading the audio file and Converting the audio 
-    audioFile = open(audioRecordedGlobal.filename,'rb')
-
+    audioFile = open("audio.mp3",'rb')
+    
     global minutes_to_update
     minutes_to_update = custom_round(minutes_to_update)
     print("Uploaded Audio or File Size : ", minutes_to_update)
@@ -219,10 +217,10 @@ def WhisperAI():
 
     if minutes_count <= float(minutes_total):
         # Model Running
-        print("Working")
-        try:
-            # Transcribing the audio    
-            if task == "transcribe":
+        # Transcribing the audio    
+        if task == "transcribe":
+            try:
+                
                 output =  openai.Audio.transcribe("whisper-1", audioFile)
                 text = output['text'][:2000]
                 
@@ -240,7 +238,7 @@ def WhisperAI():
                 )
                 language = completions.choices[0].text.strip()
                 cnx = ms.connect(user='magic_register', password='Indira@2000',
-                             host='185.104.29.84', database='magic_register')
+                            host='185.104.29.84', database='magic_register')
                 cursor = cnx.cursor()
                 update_minutes_query = f"UPDATE `user` SET `minutes_count` = '{minutes_to_update+minutes_count}' WHERE `email` = '{email}';"
                 cursor.execute(update_minutes_query)
@@ -251,17 +249,20 @@ def WhisperAI():
                 print("The total minutes will be : ",minutes_count+minutes_to_update)
                 
                 minutes_to_show = custom_round(minutes_count+minutes_to_update)
-                # audioFile.close()
-                # os.remove(audioRecordedGlobal.filename)
-                print(output['text'])
-                
-                return jsonify({'outputData': output['text'], 'language_detect': language, 'minutes_count': minutes_to_show, "minutes_total": minutes_total})
+                audioFile.close()
+                os.remove("audio.mp3")
 
-            else:
+                return jsonify({'outputData': output['text'], 'language_detect': language, 'minutes_count': minutes_to_show, "minutes_total": minutes_total})
+            except Exception as e:
+                print(e)
+                return jsonify({"outputData": e, 'translate': "", 'language_detect': '', 'minutes_count': minutes_count, "minutes_total": minutes_total})
+            
+        else:
+            try:
                 # We are again establishing a connection because large file give connection lost error
                 output_translate =  openai.Audio.translate("whisper-1", audioFile)
                 cnx = ms.connect(user='magic_register', password='Indira@2000',
-                             host='185.104.29.84', database='magic_register')
+                            host='185.104.29.84', database='magic_register')
                 cursor = cnx.cursor()
                 update_minutes_query = f"UPDATE `user` SET `minutes_count` = '{minutes_to_update+minutes_count}' WHERE `email` = '{email}';"
                 cursor.execute(update_minutes_query)
@@ -272,14 +273,14 @@ def WhisperAI():
                 print("The total minutes will be : ",minutes_count+minutes_to_update)
 
                 minutes_to_show = custom_round(minutes_count+minutes_to_update)
-                # audioFile.close()
-                # os.remove(audioRecordedGlobal.filename)
+                audioFile.close()
+                os.remove("audio.mp3")
 
                 return jsonify({'translate': output_translate['text'], 'minutes_count': minutes_to_show, "minutes_total": minutes_total})
 
-        except Exception as e:
-            print(e)
-            return jsonify({"outputData": e, 'translate': "", 'language_detect': '', 'minutes_count': minutes_count, "minutes_total": minutes_total})
+            except Exception as e:
+                print(e)
+                return jsonify({"outputData": e, 'translate': "", 'language_detect': '', 'minutes_count': minutes_count, "minutes_total": minutes_total})
     else:
         return render_template('whisper.html', data=["", "", "", "", "", "You Have Used All Your Minutes"])
 
@@ -476,4 +477,4 @@ def internal_server(e):
 
 
 if __name__ == "__main__":
-    app.run(port=5000)
+    app.run(port=5000,host="0.0.0.0",debug=True)
