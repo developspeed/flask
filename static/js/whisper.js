@@ -32,7 +32,7 @@ function startRecording() {
       var minutes = 0;
       
       fileReader.onload = function () {
-        let audioFile = new File([fileReader.result], "recording.mp3", {type: "audio/mp3",});
+        let audioFile = new File([fileReader.result], "recording.wav", {type: "audio/wav",});
         formData.append("audio", audioFile);
         audioContext
           .decodeAudioData(fileReader.result)
