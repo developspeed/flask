@@ -4,23 +4,32 @@ let startButton = document.getElementById("startButton");
 let stopButton = document.getElementById("stopButton");
 let mediaRecorder;
 let chunks = [];
+const audioPlayer = document.getElementById("audio-player");
+audioPlayer.style.display='none';
 
 function startRecording() {
   navigator.mediaDevices.getUserMedia({ audio: true }).then(function (stream) {
     mediaRecorder = new MediaRecorder(stream);
     mediaRecorder.start();
+    // chunks.length =  0;
     startButton.disabled = true;
     stopButton.disabled = false;
 
-    mediaRecorder.ondataavailable = function (e) {
-      chunks.push(e.data);
-    };
+    // mediaRecorder.ondataavailable = function (e) {
+    //   chunks.push(e.data);
+    // };
+    mediaRecorder.addEventListener("dataavailable", event => {
+      chunks.push(event.data);
+    });
+
+    // const start = () => mediaRecorder.start();
 
     mediaRecorder.onstop = function (e) {
-      let audioBlob = new Blob(chunks, { type: "audio/mp3; codecs=opus" });
+      let audioBlob = new Blob(chunks, { type: "audio/wav" });
+      // let audioBlob = new Blob(chunks, { type: "audio/mp3;" });
       let audioUrl = URL.createObjectURL(audioBlob);
-      const audioPlayer = document.getElementById("audio-player");
       const audioElement = new Audio(audioUrl);
+      audioPlayer.style.display = 'flex';
       audioPlayer.src = audioUrl;
       let formData = new FormData();
       
@@ -34,6 +43,7 @@ function startRecording() {
       fileReader.onload = function () {
         let audioFile = new File([fileReader.result], "recording.wav", {type: "audio/wav",});
         formData.append("audio", audioFile);
+        formData.append('type','mic');
         audioContext
           .decodeAudioData(fileReader.result)
           .then(function (decodedData) {
@@ -42,7 +52,7 @@ function startRecording() {
             // var data = { duration: minutes };
             formData.append("duration", minutes);
             console.log(minutes);
-            fetch("/upload", {
+            fetch("/upload-mic", {
               method: "POST",
               body: formData,
             })
@@ -75,6 +85,7 @@ stopButton.addEventListener("click", stopRecording);
 // Audio Player for uploaded audio and duration to server
 const audioFile = document.getElementById("audioFile");
 const audioFilePlayer = document.getElementById("audio-upload-player");
+audioFilePlayer.style.display = 'none';
 const uploader = document.getElementById('upload-message');
 audioFile.addEventListener("change", function () {
   const file = audioFile.files[0];
@@ -83,6 +94,8 @@ audioFile.addEventListener("change", function () {
   // console.log(file)
   let formData = new FormData();
   formData.append("audio", file);
+  formData.append('type','file')
+  audioFilePlayer.style.display = 'flex';
   audioFilePlayer.addEventListener("loadedmetadata", function () {
     var duration = audioFilePlayer.duration;
     var minutes = duration / 60;
