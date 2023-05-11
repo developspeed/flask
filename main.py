@@ -144,7 +144,7 @@ def custom_round(num, digits=2, Isstr=False):
 # Audio Upload through Mic and files with duration and other options
 audioRecordedGlobal = None
 minutes_to_update = 0
-
+type = ''
 
 @app.route('/upload', methods=['POST', 'GET'])
 def upload():
@@ -154,6 +154,23 @@ def upload():
     destination = os.path.join(cwd,audioRecordedGlobal.filename)
     audioRecordedGlobal.save(destination)
     print(audioRecordedGlobal.filename)
+    global type
+    type = request.form.get('type')
+    global minutes_to_update
+    minutes_to_update = request.form.get('duration')
+    print(minutes_to_update)
+    return "Done"
+
+@app.route('/upload-mic', methods=['POST', 'GET'])
+def upload_mic():
+    global audioRecordedGlobal
+    audioRecordedGlobal = request.files.get('audio')
+    cwd = os.getcwd()
+    destination = os.path.join(cwd,audioRecordedGlobal.filename)
+    audioRecordedGlobal.save(destination)
+    print(audioRecordedGlobal.filename)
+    global type
+    type = request.form.get('type')
     global minutes_to_update
     minutes_to_update = request.form.get('duration')
     print(minutes_to_update)
@@ -223,68 +240,116 @@ def WhisperAI():
         try:
             # Transcribing the audio    
             if task == "transcribe":
-                output =  openai.Audio.transcribe("whisper-1", audioFile)
-                text = output['text'][:2000]
-                
-                # Detecting the Language of the Text
-                model_engine = "text-davinci-002"
-                prompt = (f"Please determine the language of the following text:\n\n{text}\n\n"
-                            "The language is:")
-                completions = openai.Completion.create(
-                    engine=model_engine,
-                    prompt=prompt,
-                    max_tokens=1,
-                    n=1,
-                    stop=None,
-                    temperature=0.5,
-                )
-                language = completions.choices[0].text.strip()
-                cnx = ms.connect(user='magic_register', password='Indira@2000',
+                if type == 'mic':
+                    output = replicate.run("openai/whisper:e39e354773466b955265e969568deb7da217804d8e771ea8c9cd0cef6591f8bc",
+                                           input={"audio": open("recording.wav", "rb")})
+                    
+                    cnx = ms.connect(user='magic_register', password='Indira@2000',
                              host='185.104.29.84', database='magic_register')
-                cursor = cnx.cursor()
-                update_minutes_query = f"UPDATE `user` SET `minutes_count` = '{minutes_to_update+minutes_count}' WHERE `email` = '{email}';"
-                cursor.execute(update_minutes_query)
-                cnx.commit()
-                cursor.close()
-                cnx.close()
+                    cursor = cnx.cursor()
+                    update_minutes_query = f"UPDATE `user` SET `minutes_count` = '{minutes_to_update+minutes_count}' WHERE `email` = '{email}';"
+                    cursor.execute(update_minutes_query)
+                    cnx.commit()
+                    cursor.close()
+                    cnx.close()
 
-                print("The total minutes will be : ",minutes_count+minutes_to_update)
-                
-                minutes_to_show = custom_round(minutes_count+minutes_to_update)
-                # audioFile.close()
-                # os.remove(audioRecordedGlobal.filename)
-                print(output['text'])
-                
-                return jsonify({'outputData': output['text'], 'language_detect': language, 'minutes_count': minutes_to_show, "minutes_total": minutes_total})
+                    print("The total minutes will be : ",minutes_count+minutes_to_update)
+                    
+                    minutes_to_show = custom_round(minutes_count+minutes_to_update)
+                    # audioFile.close()
+                    # os.remove(audioRecordedGlobal.filename)
+                    # print(output['transcription'])
+                    # print('using replicate')
+                    
+                    return jsonify({'outputData': output['transcription'], 'language_detect': output['detected_language'], 'minutes_count': minutes_to_show, "minutes_total": minutes_total})
+                else:     
+                    output =  openai.Audio.transcribe("whisper-1", audioFile)
+                    text = output['text'][:2000]
+                    
+                    # Detecting the Language of the Text
+                    model_engine = "text-davinci-002"
+                    prompt = (f"Please determine the language of the following text:\n\n{text}\n\n"
+                                "The language is:")
+                    completions = openai.Completion.create(
+                        engine=model_engine,
+                        prompt=prompt,
+                        max_tokens=1,
+                        n=1,
+                        stop=None,
+                        temperature=0.5,
+                    )
+                    language = completions.choices[0].text.strip()
+                    cnx = ms.connect(user='magic_register', password='Indira@2000',
+                                host='185.104.29.84', database='magic_register')
+                    cursor = cnx.cursor()
+                    update_minutes_query = f"UPDATE `user` SET `minutes_count` = '{minutes_to_update+minutes_count}' WHERE `email` = '{email}';"
+                    cursor.execute(update_minutes_query)
+                    cnx.commit()
+                    cursor.close()
+                    cnx.close()
+
+                    print("The total minutes will be : ",minutes_count+minutes_to_update)
+                    
+                    minutes_to_show = custom_round(minutes_count+minutes_to_update)
+                    # audioFile.close()
+                    # os.remove(audioRecordedGlobal.filename)
+                    # print(output['text'])
+                    
+                    return jsonify({'outputData': output['text'], 'language_detect': language, 'minutes_count': minutes_to_show, "minutes_total": minutes_total})
 
             else:
-                # We are again establishing a connection because large file give connection lost error
-                output_translate =  openai.Audio.translate("whisper-1", audioFile)
-                cnx = ms.connect(user='magic_register', password='Indira@2000',
+                if type == 'mic':
+                    output = replicate.run("openai/whisper:e39e354773466b955265e969568deb7da217804d8e771ea8c9cd0cef6591f8bc",
+                                           input={"audio": open("recording.wav", "rb"),'translate':True})
+                    
+                    cnx = ms.connect(user='magic_register', password='Indira@2000',
                              host='185.104.29.84', database='magic_register')
-                cursor = cnx.cursor()
-                update_minutes_query = f"UPDATE `user` SET `minutes_count` = '{minutes_to_update+minutes_count}' WHERE `email` = '{email}';"
-                cursor.execute(update_minutes_query)
-                cnx.commit()
-                cursor.close()
-                cnx.close()
+                    cursor = cnx.cursor()
+                    update_minutes_query = f"UPDATE `user` SET `minutes_count` = '{minutes_to_update+minutes_count}' WHERE `email` = '{email}';"
+                    cursor.execute(update_minutes_query)
+                    cnx.commit()
+                    cursor.close()
+                    cnx.close()
 
-                print("The total minutes will be : ",minutes_count+minutes_to_update)
+                    print("The total minutes will be : ",minutes_count+minutes_to_update)
+                    
+                    minutes_to_show = custom_round(minutes_count+minutes_to_update)
+                    # audioFile.close()
+                    # os.remove(audioRecordedGlobal.filename)
+                    # print(output['transcription'])
+                    # print('using replicate')
+                    
+                    return jsonify({'translate': output['translation'], 'language_detect': output['detected_language'], 'minutes_count': minutes_to_show, "minutes_total": minutes_total})
 
-                minutes_to_show = custom_round(minutes_count+minutes_to_update)
-                # audioFile.close()
-                # os.remove(audioRecordedGlobal.filename)
+                else:
+                    # We are again establishing a connection because large file give connection lost error
+                    output_translate =  openai.Audio.translate("whisper-1", audioFile)
+                    cnx = ms.connect(user='magic_register', password='Indira@2000',
+                                host='185.104.29.84', database='magic_register')
+                    cursor = cnx.cursor()
+                    update_minutes_query = f"UPDATE `user` SET `minutes_count` = '{minutes_to_update+minutes_count}' WHERE `email` = '{email}';"
+                    cursor.execute(update_minutes_query)
+                    cnx.commit()
+                    cursor.close()
+                    cnx.close()
 
-                return jsonify({'translate': output_translate['text'], 'minutes_count': minutes_to_show, "minutes_total": minutes_total})
+                    print("The total minutes will be : ",minutes_count+minutes_to_update)
+
+                    minutes_to_show = custom_round(minutes_count+minutes_to_update)
+                    # audioFile.close()
+                    # os.remove(audioRecordedGlobal.filename)
+
+                    return jsonify({'translate': output_translate['text'], 'minutes_count': minutes_to_show, "minutes_total": minutes_total})
 
         except Exception as e:
-            print(e)
+            # print(e)
             return jsonify({"outputData": e, 'translate': "", 'language_detect': '', 'minutes_count': minutes_count, "minutes_total": minutes_total})
     else:
         return render_template('whisper.html', data=["", "", "", "", "", "You Have Used All Your Minutes"])
 
 
-# Image Edit Model and Functions
+
+# Image Edit Model and Functions    
 
 @app.route("/image-edit")
 def ImageEdit():
