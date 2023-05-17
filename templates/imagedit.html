@@ -10,7 +10,7 @@
 <link rel="stylesheet" href="{{ url_for('static', filename='css/image.css') }}">
 <div class="sticky-card btn-success">
     <p>Images Used</p>
-    <p style="text-align:center;" id="minutesUpdate">{{data[0]}} / {{data[1]}}</p>
+    <p style="text-align:center;" id="imagesUpdate">{{images_count}} / {{images_total}}</p>
 </div>
 <div class="sticky-card-left btn-warning">
     <a href="https://imageresizer.com/" target="_blank" style="text-decoration: none; color: white;">Image Resize</a>
@@ -19,7 +19,7 @@
     <div class="card">
         <div class="h1">Edit Images</div>
         <hr>
-        <p class="para">{{data[2]}}</p>
+        <p class="para">{{ImageEditText}}</p>
     </div>
 </div>
 <div class="container">

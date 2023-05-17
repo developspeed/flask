@@ -7,23 +7,23 @@
 <link rel="stylesheet" href="{{ url_for('static', filename='css/image.css') }}">
 <div class="sticky-card btn-success">
     <p>Images Used</p>
-    <p style="text-align:center;" id="minutesUpdate">{{data[0]}} / {{data[1]}}</p>
+    <p style="text-align:center;" id="minutesUpdate">{{images_count}} / {{images_total}}</p>
 </div>
 <div class="sticky-card btn-warning">
-    <p style="text-align:center;">{{data[4]}}</p>
+    <p style="text-align:center;">{{warning}}</p>
 </div>
 <div class="container">
     <div class="card">
         <h2>Output Images</h2>
-        {% if data[2] != "" %}
-        {% for i in data[2] %}
+        {% if images != "" %}
+        {% for i in images %}
         <hr>
         <img src="{{i}}" class="img-fluid" alt="Generated Images" srcset="">
         <hr>
         <p style="font-size: 15px;display:flex;justify-content: center;" class="my-3" >Just right click on the image and click save image as.. to download</p>
         {% endfor %}
         {% endif %}
-        <p>{{data[3]}}</p>
+        <p>{{error}}</p>
     </div>
 </div>
 <div class="container">
