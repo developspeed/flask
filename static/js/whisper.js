@@ -1,3 +1,17 @@
+// Random File Name Generator
+function generateRandomFileName() {
+  const characters = 'abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789';
+  const length = 10; // Specify the desired length of the file name
+
+  let randomFileName = '';
+  for (let i = 0; i < length; i++) {
+    const randomIndex = Math.floor(Math.random() * characters.length);
+    randomFileName += characters.charAt(randomIndex);
+  }
+
+  return randomFileName;
+}
+
 // Voice Recorder with Duration to Server
 
 let startButton = document.getElementById("startButton");
@@ -41,7 +55,8 @@ function startRecording() {
       var minutes = 0;
       
       fileReader.onload = function () {
-        let audioFile = new File([fileReader.result], "recording.wav", {type: "audio/wav",});
+        let filename = generateRandomFileName()
+        let audioFile = new File([fileReader.result], filename+".wav", {type: "audio/wav",});
         formData.append("audio", audioFile);
         formData.append('type','mic');
         audioContext
@@ -52,7 +67,7 @@ function startRecording() {
             // var data = { duration: minutes };
             formData.append("duration", minutes);
             console.log(minutes);
-            fetch("/upload-mic", {
+            fetch("/whisper-upload", {
               method: "POST",
               body: formData,
             })
@@ -102,7 +117,7 @@ audioFile.addEventListener("change", function () {
     // var seconds = duration % 60;
     console.log(minutes);
     formData.append("duration", minutes);
-    fetch("/upload", {
+    fetch("/whisper-upload", {
       method: "POST",
       body: formData,
     })
@@ -167,6 +182,11 @@ const formData = new FormData()
 function WhisperAITranscribe() {
   // Collect user input data
   // Send HTTP request to Python backend
+  const outputData = document.getElementById("outputData");
+  const language_detect = document.getElementById("language_detect");
+  const loader = document.getElementById("loader");
+  const minutesUpdate = document.getElementById('minutesUpdate');
+  const ouputDisplay = document.getElementById('outputToggle');
   formData.append('task','transcribe');
   const xhr = new XMLHttpRequest();
   xhr.open("POST", "/whisper-results");
@@ -176,12 +196,6 @@ function WhisperAITranscribe() {
       console.log("Success");
       const data = JSON.parse(xhr.responseText);
       // Update HTML with output data returned by Python function
-      const outputData = document.getElementById("outputData");
-      const language_detect = document.getElementById("language_detect");
-      const loader = document.getElementById("loader");
-      const minutesUpdate = document.getElementById('minutesUpdate');
-      const ouputDisplay = document.getElementById('outputToggle');
-
       ouputDisplay.style.display = 'flex';
       loader.style.display = 'none';
       outputData.innerHTML = data.outputData;
@@ -191,6 +205,9 @@ function WhisperAITranscribe() {
       // console.log(data)
     } else {
       console.log("Request failed");
+      ouputDisplay.style.display = 'flex';
+      loader.style.display = 'none';
+      outputData.innerHTML = "There's some problem in audio file or try again";
     }
   };
   xhr.onerror = function() {
@@ -207,6 +224,11 @@ function WhisperAITranslate() {
   // Collect user input data
   // Send HTTP request to Python backend
   formData2.append('task','translate');
+  const translated = document.getElementById("translated");
+  const language_detect = document.getElementById("language_detect");
+  const loader = document.getElementById("loader");
+  const minutesUpdate = document.getElementById('minutesUpdate');
+  const ouputDisplay = document.getElementById('outputToggle');
   const xhr = new XMLHttpRequest();
   xhr.open("POST", "/whisper-results");
   xhr.timeout = 3000000; // Set timeout to 5 minutes in milliseconds
@@ -215,12 +237,6 @@ function WhisperAITranslate() {
       console.log("Success");
       const data = JSON.parse(xhr.responseText);
       // Update HTML with output data returned by Python function
-      const translated = document.getElementById("translated");
-      const language_detect = document.getElementById("language_detect");
-      const loader = document.getElementById("loader");
-      const minutesUpdate = document.getElementById('minutesUpdate');
-      const ouputDisplay = document.getElementById('outputToggle');
-
       ouputDisplay.style.display = 'flex';
       loader.style.display = 'none';
       // outputData.innerHTML += '';
@@ -230,6 +246,9 @@ function WhisperAITranslate() {
       // console.log(data)
     } else {
       console.log("Request failed");
+      ouputDisplay.style.display = 'flex';
+      loader.style.display = 'none';
+      outputData.innerHTML = "There's some problem in audio file or try again";
     }
   };
   xhr.onerror = function() {
