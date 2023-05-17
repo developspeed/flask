@@ -3,13 +3,52 @@
 {% block title %}Chat GPT-4{% endblock %}
 
 {% block content %}
-
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css"
+    integrity="sha512-iecdLmaskl7CVkqkXNQ/ZH/XLlvWZOJyj7Yy7tcenmpD1ypASozpmT/E0iPtmFIB46ZmdtAc9eNBvH0H/ZpiBw=="
+    crossorigin="anonymous" referrerpolicy="no-referrer" />
+<link rel="stylesheet" href="{{ url_for('static', filename='css/chatgpt-4.css') }}">
+<div class="sticky-card btn-success">
+    <p>Words Used</p>
+    <p style="text-align:center;" id="wordsUpdate">{{words_count}} / {{words_total}}</p>
+</div>
 <div class="container">
     <div class="card">
         <h1 class="head">Chat GPT-4</h1>
-        <p>Hello mf</p>
+        <hr>
+        <p>{{ChatGPTText}}</p>
     </div>
-   
 </div>
-
+<div class="container">
+    <div class="card">
+        <h5>Prompt</h5>
+        <span><i id="change" class="fa-solid fa-microphone fa-lg" onclick="micPrompt()" style="
+            color: #3aebf8;
+            display: flex;
+            align-items: right;
+            justify-content: flex-end;
+            align-items: end;
+            z-index: 1;
+            position: relative;
+            top: 1rem;
+            right: 0.3rem;"></i></span>
+        <textarea id='chatPrompt' name="" rows="10"></textarea>
+        <span id="counter"></span>
+        <button class="btn btn-primary my-3" id="submit">Submit</button>
+        <img src="{{ url_for('static', filename='img/loader.gif') }}" id="loader" style="
+                display: none;
+                width: 10rem;
+                height: 3rem;
+                margin: auto;
+                ">
+    </div>
+</div>
+<div class="container">
+    <div class="card" id="output" style="display: none;">
+        <h3>Output</h3>
+        <hr>
+        <p id="outputData"></p>
+        <p id="warning">{{warning}}</p>
+    </div>
+</div>
+<script src="{{ url_for('static', filename='js/chatgpt-4.js') }}"></script>
 {% endblock %}
