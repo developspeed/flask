@@ -53,5 +53,3 @@ def custom_round(num, digits=2, Isstr=False):
     if Isstr:
         return x
     return float(Decimal(x))
-
-

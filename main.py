@@ -2,6 +2,7 @@ from flask import Flask, render_template, request, redirect, session, url_for, j
 from bwimage import BWImageAPI
 from whisper import WhisperFileAPI, WhisperMICAPI
 from image_edit import ImageEditAPI
+from chatgpt import ChatGPTAPI
 from utitlities import DBRead, DBReadARG
 from utitlities import custom_round
 import os
@@ -233,7 +234,6 @@ def upload_bw_image():
 def BWImage():
     if 'userSession' in session:
         userSession = session.get('userSession')
-
         images_total = DBReadARG('user','images_total','email',userSession)
         images_count = DBReadARG('user','images_count','email',userSession)
         BWEditText = DBRead('bw_config', 'text')
@@ -288,7 +288,47 @@ def BWImageResults():
 
 @app.route('/chatgpt-4',methods=["GET",'POST'])
 def ChatGPT():
-    return render_template('chatgpt-4.html')
+    if 'userSession' in session:
+        userSession = session.get('userSession')
+        words_total = DBReadARG('user','words_total','email',userSession)
+        words_count = DBReadARG('user','words_count','email',userSession)
+        ChatGPTText = DBRead('chatgpt-4', 'chat_gpt_text')
+        
+        data = {
+            'words_total':words_total,
+            'words_count':words_count,
+            'ChatGPTText':ChatGPTText,
+            'warning':''
+        }
+
+        return render_template('chatgpt-4.html', **data)
+    
+    else:
+        return redirect(url_for('login'))
+
+
+@app.route('/chatgpt-results',methods=['POST','GET'])
+def ChatGPTResults():
+    prompts = request.form.get('prompt')
+    words = int(request.form.get('words'))
+    userSession = session.get('userSession')
+    words_total = DBReadARG('user','words_total','email',userSession)
+    words_count = DBReadARG('user','words_count','email',userSession)
+    if(int(words_count) >= int(words_total)):
+        ChatGPTText = DBRead('chatgpt-4', 'chat_gpt_text')
+        data = {
+            'words_total':words_total,
+            'words_count':words_count,
+            'ChatGPTText':ChatGPTText,
+            'warning':'You have used all your words'
+        }
+
+        return render_template('chatgpt-4.html',**data)
+    
+    else:
+        output, words_to_update = ChatGPTAPI(prompts,words,userSession)
+        print(output)
+        return jsonify({"output":output,'words_count':words_to_update,'words_total':words_total,'warning':""})
 
 @app.errorhandler(404)
 def page_not_found(e):
