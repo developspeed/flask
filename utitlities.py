@@ -1,7 +1,7 @@
 from connection_cred import USER, PASSWORD, HOST, DATABASE
 import mysql.connector as ms
 from decimal import Decimal
-
+import re
 
 
 def DBUpdate(table, field, value):
@@ -53,3 +53,15 @@ def custom_round(num, digits=2, Isstr=False):
     if Isstr:
         return x
     return float(Decimal(x))
+
+
+
+def count_words(text):
+    # Use regular expression to extract complete words
+    words = re.findall(r'\b\w+\b', text)
+    
+    # Count the number of complete words
+    word_count = len(words)
+    
+    # Return the word count
+    return int(word_count)

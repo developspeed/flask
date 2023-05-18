@@ -310,7 +310,6 @@ def ChatGPT():
 @app.route('/chatgpt-results',methods=['POST','GET'])
 def ChatGPTResults():
     prompts = request.form.get('prompt')
-    words = int(request.form.get('words'))
     userSession = session.get('userSession')
     words_total = DBReadARG('user','words_total','email',userSession)
     words_count = DBReadARG('user','words_count','email',userSession)
@@ -324,10 +323,8 @@ def ChatGPTResults():
         }
 
         return render_template('chatgpt-4.html',**data)
-    
     else:
-        output, words_to_update = ChatGPTAPI(prompts,words,userSession)
-        print(output)
+        output, words_to_update = ChatGPTAPI(prompts,userSession)
         return jsonify({"output":output,'words_count':words_to_update,'words_total':words_total,'warning':""})
 
 @app.errorhandler(404)
@@ -341,4 +338,4 @@ def internal_server(e):
 
 
 if __name__ == "__main__":
-    app.run(port=5000)
+    app.run(port=5000,debug=True,host='0.0.0.0')
