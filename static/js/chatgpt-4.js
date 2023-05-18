@@ -33,11 +33,6 @@ if ("SpeechRecognition" in window || "webkitSpeechRecognition" in window) {
       }
     }
     transcript.textContent = transcriptText;
-
-    // Perform word count on the recognized text
-    const recognizedWords = transcriptText.split(/\s+/).filter(word => word !== "");
-    const recognizedWordCount = recognizedWords.length;
-    counter.textContent = "Words: " + recognizedWordCount;
   };
   // Handle the error event
   recognition.onerror = function (event) {
@@ -64,21 +59,6 @@ if ("SpeechRecognition" in window || "webkitSpeechRecognition" in window) {
   console.error("Speech recognition not supported");
 }
 
-// Get the input element
-const chatPrompt = document.getElementById("chatPrompt");
-// Get the counter element
-const counter = document.getElementById("counter");
-// Add an event listener to the input element
-let wordCount = 0;
-chatPrompt.addEventListener("input", () => {
-  const text = chatPrompt.value.trim();
-  const words = text.split(/\s+/).filter((word) => word !== "");
-  wordCount = words.length;
-
-  // Update the counter element with the word count
-  counter.innerText = "Words : " + wordCount;
-});
-
 const submit = document.getElementById("submit");
 submit.addEventListener("click", function () {
   const loader = document.getElementById('loader');
@@ -86,7 +66,6 @@ submit.addEventListener("click", function () {
   const chatPrompt = document.getElementById("chatPrompt");
   const formData = new FormData();
   formData.append("prompt", chatPrompt.value);
-  formData.append("words", wordCount);
   // formData.append('words',)
   fetch("/chatgpt-results", {
     method: "POST",
