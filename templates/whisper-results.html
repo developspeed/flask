@@ -7,25 +7,19 @@
 <div class="sticky-card btn-success">
     <!-- <h3>Minutes Usage</h3> -->
     <p>Minutes Used</p>
-    <p style="text-align:center;">{{data[3]}} / {{data[4]}}</p>
+    <p style="text-align:center;">{{minutes_count}} / {{minutes_total}}</p>
 </div>
-<div class="sticky-card btn-warning">
+<div class="sticky-card-left btn-warning">
     <!-- <h3>Minutes Usage</h3> -->
     <!-- <p>Minutes Used</p> -->
-    <p style="text-align:center;">{{data[5]}}</p>
+    <p style="text-align:center;">{{WhisperAIText}}</p>
 </div>
 
 <form method="get">
     <div class="container">
         <div class="card">
             <h2>Ouptut</h2>
-            <p class="detected_language"><b>Detected Language : {{data[2]}}</b></p>
-            <p class="output" name="output">{{data[0]}}</p>
-        </div>
-        <div class="card">
-            <h2>Translation</h2>
-            <p class="detected_language"><b>English :</b></p>
-            <p class="translate" name="translate">{{data[1]}}</p>
+            <p class="warning" name="warning">{{warning}}</p>
         </div>
     </div>
     <div class="container">
