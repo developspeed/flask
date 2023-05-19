@@ -25,7 +25,8 @@ def Authenticate():
     login_code = request.form['login_code']
 
     # You can add code here to validate the user's login information
-    auth_code = DBReadARG('user','pythonlogin','email',email)
+    result = {}
+    auth_code = DBReadARG('user','pythonlogin','email',email,result)
     session['userSession'] = email
     if login_code != auth_code:
         return render_template("login.html", data="Incorrect Email or Password")

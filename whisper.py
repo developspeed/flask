@@ -13,7 +13,8 @@ openai.api_key = str(DBRead('whisper_config','API_KEY'))
 def WhisperMICAPI(audioFile, duration, userSession, task):
     output = replicate.run("openai/whisper:e39e354773466b955265e969568deb7da217804d8e771ea8c9cd0cef6591f8bc",
                                            input={"audio": open(audioFile,'rb'),"translate":True,"model":'large-v2'})
-    minutes_count = custom_round(float(DBReadARG('user','minutes_count','email',userSession)))
+    result = {}
+    minutes_count = custom_round(float(DBReadARG('user','minutes_count','email',userSession,result)))
     minutes_to_update = custom_round(float(minutes_count+duration))
     DBUpdateARG('user','minutes_count',minutes_to_update,'email',userSession)
     if task == 'transcribe':
@@ -37,14 +38,16 @@ def WhisperFileAPI(audioFile, duration, userSession, task):
             stop=None,
             temperature=0.5,
         )
+        result = {}
         language = completions.choices[0].text.strip()
-        minutes_count = custom_round(float(DBReadARG('user','minutes_count','email',userSession)))
+        minutes_count = custom_round(float(DBReadARG('user','minutes_count','email',userSession,result)))
         minutes_to_update = custom_round(float(minutes_count+duration))
         DBUpdateARG('user','minutes_count',minutes_to_update,'email',userSession)
         return output['text'], language, minutes_to_update
     else:
         output =  openai.Audio.translate("whisper-1", open(audioFile,'rb'))
-        minutes_count = custom_round(float(DBReadARG('user','minutes_count','email',userSession)))
+        result = {}
+        minutes_count = custom_round(float(DBReadARG('user','minutes_count','email',userSession,result)))
         minutes_to_update = custom_round(float(minutes_count+duration))
         DBUpdateARG('user','minutes_count',minutes_to_update,'email',userSession)
         return output['text'], "" , minutes_to_update
