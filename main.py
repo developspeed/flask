@@ -3,9 +3,10 @@ from bwimage import BWImageAPI
 from whisper import WhisperFileAPI, WhisperMICAPI
 from image_edit import ImageEditAPI
 from chatgpt import ChatGPTAPI
-from utitlities import DBRead, DBReadARG
-from utitlities import custom_round
+from utitlities import DBRead, DBReadARG, custom_round
+import threading
 import os
+
 
 
 app = Flask(__name__, static_url_path='/static')
@@ -45,22 +46,54 @@ def Dashboard():
         userSession = session.get('userSession')
 
         ########## Getting the User data using Email from database ###########
-        name = DBReadARG('user','name','email',userSession)
+        result = {}
+
+        name_task = threading.Thread(target=DBReadARG,args=('user','name','email',userSession,result))
+        subscription_end_task = threading.Thread(target=DBReadARG,args=('user','end_subscription_period','email',userSession,result))
+        words_total_task = threading.Thread(target=DBReadARG,args=('user','words_total','email',userSession,result))
+        words_count_task = threading.Thread(target=DBReadARG,args=('user','words_count','email',userSession,result))
+        images_total_task = threading.Thread(target=DBReadARG,args=('user','images_total','email',userSession,result))
+        images_count_task = threading.Thread(target=DBReadARG,args=('user','images_count','email',userSession,result))
+        minutes_total_task = threading.Thread(target=DBReadARG,args=('user','minutes_total','email',userSession,result))
+        minutes_count_task = threading.Thread(target=DBReadARG,args=('user','minutes_count','email',userSession,result))
+
+        # Start the task 
+        name_task.start()
+        subscription_end_task.start()
+        words_total_task.start()
+        words_count_task.start()
+        images_total_task.start()
+        images_count_task.start()
+        minutes_total_task.start()
+        minutes_count_task.start()
+
+        # Join the task 
+        name_task.join()
+        subscription_end_task.join()
+        words_total_task.join()
+        words_count_task.join()
+        images_total_task.join()
+        images_count_task.join()
+        minutes_total_task.join()
+        minutes_count_task.join()
+
+
+        # User Name
+        name = result['name']
 
         # Subscription Details
-        subscription_end = DBReadARG('user','end_subscription_period','email',userSession)
-
+        subscription_end = result['end_subscription_period']
         # Words Usage
-        words_total = DBReadARG('user','words_total','email',userSession)
-        words_count = DBReadARG('user','words_count','email',userSession)
+        words_total = result['words_total']
+        words_count = result['words_count']
 
         # Image Usage
-        images_total = DBReadARG('user','images_total','email',userSession)
-        images_count = DBReadARG('user','images_count','email',userSession)
+        images_total = result['images_total']
+        images_count = result['images_count']
 
         # Minutes Usage
-        minutes_total = DBReadARG('user','minutes_total','email',userSession)
-        minutes_count = DBReadARG('user','minutes_count','email',userSession)
+        minutes_total = result['minutes_total']
+        minutes_count = result['minutes_count']
 
         return render_template("dashboard.html", data={'name': name, 'subscription_end': subscription_end, 'words_total': words_total, 'words_count': words_count, 'images_total': images_total, 'images_count': images_count, 'minutes_total': minutes_total, 'minutes_count': minutes_count})
     
@@ -93,11 +126,22 @@ def whisper_upload():
 def Whisper():
     if 'userSession' in session:
         userSession = session.get('userSession')
-
-        minutes_total = DBReadARG('user','minutes_total','email',userSession)
-        minutes_count = DBReadARG('user','minutes_count','email',userSession)
+        result = {}
+        minutes_total_task = threading.Thread(target=DBReadARG,args=('user','minutes_total','email',userSession,result))
+        minutes_count_task = threading.Thread(target=DBReadARG,args=('user','minutes_count','email',userSession,result))
         WhisperAIText = DBRead('whisper_config', 'whisper_text')
+
+        minutes_total_task.start()
+        minutes_count_task.start()
+
+        minutes_total_task.join()
+        minutes_count_task.join()
+
         
+        # Minutes Usage
+        minutes_total = result['minutes_total']
+        minutes_count = result['minutes_count']
+
         data = {
             'minutes_count':custom_round(float(minutes_count)),
             'minutes_total':minutes_total,
@@ -118,8 +162,21 @@ def WhisperAI():
     task = request.form.get('task')
     type = session.get('type')
 
-    minutes_total = DBReadARG('user','minutes_total','email',userSession)
-    minutes_count = DBReadARG('user','minutes_count','email',userSession)
+    result = {}
+    minutes_total_task = threading.Thread(target=DBReadARG,args=('user','minutes_total','email',userSession,result))
+    minutes_count_task = threading.Thread(target=DBReadARG,args=('user','minutes_count','email',userSession,result))
+
+
+    minutes_total_task.start()
+    minutes_count_task.start()
+
+    minutes_total_task.join()
+    minutes_count_task.join()
+
+    
+    # Minutes Usage
+    minutes_total = result['minutes_total']
+    minutes_count = result['minutes_count']
 
     if (float(minutes_count) >= float(minutes_total)):
         print('inside if')
@@ -129,7 +186,7 @@ def WhisperAI():
             'WhisperAIText':'',
             'warning': "You Have Used All Your Minutes"
         }
-        return render_template('whisper-results.html', **data)
+        return jsonify({'outputData': "You Have Used All Your Minutes", 'minutes_count': minutes_count, "minutes_total": minutes_total})
 
     else:
         if (task == 'transcribe' and type == 'mic'):
@@ -166,9 +223,19 @@ def ImageEdit():
     if 'userSession' in session:
         userSession = session.get('userSession')
 
-        images_total = DBReadARG('user','images_total','email',userSession)
-        images_count = DBReadARG('user','images_count','email',userSession)
+        result = {}
+        images_total_task = threading.Thread(target=DBReadARG,args=('user','images_total','email',userSession,result))
+        images_count_task = threading.Thread(target=DBReadARG,args=('user','images_count','email',userSession,result))
         ImageEditText = DBRead('image_edit_config', 'image_edit_text')
+
+        images_total_task.start()
+        images_count_task.start()
+
+        images_total_task.join()
+        images_count_task.join()
+
+        images_total = result['images_total']
+        images_count = result['images_count']
 
         data = {
             'images_count':images_count,
@@ -191,10 +258,20 @@ def ImageEditResults():
     user_output_images = int(request.form.get('output_images'))
 
 
-    images_total = DBReadARG('user','images_total','email',userSession)
-    images_count = DBReadARG('user','images_count','email',userSession)
+    result = {}
+    images_total_task = threading.Thread(target=DBReadARG,args=('user','images_total','email',userSession,result))
+    images_count_task = threading.Thread(target=DBReadARG,args=('user','images_count','email',userSession,result))
 
-    if (images_count <= images_total):
+    images_total_task.start()
+    images_count_task.start()
+
+    images_total_task.join()
+    images_count_task.join()
+
+    images_total = result['images_total']
+    images_count = result['images_count']
+
+    if (images_count >= images_total):
         data = {
             'images':'',
             'images_count':images_count,
@@ -234,9 +311,19 @@ def upload_bw_image():
 def BWImage():
     if 'userSession' in session:
         userSession = session.get('userSession')
-        images_total = DBReadARG('user','images_total','email',userSession)
-        images_count = DBReadARG('user','images_count','email',userSession)
+        result = {}
+        images_total_task = threading.Thread(target=DBReadARG,args=('user','images_total','email',userSession,result))
+        images_count_task = threading.Thread(target=DBReadARG,args=('user','images_count','email',userSession,result))
         BWEditText = DBRead('bw_config', 'text')
+
+        images_total_task.start()
+        images_count_task.start()
+
+        images_total_task.join()
+        images_count_task.join()
+
+        images_total = result['images_total']
+        images_count = result['images_count']
 
         data = {
             'images_count':images_count,
@@ -257,11 +344,21 @@ def BWImageResults():
     model = request.form.get('model')
     renderFactor = request.form.get('render_factor')
 
+     
+    result = {}
+    images_total_task = threading.Thread(target=DBReadARG,args=('user','images_total','email',userSession,result))
+    images_count_task = threading.Thread(target=DBReadARG,args=('user','images_count','email',userSession,result))
 
-    images_total = DBReadARG('user','images_total','email',userSession)
-    images_count = DBReadARG('user','images_count','email',userSession)
+    images_total_task.start()
+    images_count_task.start()
 
-    if (images_count <= images_total):
+    images_total_task.join()
+    images_count_task.join()
+
+    images_total = result['images_total']
+    images_count = result['images_count']
+
+    if (images_count >= images_total):
         data = {
             'images':'',
             'images_count':images_count,
@@ -290,9 +387,20 @@ def BWImageResults():
 def ChatGPT():
     if 'userSession' in session:
         userSession = session.get('userSession')
-        words_total = DBReadARG('user','words_total','email',userSession)
-        words_count = DBReadARG('user','words_count','email',userSession)
+        
+        result = {}
+        words_total_task = threading.Thread(target=DBReadARG,args=('user','words_total','email',userSession,result))
+        words_count_task = threading.Thread(target=DBReadARG,args=('user','words_count','email',userSession,result))
         ChatGPTText = DBRead('chatgpt-4', 'chat_gpt_text')
+
+        words_total_task.start()
+        words_count_task.start()
+
+        words_total_task.join()
+        words_count_task.join()
+
+        words_total = result['words_total']
+        words_count = result['words_count']
         
         data = {
             'words_total':words_total,
@@ -309,10 +417,23 @@ def ChatGPT():
 
 @app.route('/chatgpt-results',methods=['POST','GET'])
 def ChatGPTResults():
-    prompts = request.form.get('prompt')
     userSession = session.get('userSession')
-    words_total = DBReadARG('user','words_total','email',userSession)
-    words_count = DBReadARG('user','words_count','email',userSession)
+    prompts = request.form.get('prompt') 
+
+    result = {}
+    words_total_task = threading.Thread(target=DBReadARG,args=('user','words_total','email',userSession,result))
+    words_count_task = threading.Thread(target=DBReadARG,args=('user','words_count','email',userSession,result))
+
+
+    words_total_task.start()
+    words_count_task.start()
+
+    words_total_task.join()
+    words_count_task.join()
+
+    words_total = result['words_total']
+    words_count = result['words_count']
+
     if(int(words_count) >= int(words_total)):
         ChatGPTText = DBRead('chatgpt-4', 'chat_gpt_text')
         data = {
@@ -338,4 +459,4 @@ def internal_server(e):
 
 
 if __name__ == "__main__":
-    app.run(port=5000)
+    app.run(port=5000,debug=True,host='0.0.0.0')
