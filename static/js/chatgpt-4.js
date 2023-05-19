@@ -1,62 +1,45 @@
+const micIcon = document.getElementById("change");
 let isRecording = false;
-function micPrompt() {
-  const change = document.getElementById("change");
+let recognition;
 
+micIcon.addEventListener("click", toggleRecording);
+
+function toggleRecording() {
   if (isRecording) {
-    isRecording = false;
-    change.style =
-      "display: flex;align-items: right;justify-content: flex-end;align-items: end;z-index: 1;position: relative;top: 1rem;right: 0.3rem;color: #3aebf8";
+    stopRecording();
   } else {
-    isRecording = true;
-    change.style =
-      "display: flex;align-items: right;justify-content: flex-end;align-items: end;z-index: 1;position: relative;top: 1rem;right: 0.3rem;color: #ff0000";
+    startRecording();
   }
+  isRecording = !isRecording;
 }
 
-const transcript = document.getElementById("chatPrompt");
-const micButton = document.getElementById("change");
-// Check if the browser supports the SpeechRecognition API
-if ("SpeechRecognition" in window || "webkitSpeechRecognition" in window) {
-  // Create a new instance of SpeechRecognition
-  const recognition = new (window.SpeechRecognition || window.webkitSpeechRecognition)();
-
-  // Set optional properties
-  // recognition.lang = "en-US"; // Specify the language (e.g., 'en-US' for US English)
-  recognition.continuous = true; // Enable continuous recognition
-
-  // Handle the result event
-  recognition.onresult = function(event) {
-    let transcriptText = '';
-    for (let i = event.resultIndex; i < event.results.length; i++) {
-      if (event.results[i].isFinal) {
-        transcriptText += event.results[i][0].transcript;
-      }
-    }
-    transcript.textContent = transcriptText;
-  };
-  // Handle the error event
-  recognition.onerror = function (event) {
-    console.error("Speech recognition error:", event.error);
+function startRecording() {
+  micIcon.style.color = 'red';
+  recognition = new window.webkitSpeechRecognition() || new window.SpeechRecognition();
+//   recognition.lang = "en-US"; // Set the language for speech recognition
+  recognition.continuous = true;
+  
+  recognition.onstart = function () {
+    // console.log("Recording started");
   };
 
-  let isRecognitionRunning = false;
+  recognition.onresult = function (event) {
+    const transcript = event.results[0][0].transcript;
+    const text = document.getElementById('chatPrompt');
+    // console.log("Transcript:", transcript);
+    text.innerHTML = transcript;
+    stopRecording()
+    micIcon.click()
+    // Handle the recognized speech transcript here
+  };
 
-  // Add event listener to the mic button
-  micButton.addEventListener('click', () => {
-    if (isRecognitionRunning) {
-      // If recognition is already running, stop it
-      recognition.stop();
-      // micButton.textContent = 'Start';
-      isRecognitionRunning = false;
-    } else {
-      // If recognition is not running, start it
-      recognition.start();
-      // micButton.textContent = 'Stop';
-      isRecognitionRunning = true;
-    }
-  });
-} else {
-  console.error("Speech recognition not supported");
+  recognition.start();
+}
+
+function stopRecording() {
+  micIcon.style.color = "gray";
+  recognition.stop();
+  // console.log("Recording stopped");
 }
 
 const submit = document.getElementById("submit");
