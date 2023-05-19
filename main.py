@@ -272,7 +272,7 @@ def ImageEditResults():
     images_total = result['images_total']
     images_count = result['images_count']
 
-    if (images_count >= images_total):
+    if (int(images_count) >= int(images_total)):
         data = {
             'images':'',
             'images_count':images_count,
@@ -359,7 +359,7 @@ def BWImageResults():
     images_total = result['images_total']
     images_count = result['images_count']
 
-    if (images_count >= images_total):
+    if (int(images_count) >= int(images_total)):
         data = {
             'images':'',
             'images_count':images_count,
