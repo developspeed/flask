@@ -48,6 +48,13 @@
         <hr>
         <p id="outputData"></p>
         <p id="warning">{{warning}}</p>
+        <button id="copyText" class="btn btn-primary" onclick="copyText()" style="    
+        display: flex;
+        align-items: flex-end;
+        justify-content: end;
+        margin: auto;
+        font-size: 10px;
+        margin-top: 1rem;">Copy</button>
     </div>
 </div>
 <script src="{{ url_for('static', filename='js/chatgpt-4.js') }}"></script>

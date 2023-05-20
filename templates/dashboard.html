@@ -3,36 +3,37 @@
 {% block title %}Dashboard{% endblock %}
 
 {% block content %}
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" integrity="sha512-iecdLmaskl7CVkqkXNQ/ZH/XLlvWZOJyj7Yy7tcenmpD1ypASozpmT/E0iPtmFIB46ZmdtAc9eNBvH0H/ZpiBw==" crossorigin="anonymous" referrerpolicy="no-referrer" />
 <div class="container">
 	<div class="card">
-		<h2>Welcome, {{data['name']}}</h2>
+		<h2><i class="fa-solid fa-user"></i> | Welcome, {{data['name']}}</h2>
 		<p>You can use AI models here. We have many models which you can use to get quality results.</p>
 		<!-- <a href="#" class="cta">View Models</a> -->
 	</div>
 	<div class="card">
-		<h2>Subscription Details</h2>
+		<h2><i class="fa-solid fa-money-check-dollar"></i> | Subscription Details</h2>
 		<p>Your Subscription will end on {{data['subscription_end']}}</p>
 		<a href="https://magicaibox.site" target="_blank" class="cta">Renew</a>
 	</div>
 </div>
 <div class="container">
 	<div class="card">
-		<h2>Speech Recognizer</h2>
+		<h2><i class="fa-solid fa-microphone"></i> | Speech Recognizer</h2>
 		<p>Used to transcribe a given audio using Whisper AI model.</p>
 		<a href="/whisper" class="cta">View Model</a>
 	</div>
 	<div class="card">
-		<h2>Edit Image</h2>
+		<h2><i class="fa-solid fa-image"></i> | Edit Image</h2>
 		<p>Takes prompt from user and Edit it according to prompt.</p>
 		<a href="/image-edit" class="cta">View Model</a>
 	</div>
 	<div class="card">
-		<h2>B/W Image</h2>
+		<h2><i class="fa-solid fa-circle-half-stroke"></i> | B/W Image</h2>
 		<p>Turns old and blurry images into new ones.</p>
 		<a href="/bw-image" class="cta">View Model</a>
 	</div>
 	<div class="card">
-		<h2>Chat GPT-4</h2>
+		<h2><i class="fa-solid fa-robot"></i> | Chat GPT-4</h2>
 		<p>GPT-4 or subsequent models could have advanced natural language processing capabilities, improved contextual
 			understanding, better coherence, and potentially enhanced abilities to generate creative and nuanced
 			responses. These models might have larger training datasets, improved training techniques, and refined
@@ -42,7 +43,7 @@
 </div>
 <div class="container">
 	<div class="card">
-		<h2>Resource Usage</h2>
+		<h2><i class="fa-solid fa-sitemap"></i> | Resource Usage</h2>
 		<hr>
 		<p>Words (Used/Total) : {{data['words_count']}}/{{data['words_total']}}</p>
 		<hr>
