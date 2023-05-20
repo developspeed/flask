@@ -11,10 +11,10 @@ def ChatGPTAPI(prompt, userSession):
         response = openai.Completion.create(
         model="text-davinci-003",
         prompt=prompt,
-        temperature=0.7,
+        temperature=1,
         max_tokens=4000,
         top_p=1,
-        frequency_penalty=0.5,
+        frequency_penalty=0,
         presence_penalty=0
         )
         words_count = int(DBReadARG('user','words_count','email',userSession,result))
