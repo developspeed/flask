@@ -73,3 +73,27 @@ submit.addEventListener("click", function () {
       loader.style.display = 'none';
     });
 });
+
+
+const copyText = () =>{
+  let text = document.getElementById("outputData").innerText;
+
+  // Create a temporary input element
+  let input = document.createElement("input");
+  input.value = text;
+  document.body.appendChild(input);
+
+  // Select the text inside the input element
+  input.select();
+  input.setSelectionRange(0, 9999999);
+
+  // Copy the text to the clipboard
+  document.execCommand("copy");
+
+  // Remove the temporary input element
+  document.body.removeChild(input);
+  let copyTextBtn = document.getElementById('copyText');
+  copyTextBtn.innerHTML = 'Copied !'
+  // Provide user feedback
+  // alert("Text copied to clipboard");
+}
