@@ -29,7 +29,7 @@ function startRecording() {
     // console.log("Transcript:", transcript);
     text.innerHTML = transcript;
     stopRecording()
-    micIcon.click()
+    // micIcon.click()
     // Handle the recognized speech transcript here
   };
 
@@ -93,7 +93,7 @@ const copyText = () =>{
   // Remove the temporary input element
   document.body.removeChild(input);
   let copyTextBtn = document.getElementById('copyText');
-  copyTextBtn.innerHTML = 'Copied !'
+  // copyTextBtn.innerHTML = 'Copied !'
   // Provide user feedback
-  // alert("Text copied to clipboard");
+  alert("Text copied to clipboard");
 }
