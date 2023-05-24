@@ -8,7 +8,7 @@
 <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.0.2/dist/css/bootstrap.min.css" rel="stylesheet"
     integrity="sha384-EVSTQN3/azprG1Anm3QDgpJLIm9Nao0Yz1ztcQTwFspd3yD65VohhpuuCOmLASjC" crossorigin="anonymous">
 <link rel="stylesheet" href="{{ url_for('static', filename='css/image.css') }}">
-<div class="sticky-card btn-success">
+<div class="sticky-card btn-success" id="used">
     <p>Images Used</p>
     <p style="text-align:center;" id="imagesUpdate">{{images_count}} / {{images_total}}</p>
 </div>
@@ -148,6 +148,13 @@
         });
         slider2.title = slider2.value
     })
+
+    let images_count = {{images_count}};
+    let images_total = {{images_total}};
+    if(images_count >= images_total){
+        let used = document.getElementById('used');
+        used.style.background = '#e74c3c'
+    }
 
 </script>
 {% endblock %}

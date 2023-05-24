@@ -4,8 +4,7 @@
 
 {% block content %}
 <link rel="stylesheet" href="{{ url_for('static', filename='css/whisper.css') }}">
-<div class="sticky-card btn-success">
-    <!-- <h3>Minutes Usage</h3> -->
+<div class="sticky-card btn-success" id="used">
     <p>Minutes Used</p>
     <p style="text-align:center;" id="minutesUpdate">{{minutes_count}} / {{minutes_total}}</p>
 </div>
@@ -98,6 +97,13 @@
     function showLoader() {
         const loader = document.querySelector('#loader');
         loader.style.display = 'inline';
+    }
+
+    let minutes_count = {{minutes_count}};
+    let minutes_total = {{minutes_total}};
+    if(minutes_count >= minutes_total){
+        let used = document.getElementById('used');
+        used.style.background = '#e74c3c'
     }
 </script>
 {% endblock %}

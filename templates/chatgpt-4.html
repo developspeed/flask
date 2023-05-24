@@ -7,7 +7,7 @@
     integrity="sha512-iecdLmaskl7CVkqkXNQ/ZH/XLlvWZOJyj7Yy7tcenmpD1ypASozpmT/E0iPtmFIB46ZmdtAc9eNBvH0H/ZpiBw=="
     crossorigin="anonymous" referrerpolicy="no-referrer" />
 <link rel="stylesheet" href="{{ url_for('static', filename='css/chatgpt-4.css') }}">
-<div class="sticky-card btn-success">
+<div class="sticky-card btn-success" id="used">
     <p>Words Used</p>
     <p style="text-align:center;" id="wordsUpdate">{{words_count}} / {{words_total}}</p>
 </div>
@@ -58,4 +58,12 @@
     </div>
 </div>
 <script src="{{ url_for('static', filename='js/chatgpt-4.js') }}"></script>
+<script>
+    let words_count = {{words_count}};
+    let words_total = {{words_total}};
+    if(words_count >= words_total){
+        let used = document.getElementById('used');
+        used.style.background = '#e74c3c'
+    }
+</script>
 {% endblock %}

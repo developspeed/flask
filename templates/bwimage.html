@@ -4,7 +4,7 @@
 
 {% block content %}
 <link rel="stylesheet" href="{{ url_for('static', filename='css/bwimage.css') }}">
-<div class="sticky-card btn-success">
+<div class="sticky-card btn-success" id="used">
     <p>Images Used</p>
     <p style="text-align:center;" id="minutesUpdate">{{images_count}} / {{images_total}}</p>
 </div>
@@ -68,6 +68,13 @@
     function showLoader() {
         const loader = document.querySelector('#loader');
         loader.style.display = 'inline';
+    }
+
+    let images_count = {{images_count}};
+    let images_total = {{images_total}};
+    if(images_count >= images_total){
+        let used = document.getElementById('used');
+        used.style.background = '#e74c3c'
     }
 </script>
 {%endblock%}
