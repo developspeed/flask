@@ -61,8 +61,8 @@
                 <option value="512x512">512x512</option>
                 <option value="1024x1024">1024x1024</option>
             </select>
-            <button class="btn btn-primary my-5" id="submit">Submit</button>
-            <img src="{{ url_for('static', filename='img/loader.gif') }}" id="loader" class="my-2" style="width: 10rem;height: 3rem;margin: auto;">
+            <button class="btn btn-primary my-5" id="submit" onclick='loader()'>Submit</button>
+            <img src="{{ url_for('static', filename='img/loader.gif') }}" id="loader" class="my-2" style="display:'none';width: 10rem;height: 3rem;margin: auto;">
         </form>
     </div>
 </div>
@@ -73,6 +73,10 @@
     if(images_count >= images_total){
         let used = document.getElementById('used');
         used.style.background = '#e74c3c'
+    }
+    function loader(){
+        let loader = document.getElementById('loader');
+        loader.style.display = 'flex';
     }
 </script>
 {% endblock %}
