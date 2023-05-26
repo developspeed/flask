@@ -3,6 +3,7 @@ from bwimage import BWImageAPI
 from whisper import WhisperFileAPI, WhisperMICAPI
 from image_edit import ImageEditAPI
 from chatgpt import ChatGPTAPI
+from dalleimage import DalleImageAPI
 from utitlities import DBRead, DBReadARG, custom_round
 import threading
 import os
@@ -89,6 +90,10 @@ def Dashboard():
             target=DBReadARG,
             args=("user", "create_content", "email", userSession, result),
         )
+        dalle = threading.Thread(
+            target=DBReadARG,
+            args=("user", "create_image", "email", userSession, result),
+        )
 
         # Start the task
         name_task.start()
@@ -103,6 +108,7 @@ def Dashboard():
         edit_image.start()
         bw_tocolor.start()
         chatgpt.start()
+        dalle.start()
 
         # Join the task
         name_task.join()
@@ -117,6 +123,7 @@ def Dashboard():
         edit_image.join()
         bw_tocolor.join()
         chatgpt.join()
+        dalle.join()
 
         # User Name
         name = result["name"]
@@ -140,6 +147,7 @@ def Dashboard():
         edit_image_state = result["edit_image"]
         bw_tocolor_state = result["bw_tocolor"]
         create_content_state = result["create_content"]
+        dalle_state = result['create_image']
 
         # Date Calculation
         year = int(str(subscription_end)[:4])
@@ -171,6 +179,7 @@ def Dashboard():
                 "edit_image_state": edit_image_state,
                 "bw_tocolor_state": bw_tocolor_state,
                 "create_content_state": create_content_state,
+                "create_image_state": dalle_state,
                 "flag": flag
             },
         )
@@ -181,6 +190,8 @@ def Dashboard():
 
 ################Frontend to Backend Data Handling#######################
 
+
+########################################### Whisper AI ###############################################
 
 @app.route("/whisper-upload", methods=["POST"])
 def whisper_upload():
@@ -333,6 +344,7 @@ def WhisperAI():
                 }
             )
 
+############################################ Edit Image ############################################
 
 @app.route("/upload-image", methods=["POST"])
 def upload_image():
@@ -434,6 +446,8 @@ def ImageEditResults():
         return render_template("imagedit-results.html", **data)
 
 
+########################################### BW Image #####################################################
+
 @app.route("/upload-bw-image", methods=["POST"])
 def upload_bw_image():
     imgbwFile = request.files.get("imageFile")
@@ -532,6 +546,9 @@ def BWImageResults():
         return render_template("bwimage-results.html", **data)
 
 
+####################################### ChatGPT-4 ########################################
+
+
 @app.route("/chatgpt-4", methods=["GET", "POST"])
 def ChatGPT():
     if "userSession" in session:
@@ -610,6 +627,84 @@ def ChatGPTResults():
                 "warning": "",
             }
         )
+
+
+####################################### Dalle Images #######################################
+
+@app.route('/dalle-image',methods=['GET','POST'])
+def DalleImageGenerator():
+    if "userSession" in session:
+        userSession = session.get("userSession")
+        result = {}
+        images_total_task = threading.Thread(target=DBReadARG,args=("user", "images_total", "email", userSession, result))
+        images_count_task = threading.Thread(target=DBReadARG,args=("user", "images_count", "email", userSession, result))
+        DalleText = DBRead("dalle_image_generator", "dalle_image_text")
+
+        images_total_task.start()
+        images_count_task.start()
+
+        images_total_task.join()
+        images_count_task.join()
+
+        images_total = result["images_total"]
+        images_count = result["images_count"]
+
+        data = {
+            "images_count": images_count,
+            "images_total": images_total,
+            "DalleText": DalleText,
+            "warning": "",
+        }
+        
+        return render_template('dalleimage.html', **data)
+    else:
+        return redirect(url_for('login'))
+    
+
+@app.route('/dalle-results',methods=['POST','GET'])
+def DalleImageResults():
+    userSession = session.get("userSession")
+    prompts = request.form['prompt']
+    numImages = request.form['numImages']
+    sizes = request.form['sizes']
+
+    print(prompts,numImages,sizes)
+
+    result = {}
+    images_total_task = threading.Thread(
+        target=DBReadARG, args=("user", "images_total", "email", userSession, result)
+    )
+    images_count_task = threading.Thread(
+        target=DBReadARG, args=("user", "images_count", "email", userSession, result)
+    )
+
+    images_total_task.start()
+    images_count_task.start()
+
+    images_total_task.join()
+    images_count_task.join()
+
+    images_total = result["images_total"]
+    images_count = result["images_count"]
+
+    if int(images_count) >= int(images_total):
+        data = {
+            'images': "",
+            "images_count": images_count,
+            "images_total": images_total,
+            "warning": "You Have Used All Your images",
+        }
+        return render_template('dalle-results.html', **data)
+
+    else:
+        images, updatedImage = DalleImageAPI(prompts,numImages,sizes,userSession)
+        data = {
+            'images':images,
+            'images_count':updatedImage,
+            'images_total':images_total,
+            'warning':""
+        }
+        return render_template('dalle-results.html', **data)
 
 
 @app.errorhandler(404)
