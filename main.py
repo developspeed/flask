@@ -493,7 +493,7 @@ def BWImage():
 
     else:
         return redirect(url_for("login"))
-
+ 
 
 @app.route("/bw-image-results", methods=["POST", "GET"])
 def BWImageResults():
