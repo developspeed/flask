@@ -1,37 +1,50 @@
-{% extends 'base.html' %}
-
-{% block title %}Image Generator{% endblock %} 
-
-{%block content %}
-<link rel="stylesheet" href="{{ url_for('static', filename='css/dalle.css') }}">
+{% extends 'base.html' %} {% block title %}Image Generator{% endblock %} {%block
+content %}
+<link
+  rel="stylesheet"
+  href="{{ url_for('static', filename='css/dalle.css') }}"
+/>
 <div class="sticky-card btn-success" id="used">
-    <!-- <h3>Minutes Usage</h3> -->
-    <p>Images Used</p>
-    <p style="text-align:center;" id="minutesUpdate">{{images_count}} / {{images_total}}</p>
+  <!-- <h3>Minutes Usage</h3> -->
+  <p>Images Used</p>
+  <p style="text-align: center" id="minutesUpdate">
+    {{images_count}} / {{images_total}}
+  </p>
 </div>
-<div class="sticky-card-left btn-warning" style="height: 40px;font-size: 13px;">
-    <p style="text-align:center;">{{warning}}</p>
+<div class="sticky-card-left btn-warning" style="height: 40px; font-size: 13px">
+  <p style="text-align: center">{{warning}}</p>
 </div>
 <div class="container">
-    <div class="card">
-        <h2>Output</h2>
-        <hr>
-        {% if images != "" %}
-        {% for i in images %}
-        <img src="{{i}}" class="img-fluid" alt="Generated Images" srcset="">
-        <p style="font-size: 15px;display:flex;justify-content: center;" class="my-3" >Just right click on the image and click save image as.. to download</p>
-        <hr>
-        {% endfor %}
-        {% endif %}
-        <a href="/dalle-image" type="button" class="btn btn-primary my-4">Generate New</a>
-    </div>
+  <div class="card">
+    <h2>Output</h2>
+    <hr />
+    {% if images is iterable %} 
+    {% for i in images %}
+    <img src="{{ i }}" class="img-fluid" alt="Generated Images" srcset="" />
+    <p
+      style="font-size: 15px; display: flex; justify-content: center"
+      class="my-3"
+    >
+      Just right-click on the image and click "Save Image As..." to download
+    </p>
+    <hr />
+    {% else %}
+    <p class="error">No images found.</p>
+    {% endfor %} 
+    {% else %}
+    <p class="error">{{ images }}</p>
+    {% endif %}
+    <a href="/dalle-image" type="button" class="btn btn-primary my-4"
+      >Generate New</a
+    >
+  </div>
 </div>
 <script>
-    let images_count = {{images_count}};
-    let images_total = {{images_total}};
-    if(images_count >= images_total){
-        let used = document.getElementById('used');
-        used.style.background = '#e74c3c'
-    }
+  let images_count = {{images_count}};
+  let images_total = {{images_total}};
+  if(images_count >= images_total){
+      let used = document.getElementById('used');
+      used.style.background = '#e74c3c'
+  }
 </script>
 {% endblock %}
