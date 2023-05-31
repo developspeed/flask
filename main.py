@@ -4,10 +4,12 @@ from whisper import WhisperFileAPI, WhisperMICAPI
 from image_edit import ImageEditAPI
 from chatgpt import ChatGPTAPI
 from dalleimage import DalleImageAPI
+from dalleedit import DalleImageEditAPI
+from dallevariation import DalleImageVariationAPI
 from utitlities import DBRead, DBReadARG, custom_round
 import threading
 import os
-from datetime import datetime, date
+from datetime import datetime
 
 
 app = Flask(__name__, static_url_path="/static")
@@ -493,7 +495,7 @@ def BWImage():
 
     else:
         return redirect(url_for("login"))
- 
+
 
 @app.route("/bw-image-results", methods=["POST", "GET"])
 def BWImageResults():
@@ -631,6 +633,17 @@ def ChatGPTResults():
 
 ####################################### Dalle Images #######################################
 
+@app.route('/dalle-images-upload',methods=['POST'])
+def DalleImageUpload():
+    dalleimage = request.files.get("imageFile")
+    cwd = os.getcwd()
+    destination = os.path.join(cwd, dalleimage.filename)
+    dalleimage.save(destination)
+    print(dalleimage.filename)
+    session["dalleimage"] = dalleimage.filename
+    return "Uploaded Succesfully"
+
+
 @app.route('/dalle-image',methods=['GET','POST'])
 def DalleImageGenerator():
     if "userSession" in session:
@@ -704,6 +717,112 @@ def DalleImageResults():
             'images_total':images_total,
             'warning':""
         }
+        return render_template('dalle-results.html', **data)
+
+
+
+@app.route('/dalle-edit', methods=['GET','POST'])
+def DalleImageEdit():
+    userSession = session.get("userSession")
+    # get the image and save it 
+    imageedit = request.files['editImageFile']
+    cwd = os.getcwd()
+    destination = os.path.join(cwd, imageedit.filename)
+    imageedit.save(destination)
+    session["imageedit"] = imageedit.filename
+    print(imageedit.filename)
+
+    prompts = request.form['prompt']
+    numImages = request.form['numImages']
+    sizes = request.form['sizes']
+
+    result = {}
+    images_total_task = threading.Thread(
+        target=DBReadARG, args=("user", "images_total", "email", userSession, result)
+    )
+    images_count_task = threading.Thread(
+        target=DBReadARG, args=("user", "images_count", "email", userSession, result)
+    )
+
+    images_total_task.start()
+    images_count_task.start()
+
+    images_total_task.join()
+    images_count_task.join()
+
+    images_total = result["images_total"]
+    images_count = result["images_count"]
+
+    if int(images_count) >= int(images_total):
+        data = {
+            'images': "",
+            "images_count": images_count,
+            "images_total": images_total,
+            "warning": "You Have Used All Your images",
+        }
+        return render_template('dalle-results.html', **data)
+
+    else:
+        images, updatedImage = DalleImageEditAPI(session.get('imageedit'),prompts,numImages,sizes,userSession)
+        data = {
+            'images':images,
+            'images_count':updatedImage,
+            'images_total':images_total,
+            'warning':""
+        }
+        os.remove(session.get('imageedit'))
+        return render_template('dalle-results.html', **data)
+
+
+@app.route('/dalle-variation', methods=['GET','POST'])
+def DalleImageVariation():
+    userSession = session.get("userSession")
+    # get the image and save it 
+    variationImageFile = request.files['variationImageFile']
+    cwd = os.getcwd()
+    destination = os.path.join(cwd, variationImageFile.filename)
+    variationImageFile.save(destination)
+    session["variationImageFile"] = variationImageFile.filename
+    print(variationImageFile.filename)
+
+    numImages = request.form['numImages']
+    sizes = request.form['sizes']
+
+    result = {}
+    images_total_task = threading.Thread(
+        target=DBReadARG, args=("user", "images_total", "email", userSession, result)
+    )
+    images_count_task = threading.Thread(
+        target=DBReadARG, args=("user", "images_count", "email", userSession, result)
+    )
+
+    images_total_task.start()
+    images_count_task.start()
+
+    images_total_task.join()
+    images_count_task.join()
+
+    images_total = result["images_total"]
+    images_count = result["images_count"]
+
+    if int(images_count) >= int(images_total):
+        data = {
+            'images': "",
+            "images_count": images_count,
+            "images_total": images_total,
+            "warning": "You Have Used All Your images",
+        }
+        return render_template('dalle-results.html', **data)
+
+    else:
+        images, updatedImage = DalleImageVariationAPI(session.get('variationImageFile'),numImages,sizes,userSession)
+        data = {
+            'images':images,
+            'images_count':updatedImage,
+            'images_total':images_total,
+            'warning':""
+        }
+        os.remove(session.get('variationImageFile'))
         return render_template('dalle-results.html', **data)
 
 
