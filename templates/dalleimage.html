@@ -25,7 +25,7 @@
 <!-- Dalle Image Text  -->
 <div class="container">
     <div class="card">
-        <div class="h1">Images Generator</div>
+        <div class="h1">Dalle Models</div>
         <hr />
         <p class="para">{{DalleText}}</p>
     </div>
@@ -33,6 +33,8 @@
 <div class="container">
     <div class="card">
         <form action="/dalle-results" method="post" id="form">
+            <h3>Images Generator</h3>
+            <hr>
             <b><label for="">Enter the Image Prompt to Generate</label></b>
             <span><i id="change" class="fa-solid fa-microphone fa-lg" style="
             color: #3aebf8;
@@ -61,15 +63,102 @@
                 <option value="512x512">512x512</option>
                 <option value="1024x1024">1024x1024</option>
             </select>
-            <button class="btn btn-primary my-5" id="submit" onclick="loaders()">Submit</button>
-            <img src="{{ url_for('static', filename='img/loader.gif') }}" id="loader" class="my-2" style="display: none;width: 10rem;height: 3rem;margin: auto;">
+            <button class="btn btn-primary my-5" id="submit" onclick="loaders1()">Submit</button>
+            <img src="{{ url_for('static', filename='img/loader.gif') }}" id="loader1" class="my-2" style="display: none;width: 10rem;height: 3rem;margin: auto;">
+        </form>
+    </div>
+
+    <div class="card">
+        <form action="/dalle-edit" method="post" id="form" enctype="multipart/form-data">
+            <h3>Images Editor</h3>
+            <hr>
+            <b><label class="form-label" for="customFile">Upload Image (Transparent PNG and less than 4mb) :</label></b>
+            <input type="file" class="form-control mb-2" id="editImageFile" name="editImageFile">
+
+            <b><label for="">Enter the Prompt to edit uploaded images.</label></b>
+            <span><i id="change" class="fa-solid fa-microphone fa-lg" style="
+            color: #3aebf8;
+            display: flex;
+            align-items: right;
+            justify-content: flex-end;
+            align-items: end;
+            z-index: 1;
+            position: relative;
+            top: 20px;
+            right: 0.3rem;
+            "></i></span>
+            <input type="text" placeholder="Enter the Image Prompt to Generate" class="form-control" name="prompt" id="prompt">
+
+            <b><label class="my-2">Select the number of images to generate</label></b>
+            <select class="form-select" aria-label="Default select example" name="numImages" id="numImages">
+                <option value="1">1</option>
+                <option value="2">2</option>
+                <option value="3">3</option>
+                <option value="4">4</option>
+                <option value="5">5</option>
+                <option value="6">6</option>
+                <option value="7">7</option>
+                <option value="8">8</option>
+                <option value="9">9</option>
+                <option value="10">10</option>
+            </select>
+
+            <b><label class="my-2">Select the Size of Images to generate</label></b>
+            <select class="form-select" aria-label="Default select example" name="sizes" id="sizes">
+                <option value="256x256">256x256</option>
+                <option value="512x512">512x512</option>
+                <option value="1024x1024">1024x1024</option>
+            </select>
+            <button class="btn btn-primary my-5" id="submit" onclick="loaders2()">Submit</button>
+            <img src="{{ url_for('static', filename='img/loader.gif') }}" id="loader2" class="my-2" style="display: none; width: 10rem; height: 3rem; margin: auto;">
+        </form>
+    </div>
+
+    <div class="card">
+        <form action="/dalle-variation" method="post" id="form" enctype="multipart/form-data">
+            <h3>Images Variation</h3>
+            <hr>
+            <b><label class="form-label" for="customFile">Upload Image (Transparent PNG and less than 4mb) :</label></b>
+            <input type="file" class="form-control mb-2" id="variationImageFile" name="variationImageFile">
+
+        
+            <b><label class="my-2">Select the number of images to generate</label></b>
+            <select class="form-select" aria-label="Default select example" name="numImages" id="numImages">
+                <option value="1">1</option>
+                <option value="2">2</option>
+                <option value="3">3</option>
+                <option value="4">4</option>
+                <option value="5">5</option>
+                <option value="6">6</option>
+                <option value="7">7</option>
+                <option value="8">8</option>
+                <option value="9">9</option>
+                <option value="10">10</option>
+            </select>
+
+            <b><label class="my-2">Select the Size of Images to generate</label></b>
+            <select class="form-select" aria-label="Default select example" name="sizes" id="sizes">
+                <option value="256x256">256x256</option>
+                <option value="512x512">512x512</option>
+                <option value="1024x1024">1024x1024</option>
+            </select>
+            <button class="btn btn-primary my-5" id="submit" onclick="loaders3()">Submit</button>
+            <img src="{{ url_for('static', filename='img/loader.gif') }}" id="loader3" class="my-2" style="display: none;width: 10rem;height: 3rem;margin: auto;">
         </form>
     </div>
 </div>
 <script src="{{ url_for('static', filename='js/dalle.js') }}"></script>
 <script>
-    function loaders(){
-        let loaderIcon = document.getElementById('loader');
+    function loaders1(){
+        let loaderIcon = document.getElementById('loader1');
+        loaderIcon.style.display = 'flex';
+    }
+    function loaders2(){
+        let loaderIcon = document.getElementById('loader2');
+        loaderIcon.style.display = 'flex';
+    }
+    function loaders3(){
+        let loaderIcon = document.getElementById('loader3');
         loaderIcon.style.display = 'flex';
     }
 
