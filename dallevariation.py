@@ -4,13 +4,13 @@ from utitlities import DBUpdateARG, DBReadARG, DBRead
 openai.api_key = DBRead('dalle_image_generator','API_Key')
 
 
-def DalleImageAPI(prompt, numberOfImage, size, userSession):
+def DalleImageVariationAPI(image, numberOfImage, size, userSession):
     try:
         result = {}
-        image = openai.Image.create(
-            prompt=prompt,
-            n=int(numberOfImage),
-            size=size
+        image = openai.Image.create_variation(
+            image = open(image,'rb'),
+            n = int(numberOfImage),
+            size = size
         )
         images_count = int(DBReadARG("user", "images_count", "email", userSession, result))
         updatedImage = images_count+int(numberOfImage)
@@ -20,3 +20,5 @@ def DalleImageAPI(prompt, numberOfImage, size, userSession):
     except Exception as e:
         images_count = int(DBReadARG("user", "images_count", "email", userSession, result))
         return e , images_count
+
+
