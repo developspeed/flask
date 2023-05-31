@@ -44,31 +44,8 @@ function stopRecording() {
   // console.log("Recording stopped");
 }
 
-// Sending the form data params to the backend server
+// let imageedit = document.getElementById('editImageFile');
 
-// let formData = new FormData();
-
-// let prompts = document.getElementById('prompt');
-// let numImages = document.getElementById('numImages');
-// let sizes = document.getElementById('sizes');
-// let submit = document.getElementById('submit');
-
-
-
-// submit.addEventListener('click',()=>{
-//     formData.append('prompts',prompts.value);
-//     formData.append('numImages',numImages.value);
-//     formData.append('sizes',sizes.value);
-
-//     fetch('/dalle-results',{
-//         method: "POST",
-//         body: formData,
-//     })
-//     .then((response) => {
-//         const data = response.json()
-//         console.log(response.images);
-//       })
-//       .catch((error) => {
-//         console.error(error);
-//       });
-// });
+// imageedit.addEventListener('change',()=>{
+//   console.log(imageedit.files[0]);
+// })
