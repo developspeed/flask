@@ -19,8 +19,12 @@
 <div class="sticky-card btn-success" id="used">
     <p>Images Used</p>
     <p style="text-align:center;" id="imagesUpdate">{{images_count}} / {{images_total}}</p>
-    <p style="text-align: center" id="imagesUpdate"></p>
 </div>
+<div class="sticky-card-left btn-warning">
+    <a href="https://www.remove.bg/upload" style="text-decoration: none;">BG Remover | </a>
+    <a href="https://www.freeconvert.com/image-converter" style="text-decoration: none;">Convert Image</a>
+</div>
+
 
 <!-- Dalle Image Text  -->
 <div class="container">
@@ -36,7 +40,7 @@
             <h3>Images Generator</h3>
             <hr>
             <b><label for="">Enter the Image Prompt to Generate</label></b>
-            <span><i id="change" class="fa-solid fa-microphone fa-lg" style="
+            <span><i id="change1" class="fa-solid fa-microphone fa-lg" style="
             color: #3aebf8;
             display: flex;
             align-items: right;
@@ -76,7 +80,7 @@
             <input type="file" class="form-control mb-2" id="editImageFile" name="editImageFile">
 
             <b><label for="">Enter the Prompt to edit uploaded images.</label></b>
-            <!-- <span><i id="change" class="fa-solid fa-microphone fa-lg" style="
+            <span><i id="change2" class="fa-solid fa-microphone fa-lg" style="
             color: #3aebf8;
             display: flex;
             align-items: right;
@@ -86,8 +90,8 @@
             position: relative;
             top: 20px;
             right: 0.3rem;
-            "></i></span> -->
-            <input type="text" placeholder="Enter the Image Prompt to Generate" class="form-control" name="prompt" id="prompt">
+            "></i></span>
+            <input type="text" placeholder="Enter the Image Prompt to Generate" class="form-control" name="prompt" id="prompt2">
 
             <b><label class="my-2">Select the number of images to generate</label></b>
             <select class="form-select" aria-label="Default select example" name="numImages" id="numImages">
@@ -95,12 +99,6 @@
                 <option value="2">2</option>
                 <option value="3">3</option>
                 <option value="4">4</option>
-                <option value="5">5</option>
-                <option value="6">6</option>
-                <option value="7">7</option>
-                <option value="8">8</option>
-                <option value="9">9</option>
-                <option value="10">10</option>
             </select>
 
             <b><label class="my-2">Select the Size of Images to generate</label></b>
@@ -128,12 +126,6 @@
                 <option value="2">2</option>
                 <option value="3">3</option>
                 <option value="4">4</option>
-                <option value="5">5</option>
-                <option value="6">6</option>
-                <option value="7">7</option>
-                <option value="8">8</option>
-                <option value="9">9</option>
-                <option value="10">10</option>
             </select>
 
             <b><label class="my-2">Select the Size of Images to generate</label></b>
