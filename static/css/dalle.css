@@ -20,6 +20,11 @@
     transform: rotate(0deg);
     z-index: 1;
   }
+  .sticky-card-left a{
+    color: black;
+    text-decoration: none;
+    font-size: 14px;
+  }
   
   .sticky-card p {
     margin: 0;
