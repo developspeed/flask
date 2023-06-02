@@ -47,7 +47,6 @@ function stopRecording() {
 
 
 
-
 const micIcon2 = document.getElementById("change2");
 let isRecording2 = false;
 let recognition2;
@@ -90,3 +89,29 @@ function stopRecording2() {
   recognition2.stop();
   // console.log("Recording stopped");
 }
+
+
+let submit1 = document.getElementById('submit1');
+
+submit1.addEventListener('click',(event)=>{
+  const image = document.getElementById('editImageFile');
+  if(image.files[0] == null){
+    event.preventDefault();
+    alert('You must have to provide an Image');
+    let loaderIcon = document.getElementById('loader2');
+    loaderIcon.style.display = 'none';
+  }
+})
+let submit2 = document.getElementById('submit2');
+
+submit2.addEventListener('click',(event)=>{
+  const image = document.getElementById('variationImageFile');
+  if(image.files[0] == null){
+    event.preventDefault();
+    alert('You must have to provide an Image');
+    let loaderIcon = document.getElementById('loader3');
+    loaderIcon.style.display = 'none';
+  }
+})
+
+
