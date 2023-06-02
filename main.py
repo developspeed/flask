@@ -23,17 +23,20 @@ def login():
 
 @app.route("/", methods=["POST", "GET"])
 def Authenticate():
-    email = request.form["email"]
-    login_code = request.form["login_code"]
+    try:
+        email = request.form["email"]
+        login_code = request.form["login_code"]
 
-    # You can add code here to validate the user's login information
-    result = {}
-    auth_code = DBReadARG("user", "pythonlogin", "email", email, result)
-    session["userSession"] = email
-    if login_code != auth_code:
-        return render_template("login.html", data="Incorrect Email or Password")
-    else:
-        return redirect(url_for("Dashboard"))
+        # You can add code here to validate the user's login information
+        result = {}
+        auth_code = DBReadARG("user", "pythonlogin", "email", email, result)
+        session["userSession"] = email
+        if login_code != auth_code or login_code == "" or email == "":
+            return render_template("login.html", data="Incorrect Email or Password")
+        else: 
+            return redirect(url_for("Dashboard"))
+    except Exception as e:
+        return render_template('login.html')
 
 
 @app.route("/logout")
@@ -753,6 +756,7 @@ def DalleImageEdit():
     images_total = result["images_total"]
     images_count = result["images_count"]
 
+
     if int(images_count) >= int(images_total):
         data = {
             'images': "",
@@ -770,7 +774,8 @@ def DalleImageEdit():
             'images_total':images_total,
             'warning':""
         }
-        os.remove(session.get('imageedit'))
+        # os.remove(session.get('imageedit'))
+        print('error',images)
         return render_template('dalle-results.html', **data)
 
 
