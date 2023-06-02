@@ -18,25 +18,14 @@ content %}
   <div class="card">
     <h2>Output</h2>
     <hr />
-    {% if images is iterable %} 
+
     {% for i in images %}
-    <img src="{{ i }}" class="img-fluid" style="margin: auto;" alt="Generated Images" srcset="" />
-    <p
-      style="font-size: 15px; display: flex; justify-content: center"
-      class="my-3"
-    >
-      Just right-click on the image and click "Save Image As..." to download
-    </p>
+    <img src="{{i}}" class="img-fluid" style="margin: auto;" alt="Generated Images" srcset="">
+    <a href="{{ i }}" style="width: auto; margin: auto;" download class="btn btn-warning my-2" target="_blank">Download Image</a>
     <hr />
-    {% else %}
-    <p class="error">No images found.</p>
     {% endfor %} 
-    {% else %}
-    <p class="error">{{ images }}</p>
-    {% endif %}
-    <a href="/dalle-image" type="button" class="btn btn-primary my-4"
-      >Generate New</a
-    >
+
+    <a href="/dalle-image" type="button" class="btn btn-primary my-4">Generate New</a>
   </div>
 </div>
 <script>
