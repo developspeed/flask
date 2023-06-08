@@ -56,6 +56,10 @@ def Dashboard():
         name_task = threading.Thread(
             target=DBReadARG, args=("user", "name", "email", userSession, result)
         )
+        end_subscription_period = threading.Thread(
+            target=DBReadARG,
+            args=("user", "end_subscription_period", "email", userSession, result),
+        ) 
         subscription_start_task = threading.Thread(
             target=DBReadARG,
             args=("user", "subscription_start_date", "email", userSession, result),
@@ -102,6 +106,7 @@ def Dashboard():
 
         # Start the task
         name_task.start()
+        end_subscription_period.start()
         subscription_start_task.start()
         words_total_task.start()
         words_count_task.start()
@@ -117,6 +122,7 @@ def Dashboard():
 
         # Join the task
         name_task.join()
+        end_subscription_period.join()
         subscription_start_task.join()
         words_total_task.join()
         words_count_task.join()
@@ -135,6 +141,7 @@ def Dashboard():
 
         # Subscription Details
         subscription_start = result['subscription_start_date']
+        subscription_end = result["end_subscription_period"]
 
         # Words Usage
         words_total = result["words_total"]
@@ -160,24 +167,9 @@ def Dashboard():
             date_first_login_query = DBReadARG('user','date_first_login','email',userSession,result)
             date_first_login = result['date_first_login']
             subscription_end = date_first_login + timedelta(days=10)
-            subscription_start_update = threading.Thread(target=DBUpdateARG,args=('user','subscription_start_date',date_first_login,'email',userSession),)
-            end_subscription_task = threading.Thread(target=DBUpdateARG,args=('user','end_subscription_period',subscription_end,'email',userSession),)
-
-            subscription_start_update.start()
-            end_subscription_task.start()
-
-            subscription_start_update.join()
-            end_subscription_task.join()
-
-        # Susbcription Details New
-        end_subscription_period = threading.Thread(
-            target=DBReadARG,
-            args=("user", "end_subscription_period", "email", userSession, result),
-        )
-        end_subscription_period.start()
-        end_subscription_period.join()
-        subscription_end = result["end_subscription_period"]
-
+                
+        
+        print(subscription_end)
         # Date Calculation
         year = int(str(subscription_end)[:4])
         month = int(str(subscription_end)[5:7])
@@ -864,4 +856,4 @@ def internal_server(e):
 
 
 if __name__ == "__main__":
-    app.run(port=5000, host="0.0.0.0")
+    app.run(port=5000,host="0.0.0.0")
