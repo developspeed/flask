@@ -17,6 +17,7 @@ app.secret_key = "5gfdfdsdr345dgfs45dgfdgdfg09043532%##$h2h340adsf9"
 
 
 @app.route("/")
+@app.route("/login")
 def login():
     return render_template("login.html")
 
