@@ -6,11 +6,11 @@ from chatgpt import ChatGPTAPI
 from dalleimage import DalleImageAPI
 from dalleedit import DalleImageEditAPI
 from dallevariation import DalleImageVariationAPI
-from utitlities import DBRead, DBReadARG, custom_round
+from utitlities import DBRead, DBReadARG, DBUpdateARG, custom_round
 import threading
 import os
-from datetime import datetime
- 
+from datetime import datetime, date, timedelta 
+
 
 app = Flask(__name__, static_url_path="/static")
 app.secret_key = "5gfdfdsdr345dgfs45dgfdgdfg09043532%##$h2h340adsf9"
@@ -56,9 +56,9 @@ def Dashboard():
         name_task = threading.Thread(
             target=DBReadARG, args=("user", "name", "email", userSession, result)
         )
-        subscription_end_task = threading.Thread(
+        subscription_start_task = threading.Thread(
             target=DBReadARG,
-            args=("user", "end_subscription_period", "email", userSession, result),
+            args=("user", "subscription_start_date", "email", userSession, result),
         )
         words_total_task = threading.Thread(
             target=DBReadARG, args=("user", "words_total", "email", userSession, result)
@@ -102,7 +102,7 @@ def Dashboard():
 
         # Start the task
         name_task.start()
-        subscription_end_task.start()
+        subscription_start_task.start()
         words_total_task.start()
         words_count_task.start()
         images_total_task.start()
@@ -117,7 +117,7 @@ def Dashboard():
 
         # Join the task
         name_task.join()
-        subscription_end_task.join()
+        subscription_start_task.join()
         words_total_task.join()
         words_count_task.join()
         images_total_task.join()
@@ -129,12 +129,13 @@ def Dashboard():
         bw_tocolor.join()
         chatgpt.join()
         dalle.join()
-
+        
         # User Name
         name = result["name"]
 
         # Subscription Details
-        subscription_end = result["end_subscription_period"]
+        subscription_start = result['subscription_start_date']
+
         # Words Usage
         words_total = result["words_total"]
         words_count = result["words_count"]
@@ -154,20 +155,42 @@ def Dashboard():
         create_content_state = result["create_content"]
         dalle_state = result['create_image']
 
+        # If someone is new user and haven't got susbscription yet then he has 10 days from today after that he will not able to use the api
+        if(subscription_start == None):
+            date_first_login_query = DBReadARG('user','date_first_login','email',userSession,result)
+            date_first_login = result['date_first_login']
+            subscription_end = date_first_login + timedelta(days=10)
+            subscription_start_update = threading.Thread(target=DBUpdateARG,args=('user','subscription_start_date',date_first_login,'email',userSession),)
+            end_subscription_task = threading.Thread(target=DBUpdateARG,args=('user','end_subscription_period',subscription_end,'email',userSession),)
+
+            subscription_start_update.start()
+            end_subscription_task.start()
+
+            subscription_start_update.join()
+            end_subscription_task.join()
+
+        # Susbcription Details New
+        end_subscription_period = threading.Thread(
+            target=DBReadARG,
+            args=("user", "end_subscription_period", "email", userSession, result),
+        )
+        end_subscription_period.start()
+        end_subscription_period.join()
+        subscription_end = result["end_subscription_period"]
+        print(subscription_end)
+
         # Date Calculation
         year = int(str(subscription_end)[:4])
         month = int(str(subscription_end)[5:7])
-        date = int(str(subscription_end)[8:11])
+        dates = int(str(subscription_end)[8:11])
 
         curYear = int(datetime.now().year)
         curMonth = int(datetime.now().month)
         curdate = int(datetime.now().day)
 
         flag = 0
-        if date - curdate <= 8 and month - curMonth == 0 and year - curYear == 0:
-            flag = 1
-
-
+        if dates - curdate <= 8 and month - curMonth == 0 and year - curYear == 0:
+            flag = 1    
 
         return render_template(
             "dashboard.html",
