@@ -177,7 +177,6 @@ def Dashboard():
         end_subscription_period.start()
         end_subscription_period.join()
         subscription_end = result["end_subscription_period"]
-        print(subscription_end)
 
         # Date Calculation
         year = int(str(subscription_end)[:4])
