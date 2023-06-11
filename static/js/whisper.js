@@ -268,7 +268,6 @@ ytButton.addEventListener("click", () => {
   let formData = new FormData();
   formData.append("ytLink", ytLink);
   formData.append("type", "file");
-  ytButton.innerText = "Done!";
   fetch("/whisper-upload", {
     method: "POST",
     body: formData,
@@ -276,5 +275,6 @@ ytButton.addEventListener("click", () => {
   .then((response) => response.text())
   .then((response) => {
     console.log(response);
+    ytButton.innerText = "Done!";
   });
 });
