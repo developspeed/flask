@@ -12,19 +12,19 @@
     <p style="text-align:center;">{{warning}}</p>
 </div>
 <div class="sticky-card-left btn-warning">
-    <a href="https://www.xconvert.com/audio-compressor" target="_blank" style="text-decoration: none; color: black;">Audio Compresser</a>
+    <a href="https://www.xconvert.com/audio-compressor" target="_blank" style="text-decoration: none; color: white;">Audio Compresser</a>
 </div>
 
 <div class="container">
     <div class="card">
-        <h1>Whisper Speech Recognizer</h1>
+        <h1>Speech Recognizer</h1>
         <hr>
         <p> {{WhisperAIText}}
         </p>
     </div>
 </div>
 <form method="POST" enctype="multipart/form-data" id="upload-form">
-    <div class="container" id="data_send_by_user">
+    <div class="container" id="data_send_by_user"> 
         <div class="card">
             <div class="form-group">
                 <label for="audioFile"><b>Select Audio File:</b></label>
@@ -40,6 +40,11 @@
                 <audio id="audio-upload-player" src="" controls align="center" format="audio/wav">
                     Your browser does not support the audio tag.
                 </audio>
+                <b><label for="YT">Transcribe a Youtube Video:</label></b><br>
+                <span>
+                    <input type="text" id="ytTranscribe" name="ytTranscribe" style="height: 36px; outline: none;" placeholder="Enter Youtube Video Link">
+                    <button class="btn btn-danger" id="ytButton">Submit</button>
+                </span>
             </div>
         </div>
         <h4>or</h4>
