@@ -9,6 +9,7 @@ from dallevariation import DalleImageVariationAPI
 from utitlities import DBRead, DBReadARG, DBUpdateARG, custom_round
 import threading
 import os
+from pytube import YouTube
 from datetime import datetime, date, timedelta 
 
 
@@ -214,20 +215,39 @@ def Dashboard():
 
 @app.route("/whisper-upload", methods=["POST"])
 def whisper_upload():
-    audioRecorded = request.files.get("audio")
-    cwd = os.getcwd()
-    destination = os.path.join(cwd, audioRecorded.filename)
-    audioRecorded.save(destination)
-    print(audioRecorded.filename)
-    session["filename"] = audioRecorded.filename
+    if request.files.get("audio") != None:
+        audioRecorded = request.files.get("audio")
+        cwd = os.getcwd()
+        destination = os.path.join(cwd, audioRecorded.filename)
+        audioRecorded.save(destination)
+        print(audioRecorded.filename)
+        session["filename"] = audioRecorded.filename
 
-    type = request.form.get("type")
-    session["type"] = type
+        type = request.form.get("type")
+        session["type"] = type
 
-    duration = request.form.get("duration")
-    session["duration"] = duration
-    print(duration)
-    return "Done"
+        duration = request.form.get("duration")
+        session["duration"] = duration
+        print(duration)
+        return "Done"
+    else:
+        ytLink = request.form.get('ytLink')
+        yt = YouTube(ytLink)
+        video = yt.streams.filter(only_audio=True).first()
+        out_file = video.download(output_path='')
+        base, ext = os.path.splitext(out_file)
+        new_file = base + '.mp3'
+        os.rename(out_file, new_file)
+        session['filename'] = new_file
+        # print(yt.title + " has been successfully downloaded.")
+
+        type = request.form.get("type")
+        session["type"] = type
+
+        # duration    
+        session["duration"] = yt.length/60
+
+        return "YT DONE"
 
 
 @app.route("/whisper", methods=["POST", "GET"])
@@ -327,7 +347,8 @@ def WhisperAI():
             transcription, detected_language, minutes_to_update = WhisperFileAPI(
                 filename, duration, userSession, task
             )
-            print(transcription, detected_language, minutes_to_update)
+            # print(transcription, detected_language, minutes_to_update)
+            # os.remove(filename)
             return jsonify(
                 {
                     "outputData": transcription,
@@ -354,6 +375,7 @@ def WhisperAI():
             translate, detected_language, minutes_to_update = WhisperFileAPI(
                 filename, duration, userSession, task
             )
+            # os.remove(filename)
             return jsonify(
                 {
                     "translate": translate,
@@ -856,4 +878,4 @@ def internal_server(e):
 
 
 if __name__ == "__main__":
-    app.run(port=5000,host="0.0.0.0")
+    app.run(port=5000, host="0.0.0.0")
