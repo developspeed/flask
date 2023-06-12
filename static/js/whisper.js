@@ -203,7 +203,29 @@ function WhisperAITranscribe() {
       // translated.innerHTML += '';
       language_detect.innerHTML = "Detected Language : " + data.language_detect;
       minutesUpdate.innerHTML = data.minutes_count + " / " + data.minutes_total;
-      // console.log(data)
+
+      let copyText1 = document.getElementById('copyText1');
+      copyText1.addEventListener('click',()=>{
+        let text = data.outputData;
+        // Create a temporary input element
+        let input = document.createElement("input");
+        input.value = text;
+        document.body.appendChild(input);
+  
+        // Select the text inside the input element
+        input.select();
+        input.setSelectionRange(0, 9999999);
+  
+        // Copy the text to the clipboard
+        document.execCommand("copy");
+  
+        // Remove the temporary input element
+        document.body.removeChild(input);
+        copyText1.innerHTML = 'Copied !'
+        // Provide user feedback
+        // alert("Text copied to clipboard");
+        // console.log(data)
+      })
     } else {
       console.log("Request failed");
       ouputDisplay.style.display = "flex";
@@ -244,7 +266,29 @@ function WhisperAITranslate() {
       translated.innerHTML = data.translate;
       language_detect.innerHTML = "Detected Language : ";
       minutesUpdate.innerHTML = data.minutes_count + " / " + data.minutes_total;
-      // console.log(data)
+
+      let copyText2 = document.getElementById('copyText2');
+      copyText2.addEventListener('click',()=>{
+        let text = data.translate;
+        // Create a temporary input element
+        let input = document.createElement("input");
+        input.value = text;
+        document.body.appendChild(input);
+  
+        // Select the text inside the input element
+        input.select();
+        input.setSelectionRange(0, 9999999);
+  
+        // Copy the text to the clipboard
+        document.execCommand("copy");
+  
+        // Remove the temporary input element
+        document.body.removeChild(input);
+        copyText2.innerHTML = 'Copied !'
+        // Provide user feedback
+        // alert("Text copied to clipboard");
+        // console.log(data)
+      })
     } else {
       console.log("Request failed");
       ouputDisplay.style.display = "flex";
