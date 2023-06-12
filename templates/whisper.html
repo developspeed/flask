@@ -45,6 +45,9 @@
                     <input type="text" id="ytTranscribe" name="ytTranscribe" style="height: 36px; outline: none;" placeholder="Enter Youtube Video Link">
                     <button class="btn btn-danger" id="ytButton">Submit</button>
                 </span>
+                <p>*Paste the copied video url here, NOT the 
+                    website url. Select 'Copy Video URL' under 
+                    settings [at the bottom of the youtube video]</p>
             </div>
         </div>
         <h4>or</h4>
@@ -84,11 +87,25 @@
             <p class="detected_language" id="language_detect"></p>
         </b>
         <p class="output" name="output" id="outputData"></p>
+        <button class="btn btn-primary" id="copyText1" style="    
+        display: flex;
+        align-items: flex-end;
+        justify-content: end;
+        margin: auto;
+        font-size: 10px;
+        margin-top: 1rem;">Copy</button>
     </div>
     <div class="card">
         <h2>Translation</h2>
         <p class="detected_language"><b>English :</b></p>
         <p class="translate" name="translate" id="translated"></p>
+        <button class="btn btn-primary" id="copyText2" style="    
+        display: flex;
+        align-items: flex-end;
+        justify-content: end;
+        margin: auto;
+        font-size: 10px;
+        margin-top: 1rem;">Copy</button>
     </div>
     <div class="container">
         <div class="card">
