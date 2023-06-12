@@ -83,8 +83,6 @@ content %}
     </p>
     <a href="/image-edit" class="cta" id="imageState">View Model</a>
   </div>
-  
-  
 </div>
 <div class="container">
   <div class="card">
@@ -98,8 +96,8 @@ content %}
         "
       >
         How to create text summaries, sentiment analysis, action items from
-        audiofiles from Teams and Zoom meetings, from YouTube videos or
-        podcasts MP3 files or from blogs, speeches, etc. that you can find on the
+        audiofiles from Teams and Zoom meetings or from YouTube videos or
+        podcasts. Or from blogs, speeches, etc. that you can find on the
         internet.
       </div></b
     >
@@ -114,8 +112,8 @@ content %}
     >
       <b>
         Follow the procedure, 1 - 5, to perform various actions on the text of
-        audio files, YouTube videos or MP3 podcasts: <br />
-        1. Select the audio or video file in the Whisper Speech Recognizer model and
+        audio files: <br />
+        1. Select the audio file in the Whisper Speech Recognizer model and
         choose Transcribe <br />
         * On the Whisper model page you can also compress an audio file, up to
         max. of 25M even when using a bitrate of 16K <br />
@@ -123,8 +121,9 @@ content %}
         3. Save the transcript as plain text in notepad, e.g.
         <b>meeting-23-03-23.txt</b><br />
         4. Upload the textfile to the dataspeed cloudserver <br />
-        * file will be automatically deleted the next day <br />
+        <input type="file" name="uploadFiles" id="uploadFiles"> <span style="color: red;">*file will be automatically deleted the next day</span><br />
         5. Copy the URL adress <br />
+        <button class="btn btn-secondary" id="uploadedFileCopy">Copy</button>
       </b>
       <br />
       Now you can perform various operations on the text, whereby you can copy
@@ -139,16 +138,6 @@ content %}
         >&lt;paste here the copied url adress from the uploaded audio texfile or
         on-line blogs, speeches,etc.&gt;</i
       >
-      <br />
-      <br />
-      <h5>TEXT CLASSIFICATION</h5>
-      Provide a classification, in the Dutch language, of the following file:as a
-	  bullet point list of the most important points.  <br />
-      <i
-        >&lt;paste here the copied url adress from the uploaded audio texfile or
-        on-line blogs, speeches,etc.&gt;</i
-      >
-
 
       <br />
       <br />
@@ -208,6 +197,7 @@ content %}
   </div>
 </div>
 
+<script src="{{ url_for('static', filename='js/dashboard.js') }}"></script>
 <script>
   let whisperState = {{data['whisper_state']}}
   let edit_image_state = {{data['edit_image_state']}}
