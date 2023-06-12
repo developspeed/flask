@@ -1,6 +1,6 @@
 {% extends 'base.html' %}
 
-{% block title %}B/W Image{% endblock %}
+{% block title %}B/W Image Magic AI Box{% endblock %}
 
 {% block content %}
 <link rel="stylesheet" href="{{ url_for('static', filename='css/bwimage.css') }}">
@@ -14,6 +14,10 @@
         <hr>
         <p class="para">{{BWEditText}}</p>
     </div>
+</div>
+
+<div class="container">
+    <a href='https://www.magicaibox.site/prompts/coloring_image_prompts.htmll' class="btn btn-secondary" type="button" target="_blank" style="margin: auto;">Browse Examples</a>
 </div>
 
 <form class="form" action="/bw-image-results" enctype="multipart/form-data" method="POST">
