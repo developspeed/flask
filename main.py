@@ -9,9 +9,10 @@ from dallevariation import DalleImageVariationAPI
 from utitlities import DBRead, DBReadARG, DBUpdateARG, custom_round
 import threading
 import os
+from ftplib import FTP
 from pytube import YouTube
 from datetime import datetime, date, timedelta 
-
+from connection_cred import username, hostname, password, remote_file_path
 
 app = Flask(__name__, static_url_path="/static")
 app.secret_key = "5gfdfdsdr345dgfs45dgfdgdfg09043532%##$h2h340adsf9"
@@ -207,6 +208,28 @@ def Dashboard():
     else:
         return redirect(url_for("login"))
 
+@app.route('/userFilesUpload',methods=["POST"])
+def UserFileUpload():
+    userFile = request.files.get('userFiles');
+    localfile = userFile.filename
+    ftp = FTP(hostname)
+    ftp.login(username, password)
+
+    try:
+        # Upload the file to the FTP server
+        ftp.storbinary('STOR ' +localfile, userFile)
+
+        # Generate the link to the uploaded file
+        file_link = 'https://www.magicaibox.site/doc/'+ localfile
+
+        return file_link
+    
+    except Exception as e:
+        return 'Error: ' + str(e)
+    
+    finally:
+        # Close the FTP connection
+        ftp.quit()
 
 ################Frontend to Backend Data Handling#######################
 
@@ -878,4 +901,4 @@ def internal_server(e):
 
 
 if __name__ == "__main__":
-    app.run(port=5000, host="0.0.0.0")
+    app.run(port=5000, debug=True, host="0.0.0.0")
