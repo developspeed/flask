@@ -13,7 +13,7 @@ def ChatGPTAPI(prompt, userSession):
         # "messages": [{"role": "user", "content": "Hello!"}],
         messages=[{"role": "user", "content": prompt}],
         temperature=0.7,
-        max_tokens=8000,
+        # max_tokens=8000,
         top_p=1,
         frequency_penalty=0.5,
         presence_penalty=0
