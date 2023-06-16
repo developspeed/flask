@@ -11,6 +11,9 @@
     <p>Words Used</p>
     <p style="text-align:center;" id="wordsUpdate">{{words_count}} / {{words_total}}</p>
 </div>
+<div class="sticky-card-left btn-warning">
+    <a href="https://platform.openai.com/tokenizer" target="_blank" style="text-decoration: none; color: black;">Tokenizer</a>
+</div>
 <div class="container">
     <div class="card">
         <h1 class="head">ChatGPT-4 Text Generator</h1>
@@ -113,7 +116,10 @@
 
 <div class="container">
     <div class="card">
-        <h5>Prompt</h5>
+        <span><h5>Prompt</h5><p style="font-size: 13px;">Meanwhile, prompts [input and output] can handle up to 18,000 
+            tokens, which is about 7,800 words. [1 word is about 2.5 token]. 
+            Click on the Tokenizer link at the bottom left of the screen to 
+            request the exact number of tokens.</p></span>
         <span><i id="change" class="fa-solid fa-microphone fa-lg" style="
             color: #3aebf8;
             display: flex;
