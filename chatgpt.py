@@ -9,8 +9,8 @@ def ChatGPTAPI(prompt, userSession):
     result = {}
     try:
         response = openai.ChatCompletion.create(
-        model="gpt-4-32k-0613",
-	    # "messages": [{"role": "user", "content": "Hello!"}],
+        model="gpt-3.5-turbo-16k",
+        # "messages": [{"role": "user", "content": "Hello!"}],
         messages=[{"role": "user", "content": prompt}],
         temperature=1,
         # max_tokens=8000,
@@ -26,5 +26,3 @@ def ChatGPTAPI(prompt, userSession):
         words_count = int(DBReadARG('user','words_count','email',userSession,result))
         return error, words_count
     
-	
-	gpt-4-32k-0613
