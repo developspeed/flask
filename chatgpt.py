@@ -9,7 +9,7 @@ def ChatGPTAPI(prompt, userSession):
     result = {}
     try:
         response = openai.ChatCompletion.create(
-        model="gpt-3.5-turbo-16k",
+        model="gpt-4-32k-0613",
         # "messages": [{"role": "user", "content": "Hello!"}],
         messages=[{"role": "user", "content": prompt}],
         temperature=1,
@@ -25,4 +25,3 @@ def ChatGPTAPI(prompt, userSession):
     except Exception as error:
         words_count = int(DBReadARG('user','words_count','email',userSession,result))
         return error, words_count
-    
