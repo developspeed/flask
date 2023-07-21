@@ -10,6 +10,7 @@ openai.api_key = str(DBRead('whisper_config','API_KEY'))
 
 
 
+
 def WhisperMICAPI(audioFile, duration, userSession, task):
     output = replicate.run("openai/whisper:e39e354773466b955265e969568deb7da217804d8e771ea8c9cd0cef6591f8bc",
                                            input={"audio": open(audioFile,'rb'),"translate":True,"model":'large-v2'})
@@ -51,4 +52,3 @@ def WhisperFileAPI(audioFile, duration, userSession, task):
         minutes_to_update = custom_round(float(minutes_count+duration))
         DBUpdateARG('user','minutes_count',minutes_to_update,'email',userSession)
         return output['text'], "" , minutes_to_update
-

@@ -1,9 +1,8 @@
 import openai
-import os
 from utitlities import DBUpdateARG, DBReadARG, DBRead, count_words
 
 # Initializing Tokkens
-openai.api_key = DBRead('whisper_config','API_KEY')
+openai.api_key = DBRead('chatgpt-4','API_KEY')
 
 def ChatGPTAPI(prompt, userSession):
     result = {}
@@ -25,3 +24,4 @@ def ChatGPTAPI(prompt, userSession):
     except Exception as error:
         words_count = int(DBReadARG('user','words_count','email',userSession,result))
         return error, words_count
+    
