@@ -1,0 +1,171 @@
+{% extends 'base.html' %}
+
+{% block title %}Scribble Image{% endblock %}
+
+{% block content %}
+<link rel="stylesheet" href="{{ url_for('static', filename='css/scribble.css') }}">
+<div class="sticky-card btn-success" id="used">
+    <p>Minutes Used</p>
+    <p style="text-align:center;" id="imagesUpdate">{{images_count}} / {{images_total}}</p>
+</div>
+<div class="sticky-card btn-warning">
+    <p style="text-align:center;">{{warning}}</p>
+</div>
+<style>
+    #prompt {
+        margin: auto;
+        width: 50%;
+        margin-top: 0.3rem;
+    }
+
+    .button-container {
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        margin-top: 0.2rem;
+    }
+
+    .button-container button {
+        margin: 3px;
+    }
+
+    #canvasCard {
+        /* margin: 0 20rem; */
+        /* display: flex;
+        align-items: center;
+        justify-content: center; */
+    }
+
+    .canvas-container {
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        /* height: 100vh; */
+        background-color: #f0f0f0;
+        margin: auto;
+    }
+
+    .canvas-container canvas {
+        border: 1px solid #ccc;
+        border-radius: 10px;
+        cursor: crosshair;
+        max-width: 100%;
+        max-height: 100%;
+    }
+</style>
+<div class="container">
+    <div class="card">
+        <h1>Scribble Image</h1>
+        <hr>
+        <p>{{ScribbleText}}</p>
+    </div>
+    <div class="container">
+        <div class="card" id="canvasCard">
+            <form class="form" action="/scribble-results" method="post" enctype="multipart/form-data">
+                <div class="canvas-container">
+                    <canvas id="drawingCanvas" width="400" height="400"></canvas>
+                </div>
+                <div class="button-container">
+                    <button class="btn btn-danger align-items-center" onclick="clearCanvas()">Clear</button>
+                </div>
+                <div class="input-group mb-3" id="prompt">
+                    <div class="input-group-prepend">
+                        <span class="input-group-text" id="inputGroup-sizing-default">Prompt</span>
+                    </div>
+                    <input type="text" class="form-control" aria-label="Default" id="promptInput"
+                        placeholder="Describe the Image you want to create"
+                        aria-describedby="inputGroup-sizing-default">
+                </div>
+                <div class="button-container">
+                    <button class="btn btn-warning" id="promptForm">Submit</button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+<script>
+    const canvas = document.getElementById('drawingCanvas');
+    const ctx = canvas.getContext('2d');
+    let isDrawing = false;
+
+    // Function to get the correct mouse coordinates relative to the canvas
+    function getMouseCoordinates(e) {
+        const rect = canvas.getBoundingClientRect();
+        return {
+            x: e.clientX - rect.left,
+            y: e.clientY - rect.top
+        };
+    }
+
+    function startDrawing(e) {
+        isDrawing = true;
+        const coords = getMouseCoordinates(e);
+        ctx.beginPath();
+        ctx.moveTo(coords.x, coords.y);
+    }
+
+    function stopDrawing() {
+        isDrawing = false;
+    }
+
+    function draw(e) {
+        if (!isDrawing) return;
+        const coords = getMouseCoordinates(e);
+        ctx.lineTo(coords.x, coords.y);
+        ctx.stroke();
+    }
+
+    function clearCanvas() {
+        ctx.clearRect(0, 0, canvas.width, canvas.height);
+    }
+
+    canvas.addEventListener('mousedown', startDrawing);
+    canvas.addEventListener('mouseup', stopDrawing);
+    canvas.addEventListener('mousemove', draw);
+
+    // Random File Name Generator
+    function generateRandomFileName() {
+        const characters =
+            "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789";
+        const length = 10; // Specify the desired length of the file name
+
+        let randomFileName = "";
+        for (let i = 0; i < length; i++) {
+            const randomIndex = Math.floor(Math.random() * characters.length);
+            randomFileName += characters.charAt(randomIndex);
+        }
+
+        return randomFileName;
+    }
+
+    const promptForm = document.getElementById('promptForm');
+    promptForm.addEventListener('click', function (event) {
+        // Convert the canvas image to a file
+        canvas.toBlob(function (blob) {
+            const formData = new FormData();
+            const promptInput = document.getElementById('promptInput').value; // Corrected here (use "value" instead of "innerText")
+            filename = generateRandomFileName() + '.png'
+            console.log(filename)
+            formData.append('image', blob, filename);
+            formData.append('prompt', promptInput);
+            console.log(promptInput)
+
+            // Send the FormData object to Flask backend
+            fetch('/scribble-upload', {
+                method: 'POST',
+                body: formData
+            })
+                .then(response => response.json())
+                .then(data => console.log(data))
+                .catch(error => console.error('Error sending image:', error));
+        });
+    });
+
+    let images_count = {{ images_count }};
+    let images_total = {{ images_total }};
+    if (images_count >= images_total) {
+        let used = document.getElementById('used');
+        used.style.background = '#e74c3c'
+    }
+</script>
+{% endblock %}

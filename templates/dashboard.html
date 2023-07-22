@@ -1,18 +1,15 @@
 {% extends 'base.html' %} {% block title %}Dashboard{% endblock %} {% block
 content %}
-<link
-  rel="stylesheet"
-  href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css"
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css"
   integrity="sha512-iecdLmaskl7CVkqkXNQ/ZH/XLlvWZOJyj7Yy7tcenmpD1ypASozpmT/E0iPtmFIB46ZmdtAc9eNBvH0H/ZpiBw=="
-  crossorigin="anonymous"
-  referrerpolicy="no-referrer"
-/>
+  crossorigin="anonymous" referrerpolicy="no-referrer" />
 <div class="container">
   <div class="card">
     <h2><i class="fa-solid fa-user"></i> | Welcome, {{data['name']}}</h2>
     <hr />
     <p>
-In addition to other AI Models, you can also use all OpenAI AI models from one place, including AI models that are only accessible to developers and may also be made accessible to others by the developers via an API.
+      In addition to other AI Models, you can also use all OpenAI AI models from one place, including AI models that are
+      only accessible to developers and may also be made accessible to others by the developers via an API.
     </p>
     <!-- <a href="#" class="cta">View Models</a> -->
   </div>
@@ -22,14 +19,8 @@ In addition to other AI Models, you can also use all OpenAI AI models from one p
     </h2>
     <hr />
     <p>Your Subscription will end on <b>{{data['subscription_end']}}</b></p>
-    <a
-      href="https://magicaibox.site"
-      target="_blank"
-      class="cta"
-      id="subscription"
-      style="background-color: green"
-      >Renew</a
-    >
+    <a href="https://magicaibox.site" target="_blank" class="cta" id="subscription"
+      style="background-color: green">Renew</a>
   </div>
 </div>
 <div class="container">
@@ -42,25 +33,31 @@ In addition to other AI Models, you can also use all OpenAI AI models from one p
     <h2><i class="fa-solid fa-microphone"></i> | Whisper Speech Recognizer</h2>
     <hr />
     <p>
-      Whisper is a speech recognition model and can perform multilingual speech recognition and transcription in a human-like manner. Very suitable for, among other things, transcription of the audio of teams and zoom meetings. Can also be used for transcribing YouTube Videos
+      Whisper is a speech recognition model and can perform multilingual speech recognition and transcription in a
+      human-like manner. Very suitable for, among other things, transcription of the audio of teams and zoom meetings.
+      Can also be used for transcribing YouTube Videos
     </p>
     <a href="/whisper" class="cta" id="whisperState">View Model</a>
   </div>
-  
-    <div class="card">
+
+  <div class="card">
     <h2><i class="fa-solid fa-robot"></i> | ChatGPT-4 Text Generator</h2>
     <hr />
     <p>
-ChatGPT-4 is only accessible to proven developers who have been granted access, like the Magic AI Box. The result is at least 75% improved compared to ChatGPT-3. GPT-4 has advanced natural language processing capabilities, contextual understanding and enhanced abilities to generate creative and nuanced responses.
+      ChatGPT-4 is only accessible to proven developers who have been granted access, like the Magic AI Box. The result
+      is at least 75% improved compared to ChatGPT-3. GPT-4 has advanced natural language processing capabilities,
+      contextual understanding and enhanced abilities to generate creative and nuanced responses.
     </p>
     <a href="/chatgpt-4" class="cta" id="createContentState">View Model</a>
   </div>
-    
+
   <div class="card">
     <h2><i class="fa-solid fa-image"></i> | DALL-E 2 Image Generator</h2>
     <hr />
     <p>
- DALL-E 2 is the latest versionn of the model to generate digital images from natural language descriptions called "prompts". DALL-E 2 is designed to generate more realistic images with higher resolutions that can combine attributes and styles. 
+      DALL-E 2 is the latest versionn of the model to generate digital images from natural language descriptions called
+      "prompts". DALL-E 2 is designed to generate more realistic images with higher resolutions that can combine
+      attributes and styles.
     </p>
     <a href="/dalle-image" class="cta" id="dalleImage">View Model</a>
   </div>
@@ -75,20 +72,33 @@ ChatGPT-4 is only accessible to proven developers who have been granted access, 
     <h2><i class="fa-solid fa-circle-half-stroke"></i> | B/W Image</h2>
     <hr />
     <p>
-Turns old and 'black and white' images into color images using this AI. See what your great-great-grandparents might have looked like in color.
+      Turns old and 'black and white' images into color images using this AI. See what your great-great-grandparents
+      might have looked like in color.
     </p>
     <a href="/bw-image" class="cta" id="bwToColorState">View Model</a>
   </div>
-  
-  
+
+
   <div class="card">
     <h2><i class="fa-solid fa-image"></i> | Edit Image</h2>
     <hr />
     <p>
-After uploading an image or after taking a photo with the webcam, provide instructions for any adjustments to the image, e.g. Make his coat of red leather.
+      After uploading an image or after taking a photo with the webcam, provide instructions for any adjustments to the
+      image, e.g. Make his coat of red leather.
     </p>
     <a href="/image-edit" class="cta" id="imageState">View Model</a>
   </div>
+
+
+  <div class="card">
+    <h2><i class="fa-solid fa-image"></i> | Scribble Image</h2>
+    <hr />
+    <p>
+      Draw any rough Image and give prompt for the image you want and the image will be generated. 
+    </p>
+    <a href="/scribble" class="cta" id="scribbleState">View Model</a> 
+  </div>
+
 </div>
 <div class="container">
   <div class="card">
@@ -108,52 +118,52 @@ After uploading an image or after taking a photo with the webcam, provide instru
 
 <script src="{{ url_for('static', filename='js/dashboard.js') }}"></script>
 <script>
-  let whisperState = {{data['whisper_state']}}
-  let edit_image_state = {{data['edit_image_state']}}
-  let bw_tocolor_state = {{data['bw_tocolor_state']}}
-  let create_content_state = {{data['create_content_state']}};
-  let create_image_state = {{data['create_image_state']}};
-  let subscriptionFlag = {{data['flag']}};
+  let whisperState = {{ data['whisper_state']}}
+  let edit_image_state = {{ data['edit_image_state']}}
+  let bw_tocolor_state = {{ data['bw_tocolor_state']}}
+  let create_content_state = {{ data['create_content_state']}};
+  let create_image_state = {{ data['create_image_state']}};
+  let subscriptionFlag = {{ data['flag']}};
 
-  if(subscriptionFlag == 1){
-  	let subscription = document.getElementById('subscription');
-  	subscription.style.background = '#e74c3c';
+  if (subscriptionFlag == 1) {
+    let subscription = document.getElementById('subscription');
+    subscription.style.background = '#e74c3c';
   }
 
-  if(whisperState == 0){
-  	let whisper = document.getElementById('whisperState');
-  	whisper.style.background = '#e74c3c'
-  	whisper.addEventListener('click',(event)=>{
-  		event.preventDefault();
-  	});
+  if (whisperState == 0) {
+    let whisper = document.getElementById('whisperState');
+    whisper.style.background = '#e74c3c'
+    whisper.addEventListener('click', (event) => {
+      event.preventDefault();
+    });
   }
-  if(edit_image_state == 0){
-  	let imageState = document.getElementById('imageState');
-  	imageState.style.background = '#e74c3c'
-  	imageState.addEventListener('click',(event)=>{
-  		event.preventDefault();
-  	});
+  if (edit_image_state == 0) {
+    let imageState = document.getElementById('imageState');
+    imageState.style.background = '#e74c3c'
+    imageState.addEventListener('click', (event) => {
+      event.preventDefault();
+    });
   }
-  if(bw_tocolor_state == 0){
-  	let bw_tocolor_state = document.getElementById('bwToColorState');
-  	bw_tocolor_state.style.background = '#e74c3c'
-  	bw_tocolor_state.addEventListener('click',(event)=>{
-  		event.preventDefault();
-  	});
+  if (bw_tocolor_state == 0) {
+    let bw_tocolor_state = document.getElementById('bwToColorState');
+    bw_tocolor_state.style.background = '#e74c3c'
+    bw_tocolor_state.addEventListener('click', (event) => {
+      event.preventDefault();
+    });
   }
-  if(create_content_state == 0){
-  	let create_content_state = document.getElementById('createContentState');
-  	create_content_state.style.background = '#e74c3c'
-  	create_content_state.addEventListener('click',(event)=>{
-  		event.preventDefault();
-  	});
+  if (create_content_state == 0) {
+    let create_content_state = document.getElementById('createContentState');
+    create_content_state.style.background = '#e74c3c'
+    create_content_state.addEventListener('click', (event) => {
+      event.preventDefault();
+    });
   }
-  if(create_image_state == 0){
-  	let create_image_state = document.getElementById('dalleImage');
-  	create_image_state.style.background = '#e74c3c'
-  	create_image_state.addEventListener('click',(event)=>{
-  		event.preventDefault();
-  	});
+  if (create_image_state == 0) {
+    let create_image_state = document.getElementById('dalleImage');
+    create_image_state.style.background = '#e74c3c'
+    create_image_state.addEventListener('click', (event) => {
+      event.preventDefault();
+    });
   }
 </script>
 {% endblock %}
