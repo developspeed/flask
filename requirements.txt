@@ -5,3 +5,4 @@ flask==2.3.2
 mysql-connector==2.2.9
 openai==0.27.8
 replicate==0.9.0
+gevent==23.7.0
