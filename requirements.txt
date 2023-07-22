@@ -1,7 +1,16 @@
+Flask==2.2.3
 mysql-connector==2.2.9
 gunicorn>=20.1.0
-urllib3
+urllib3==1.25.11
+openai==0.27.6
+replicate==0.7.0
 pytube==15.0.0
+
+
+# Newer
 flask==2.3.2
+mysql-connector==2.2.9
 openai==0.27.8
-replicate==0.9.0
+pip-chill==1.0.3
+pytube==15.0.0
+replicate==0.8.3

@@ -6,6 +6,7 @@ from chatgpt import ChatGPTAPI
 from dalleimage import DalleImageAPI
 from dalleedit import DalleImageEditAPI
 from dallevariation import DalleImageVariationAPI
+from scribble import ScribbleAPI
 from utitlities import DBRead, DBReadARG, DBUpdateARG, custom_round
 import threading
 import os
@@ -16,7 +17,7 @@ from connection_cred import username, hostname, password, remote_file_path
 
 app = Flask(__name__, static_url_path="/static")
 app.secret_key = "5gfdfdsdr345dgfs45dgfdgdfg09043532%##$h2h340adsf9"
-
+app.config['TEMPLATES_AUTO_RELOAD'] = True
 
 @app.route("/")
 def login():
@@ -610,6 +611,98 @@ def BWImageResults():
         return render_template("bwimage-results.html", **data)
 
 
+####################################### Scribble Image ###################################
+
+@app.route('/scribble-upload', methods=['POST'])
+def upload_scribble():
+    image = request.files['image']  # Get the uploaded image from the request
+    session['scribbleImage'] = (image.filename)
+    session['scribblePrompt'] = request.form['prompt']
+    cwd = os.getcwd()
+    destination = os.path.join(cwd, image.filename)
+    image.save(destination)
+    # For demonstration purposes, let's just return the received data as JSON
+    return jsonify({'prompt': session['scribbleImage'], 'success': True}), 200
+    
+
+
+@app.route("/scribble",methods=['GET','POST'])
+def Scribble():
+    if 'userSession' in session:
+        userSession = session.get('userSession')
+        result = {}
+        images_total_task = threading.Thread(target=DBReadARG,args=("user", "images_total", "email", userSession, result))
+        images_count_task = threading.Thread(target=DBReadARG,args=("user", "images_count", "email", userSession, result))
+        ScribbleText = DBRead("scribble", "scribble_text")
+
+        images_total_task.start()
+        images_count_task.start()
+
+        images_total_task.join()
+        images_count_task.join()
+
+        images_total = result["images_total"]
+        images_count = result["images_count"]
+
+        data = {
+            "images_count": images_count,
+            "images_total": images_total,
+            "ScribbleText": ScribbleText,
+            "warning": "",
+        }
+        
+        return render_template('scribble.html', **data)
+    else:
+        return redirect(url_for('login'))
+
+
+@app.route('/scribble-results',methods=['POST'])
+def ScribblResults():
+    userSession = session.get('userSession')
+    scribbleImage = session.get('scribbleImage')
+    scribblePrompt = session.get('scribblePrompt')
+
+    result = {}
+    images_total_task = threading.Thread(
+        target=DBReadARG, args=("user", "images_total", "email", userSession, result)
+    )
+    images_count_task = threading.Thread(
+        target=DBReadARG, args=("user", "images_count", "email", userSession, result)
+    )
+
+    images_total_task.start()
+    images_count_task.start()
+
+    images_total_task.join()
+    images_count_task.join()
+
+    images_total = result["images_total"]
+    images_count = result["images_count"] 
+    
+    if int(images_count) >= int(images_total):
+        data = {
+            "images": "",
+            "images_count": images_count,
+            "images_total": images_total,
+            "ScribbleText": "",
+            "warning": "You Have Used All Your images",
+        }
+        os.remove(scribbleImage)
+        return render_template("scribble-results.html", **data)
+
+    else:
+        output, error, images_to_update = ScribbleAPI(scribbleImage,scribblePrompt,userSession)
+        data = {
+            "images": output,
+            "images_count": images_to_update,
+            "images_total": images_total,
+            "ScribbleText": "",
+            "warning": "",
+            "error": error,
+        }
+        os.remove(scribbleImage)
+        return render_template("scribble-results.html", **data)
+
 ####################################### ChatGPT-4 ########################################
 
 
@@ -901,4 +994,4 @@ def internal_server(e):
 
 
 if __name__ == "__main__":
-    app.run(port=5000, host="0.0.0.0")
+    app.run(port=5000, host="0.0.0.0",debug=True)
