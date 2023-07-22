@@ -17,7 +17,7 @@ from connection_cred import username, hostname, password, remote_file_path
 
 app = Flask(__name__, static_url_path="/static")
 app.secret_key = "5gfdfdsdr345dgfs45dgfdgdfg09043532%##$h2h340adsf9"
-
+app.config['TEMPLATES_AUTO_RELOAD'] = True
 
 @app.route("/")
 def login():
@@ -106,6 +106,10 @@ def Dashboard():
             target=DBReadARG,
             args=("user", "create_image", "email", userSession, result),
         )
+        scribble = threading.Thread(
+            target=DBReadARG,
+            args=("user", "scribble", "email", userSession, result),
+        )
 
         # Start the task
         name_task.start()
@@ -122,6 +126,7 @@ def Dashboard():
         bw_tocolor.start()
         chatgpt.start()
         dalle.start()
+        scribble.start()
 
         # Join the task
         name_task.join()
@@ -138,6 +143,7 @@ def Dashboard():
         bw_tocolor.join()
         chatgpt.join()
         dalle.join()
+        scribble.join()
         
         # User Name
         name = result["name"]
@@ -164,6 +170,7 @@ def Dashboard():
         bw_tocolor_state = result["bw_tocolor"]
         create_content_state = result["create_content"]
         dalle_state = result['create_image']
+        scribble_state = result['scribble']
 
         # If someone is new user and haven't got susbscription yet then he has 10 days from today after that he will not able to use the api
         if(subscription_start == None):
@@ -172,7 +179,7 @@ def Dashboard():
             subscription_end = date_first_login + timedelta(days=10)
                 
         
-        print(subscription_end)
+        # print(subscription_end)
         # Date Calculation
         year = int(str(subscription_end)[:4])
         month = int(str(subscription_end)[5:7])
@@ -202,6 +209,7 @@ def Dashboard():
                 "bw_tocolor_state": bw_tocolor_state,
                 "create_content_state": create_content_state,
                 "create_image_state": dalle_state,
+                "scribble_state":scribble_state,
                 "flag": flag
             },
         )
