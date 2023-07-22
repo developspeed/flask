@@ -17,7 +17,7 @@ from connection_cred import username, hostname, password, remote_file_path
 
 app = Flask(__name__, static_url_path="/static")
 app.secret_key = "5gfdfdsdr345dgfs45dgfdgdfg09043532%##$h2h340adsf9"
-app.config['TEMPLATES_AUTO_RELOAD'] = True
+
 
 @app.route("/")
 def login():
@@ -700,7 +700,7 @@ def ScribblResults():
             "warning": "",
             "error": error,
         }
-        os.remove(scribbleImage)
+        # os.remove(scribbleImage)
         return render_template("scribble-results.html", **data)
 
 ####################################### ChatGPT-4 ########################################
@@ -926,8 +926,7 @@ def DalleImageEdit():
             'images_total':images_total,
             'warning':""
         }
-        # os.remove(session.get('imageedit'))
-        print('error',images)
+        os.remove(session.get('imageedit'))
         return render_template('dalle-results.html', **data)
 
 
