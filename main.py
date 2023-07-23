@@ -179,7 +179,7 @@ def Dashboard():
             subscription_end = date_first_login + timedelta(days=10)
                 
         
-        # print(subscription_end)
+
         # Date Calculation
         year = int(str(subscription_end)[:4])
         month = int(str(subscription_end)[5:7])
@@ -252,7 +252,7 @@ def whisper_upload():
         cwd = os.getcwd()
         destination = os.path.join(cwd, audioRecorded.filename)
         audioRecorded.save(destination)
-        print(audioRecorded.filename)
+
         session["filename"] = audioRecorded.filename
 
         type = request.form.get("type")
@@ -260,7 +260,6 @@ def whisper_upload():
 
         duration = request.form.get("duration")
         session["duration"] = duration
-        print(duration)
         return "Done"
     else:
         ytLink = request.form.get('ytLink')
@@ -271,7 +270,6 @@ def whisper_upload():
         new_file = base + '.mp3'
         os.rename(out_file, new_file)
         session['filename'] = new_file
-        # print(yt.title + " has been successfully downloaded.")
 
         type = request.form.get("type")
         session["type"] = type
@@ -346,13 +344,6 @@ def WhisperAI():
     minutes_count = result["minutes_count"]
 
     if float(minutes_count) >= float(minutes_total):
-        print("inside if")
-        data = {
-            "minutes_count": custom_round(float(minutes_count)),
-            "minutes_total": minutes_total,
-            "WhisperAIText": "",
-            "warning": "You Have Used All Your Minutes",
-        }
         return jsonify(
             {
                 "outputData": "You Have Used All Your Minutes",
@@ -379,8 +370,7 @@ def WhisperAI():
             transcription, detected_language, minutes_to_update = WhisperFileAPI(
                 filename, duration, userSession, task
             )
-            # print(transcription, detected_language, minutes_to_update)
-            # os.remove(filename)
+        
             return jsonify(
                 {
                     "outputData": transcription,
@@ -425,7 +415,6 @@ def upload_image():
     cwd = os.getcwd()
     destination = os.path.join(cwd, imgFile.filename)
     imgFile.save(destination)
-    print(imgFile.filename)
     session["imgFilename"] = imgFile.filename
     return "Uploaded Succesfully"
 
@@ -527,7 +516,6 @@ def upload_bw_image():
     cwd = os.getcwd()
     destination = os.path.join(cwd, imgbwFile.filename)
     imgbwFile.save(destination)
-    print(imgbwFile.filename)
     session["imgbwFilename"] = imgbwFile.filename
     return "Uploaded Succesfully"
 
@@ -626,6 +614,7 @@ def upload_scribble():
     image = request.files['image']  # Get the uploaded image from the request
     session['scribbleImage'] = (image.filename)
     session['scribblePrompt'] = request.form['prompt']
+
     cwd = os.getcwd()
     destination = os.path.join(cwd, image.filename)
     image.save(destination)
@@ -686,7 +675,7 @@ def ScribblResults():
 
     images_total = result["images_total"]
     images_count = result["images_count"] 
-    
+
     if int(images_count) >= int(images_total):
         data = {
             "images": "",
@@ -695,6 +684,8 @@ def ScribblResults():
             "ScribbleText": "",
             "warning": "You Have Used All Your images",
         }
+        session.pop("scribbleImage",None)
+        session.pop("scribblePrompt",None)
         os.remove(scribbleImage)
         return render_template("scribble-results.html", **data)
 
@@ -708,7 +699,9 @@ def ScribblResults():
             "warning": "",
             "error": error,
         }
-        # os.remove(scribbleImage)
+        session.pop("scribbleImage",None)
+        session.pop("scribblePrompt",None)
+        os.remove(scribbleImage)
         return render_template("scribble-results.html", **data)
 
 ####################################### ChatGPT-4 ########################################
@@ -802,7 +795,7 @@ def DalleImageUpload():
     cwd = os.getcwd()
     destination = os.path.join(cwd, dalleimage.filename)
     dalleimage.save(destination)
-    print(dalleimage.filename)
+
     session["dalleimage"] = dalleimage.filename
     return "Uploaded Succesfully"
 
@@ -844,7 +837,6 @@ def DalleImageResults():
     numImages = request.form['numImages']
     sizes = request.form['sizes']
 
-    print(prompts,numImages,sizes)
 
     result = {}
     images_total_task = threading.Thread(
@@ -893,7 +885,7 @@ def DalleImageEdit():
     destination = os.path.join(cwd, imageedit.filename)
     imageedit.save(destination)
     session["imageedit"] = imageedit.filename
-    print(imageedit.filename)
+
 
     prompts = request.form['prompt']
     numImages = request.form['numImages']
@@ -947,7 +939,6 @@ def DalleImageVariation():
     destination = os.path.join(cwd, variationImageFile.filename)
     variationImageFile.save(destination)
     session["variationImageFile"] = variationImageFile.filename
-    print(variationImageFile.filename)
 
     numImages = request.form['numImages']
     sizes = request.form['sizes']
