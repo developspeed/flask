@@ -5,7 +5,7 @@
 {% block content %}
 <link rel="stylesheet" href="{{ url_for('static', filename='css/scribble.css') }}">
 <div class="sticky-card btn-success" id="used">
-    <p>Minutes Used</p>
+    <p>Images Used</p>
     <p style="text-align:center;" id="imagesUpdate">{{images_count}} / {{images_total}}</p>
 </div>
 <div class="sticky-card btn-warning">
@@ -60,7 +60,6 @@
     .canvas-container canvas {
         border: 1px solid #ccc;
         border-radius: 10px;
-        cursor: crosshair;
         max-width: 100%;
         max-height: 100%;
     }
@@ -78,7 +77,9 @@
                     <canvas id="drawingCanvas" width="400" height="400"></canvas>
                 </div>
                 <div class="button-container">
+                    <button class="btn btn-warning" id="undoButton">Undo</button>
                     <button class="btn btn-danger align-items-center" id="clearButton">Clear</button>
+                    <button class="btn btn-primary " id="uploadButton">Upload Both</button>
                 </div>
                 <div class="input-group mb-3" id="prompt">
                     <input type="text" class="form-control" aria-label="Default" id="promptInput"
@@ -86,7 +87,7 @@
                         aria-describedby="inputGroup-sizing-default">
                 </div>
                 <div class="button-container">
-                    <button class="btn btn-warning" id="promptForm">Submit</button>
+                    <button class="btn btn-success" id="promptForm">Submit</button>
                 </div>
             </form>
         </div>
@@ -94,66 +95,120 @@
 </div>
 <script>
     const canvas = document.getElementById('drawingCanvas');
-    const ctx = canvas.getContext('2d');
-    let isDrawing = false;
+const ctx = canvas.getContext('2d');
+let isDrawing = false;
+const points = []; // Array to store the points of the current path
+const paths = []; // Array to store all the drawing paths
 
-    function getCoordinates(e) {
-        const rect = canvas.getBoundingClientRect();
-        if (e.touches && e.touches[0]) {
-            return {
-                x: e.touches[0].clientX - rect.left,
-                y: e.touches[0].clientY - rect.top
-            };
-        } else {
-            return {
-                x: e.clientX - rect.left,
-                y: e.clientY - rect.top
-            };
+function getCoordinates(e) {
+    const rect = canvas.getBoundingClientRect();
+    if (e.touches && e.touches[0]) {
+        return {
+            x: e.touches[0].clientX - rect.left,
+            y: e.touches[0].clientY - rect.top
+        };
+    } else {
+        return {
+            x: e.clientX - rect.left,
+            y: e.clientY - rect.top
+        };
+    }
+}
+
+function drawPoint(x, y) {
+    ctx.lineTo(x, y);
+    ctx.stroke();
+}
+
+function startDrawing(e) {
+    isDrawing = true;
+    const coords = getCoordinates(e);
+    ctx.beginPath();
+    ctx.moveTo(coords.x, coords.y);
+
+    // Store the starting point in the current path
+    points.push({ x: coords.x, y: coords.y });
+}
+
+function stopDrawing() {
+    isDrawing = false;
+
+    // Save the current path to the paths array
+    if (points.length > 0) {
+        paths.push([...points]); // Create a copy of the points array
+        points.length = 0; // Clear the current path
+    }
+}
+
+function draw(e) {
+    if (!isDrawing) return;
+    const coords = getCoordinates(e);
+    ctx.lineTo(coords.x, coords.y);
+    ctx.stroke();
+
+    // Store the point in the current path
+    points.push({ x: coords.x, y: coords.y });
+}
+
+function clearCanvas() {
+    ctx.clearRect(0, 0, canvas.width, canvas.height);
+    points.length = 0; // Clear the current path
+}
+
+// Undo button event listener
+const undoButton = document.getElementById('undoButton');
+undoButton.addEventListener('click', function (event) {
+    event.preventDefault();
+
+    if (paths.length > 0) {
+        // Remove the last path from the paths array
+        paths.pop();
+
+        // Clear the canvas
+        clearCanvas();
+
+        // Redraw all paths in the paths array
+        for (const path of paths) {
+            drawPath(path);
         }
     }
+});
 
-    function startDrawing(e) {
-        isDrawing = true;
-        const coords = getCoordinates(e);
-        ctx.beginPath();
-        ctx.moveTo(coords.x, coords.y);
+// Function to draw a path from an array of points
+function drawPath(path) {
+    ctx.beginPath();
+    ctx.moveTo(path[0].x, path[0].y);
+    for (let i = 1; i < path.length; i++) {
+        ctx.lineTo(path[i].x, path[i].y);
     }
+    ctx.stroke();
+}
 
-    function stopDrawing() {
-        isDrawing = false;
-    }
+// Touch events
+canvas.addEventListener('touchstart', startDrawing);
+canvas.addEventListener('touchend', stopDrawing);
+canvas.addEventListener('touchmove', draw);
 
-    function draw(e) {
-        if (!isDrawing) return;
-        const coords = getCoordinates(e);
-        ctx.lineTo(coords.x, coords.y);
-        ctx.stroke();
-    }
+// Prevent scrolling on the canvas when touching
+canvas.addEventListener('touchmove', function (e) {
+    e.preventDefault();
+}, { passive: false });
 
-    function clearCanvas() {
-        ctx.clearRect(0, 0, canvas.width, canvas.height);
-    }
+// Mouse events
+canvas.addEventListener('mousedown', startDrawing);
+canvas.addEventListener('mouseup', stopDrawing);
+canvas.addEventListener('mousemove', draw);
 
-    canvas.addEventListener('mousedown', startDrawing);
-    canvas.addEventListener('mouseup', stopDrawing);
-    canvas.addEventListener('mousemove', draw);
+// Clear button event listener
+const clearButton = document.getElementById('clearButton');
+clearButton.addEventListener('click', function (event) {
+    event.preventDefault();
 
-    // Touch events
-    canvas.addEventListener('touchstart', startDrawing);
-    canvas.addEventListener('touchend', stopDrawing);
-    canvas.addEventListener('touchmove', draw);
+    // Clear the canvas and reset the paths array
+    paths.length = 0;
+    clearCanvas();
+});
 
-    // Prevent scrolling on the canvas when touching
-    canvas.addEventListener('touchmove', function (e) {
-        e.preventDefault();
-    }, { passive: false });
-
-    // Clear button event listener
-    const clearButton = document.getElementById('clearButton');
-    clearButton.addEventListener('click', function (event) {
-        event.preventDefault();
-        clearCanvas();
-    });
 
 
     // Random File Name Generator
@@ -170,18 +225,19 @@
 
         return randomFileName;
     }
-
-    const promptForm = document.getElementById('promptForm');
-    promptForm.addEventListener('click', function (event) {
+    var uploadState = 0;
+        const uploadButton = document.getElementById('uploadButton');
+    uploadButton.addEventListener('click', function (event) {
         // Convert the canvas image to a file
+        event.preventDefault()
+        uploadState = 1;
         canvas.toBlob(function (blob) {
             const formData = new FormData();
             const promptInput = document.getElementById('promptInput').value; // Corrected here (use "value" instead of "innerText")
+            console.log(promptInput)
             filename = generateRandomFileName() + '.png'
-            console.log(filename)
             formData.append('image', blob, filename);
             formData.append('prompt', promptInput);
-            console.log(promptInput)
 
             // Send the FormData object to Flask backend
             fetch('/scribble-upload', {
@@ -193,6 +249,15 @@
                 .catch(error => console.error('Error sending image:', error));
         });
     });
+
+    let submitBtn = document.getElementById('promptForm');
+    submitBtn.addEventListener('click',(event)=>{
+        if(uploadState == 0)
+        {
+            event.preventDefault();
+            alert('Firstly you need to draw image and give prompt then click upload button')
+        }
+    })
 
     let images_count = {{ images_count }};
     let images_total = {{ images_total }};
