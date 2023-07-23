@@ -227,11 +227,12 @@ clearButton.addEventListener('click', function (event) {
         return randomFileName;
     }
     var uploadState = 0;
-        const uploadButton = document.getElementById('uploadButton');
+    const uploadButton = document.getElementById('uploadButton');
     uploadButton.addEventListener('click', function (event) {
         // Convert the canvas image to a file
         event.preventDefault()
         uploadState = 1;
+        uploadButton.innerText = 'Done!'
         canvas.toBlob(function (blob) {
             const formData = new FormData();
             const promptInput = document.getElementById('promptInput').value; // Corrected here (use "value" instead of "innerText")
