@@ -1,6 +1,6 @@
 {% extends 'base.html' %}
 
-{% block title %}Scribble Image{% endblock %}
+{% block title %}Sketch to Image{% endblock %}
 
 {% block content %}
 <link rel="stylesheet" href="{{ url_for('static', filename='css/scribble.css') }}">
@@ -22,7 +22,7 @@
         <p>{{error}}</p>
         {% endfor %}
         <hr>
-        <a href="/scribble" class="btn btn-primary">Scribble New Image</a>
+        <a href="/scribble" class="btn btn-primary">New Sketch to Image</a>
     </div>
     
 </div>
