@@ -10,7 +10,7 @@ def ScribbleAPI(image,prompt,userSession):
     try:
         output = replicate.run(
             "rossjillian/controlnet:795433b19458d0f4fa172a7ccf93178d2adb1cb8ab2ad6c8fdc33fdbcd49f477",
-            input={"image": open(image,'rb'),'prompt':prompt,'structure':'scribble','image_resolution':512}
+            input={"image": open(image,'rb'),'prompt':prompt,'structure':'scribble','image_resolution':256}
         )
         images_count = int(DBReadARG('user','images_count','email',userSession,result))
         images_count += 1
