@@ -1,6 +1,6 @@
 {% extends 'base.html' %}
 
-{% block title %}Sketch to Image{% endblock %}
+{% block title %}Scribble Image{% endblock %}
 
 {% block content %}
 <link rel="stylesheet" href="{{ url_for('static', filename='css/scribble.css') }}">
@@ -16,12 +16,13 @@
         <h2>Output</h2>
         <hr>
         {% for i in images %}
-        <img src="{{i}}" class='img-fluid' alt="Scribble-Image" srcset="">
+        <img src="{{i}}" class='img-fluid' alt="Scribble-Image" height="256" width="256" style="margin: auto;" srcset="">
         <p style="font-size: 15px;display:flex;justify-content: center;" class="my-3" >Just right click on the image and click save image as.. to download</p>
+        <a href="{{ i }}" style="width: auto; margin: auto;" download class="btn btn-warning my-2" target="_blank">Download Image</a>
         <p>{{error}}</p>
         {% endfor %}
         <hr>
-        <a href="/scribble" class="btn btn-primary">New Sketch to Image</a>
+        <a href="/scribble" class="btn btn-primary">Scribble New Image</a>
     </div>
     
 </div>
