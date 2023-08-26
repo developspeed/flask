@@ -1,4 +1,5 @@
-from flask import Flask, render_template, request, redirect, session, url_for, jsonify
+from flask import Flask, render_template, request, redirect, session, url_for, jsonify, g 
+from werkzeug.utils import secure_filename
 from bwimage import BWImageAPI
 from whisper import WhisperFileAPI, WhisperMICAPI
 from image_edit import ImageEditAPI
@@ -981,6 +982,43 @@ def DalleImageVariation():
         return render_template('dalle-results.html', **data)
 
 
+######################## ChatDocs ###########################
+
+# Set the main upload folder
+UPLOAD_FOLDER = 'documents'
+app.config['UPLOAD_FOLDER'] = UPLOAD_FOLDER
+
+# Create user-specific upload folder
+@app.before_request
+def before_request():
+    g.userSession = session.get("userSession")
+    if g.userSession:
+        g.user_upload_folder = os.path.join(app.config['UPLOAD_FOLDER'], g.userSession)
+        if not os.path.exists(g.user_upload_folder):
+            os.makedirs(g.user_upload_folder)
+
+@app.route('/upload', methods=['POST'])
+def upload_files():
+    uploaded_files = request.files.getlist('files')
+    uploaded_filenames = []
+
+    for file in uploaded_files:
+        if file:
+            filename = secure_filename(file.filename)
+            file_path = os.path.join(g.user_upload_folder, filename)
+            file.save(file_path)
+            uploaded_filenames.append(filename)
+
+    return jsonify({'uploaded_files': uploaded_filenames})
+
+
+@app.route('/chatdocs',methods=['GET','POST'])
+def ChatDocs():
+    if "userSession" in session:
+        return render_template("chatdocs.html")
+    else:
+        return redirect(url_for('login'))
+
 @app.errorhandler(404)
 def page_not_found(e):
     return render_template("404.html"), 404
@@ -992,4 +1030,4 @@ def internal_server(e):
 
 
 if __name__ == "__main__":
-    app.run(port=5000, host="0.0.0.0")
+    app.run(port=5000, host="0.0.0.0",debug=True)
