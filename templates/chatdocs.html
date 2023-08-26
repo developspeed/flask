@@ -1,0 +1,100 @@
+{% extends 'base.html' %}
+{% block title %}ChatDocs{% endblock %}
+
+<!-- Excluding the previous navbar from the base class -->
+{% block header %}
+{# Exclude the header from the base template #}
+{% endblock %}
+{% block content %}
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.2/css/all.min.css"
+    integrity="sha512-z3gLpd7yknf1YoNbCzqRKc4qyor8gaKU1qmn+CShxbuBusANI9QpRohGBreCFkKxLhei6S9CQXFEbbKuqLg0DA=="
+    crossorigin="anonymous" referrerpolicy="no-referrer" />
+<script src="https://cdn.tailwindcss.com"></script>
+
+
+<div class="flex h-screen">
+    <!-- Main Content -->
+    <div class="flex-1 flex flex-col bg-gray-100">
+        <!-- Navbar -->
+        <div class="bg-gray-800 text-white p-4 flex items-center justify-between">
+            <div class="flex items-center">
+                <img src="{{ url_for('static', filename='img/docbot.jpg') }}" alt="Profile Picture"
+                    class="h-8 w-8 rounded-full mr-2">
+                <h2 class="text-lg font-semibold">DocBot</h2>
+            </div>
+
+            <div class="flex space-x-4">
+                <a href="/dashboard" style="text-decoration: none;" class="text-white hover:underline">Dashboard</a>
+                <a href="/logout" style="text-decoration: none;" class="text-white hover:underline">Logout</a>
+            </div>
+        </div>
+
+        <!-- Messaging Area -->
+        <div class="flex-1 p-4 overflow-y-auto">
+            <div class="flex flex-col h-full">
+                <!-- Messages Container -->
+                <div class="flex-1 mb-4">
+                    <div class="flex items-end mb-2">
+                        <div class="bg-blue-500 text-white py-2 px-4 rounded-lg max-w-md">
+                            Hello there! You can upload your docs and start chatting with them :)
+                        </div>
+                    </div>
+                    <div class="flex items-end mb-2">
+                        <div class="bg-blue-500 text-white py-2 px-4 rounded-lg max-w-md">
+                            <div class="flex items-center justify-center"><h3>Example Prompts</h3></div><br>
+                            Tell me the page number where the flower quote is written!
+                        </div>
+                    </div>
+                    <!-- More messages can be added similarly -->
+                    <div class="flex items-end justify-end mb-2">
+                        <div class="bg-gray-200 text-black py-2 px-4 rounded-lg max-w-md">
+                            Thanks for the instructions
+                        </div>
+                    </div>
+                    <div id="messagesContainer" class="flex-1 mb-4">
+                        <!-- Existing messages here after uploading or chatting with ai tool -->
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+        <!-- Message box -->
+        <div class="flex items-center justify-center p-4 bg-white" style="position: sticky; bottom: 0;">
+            <label
+                class="relative inline-flex items-center justify-center p-0.5 mr-2 overflow-hidden text-sm font-medium text-gray-900 rounded-lg group bg-gradient-to-br from-cyan-500 to-blue-500 group-hover:from-cyan-500 group-hover:to-blue-500 hover:text-white dark:text-white focus:ring-4 focus:outline-none focus:ring-cyan-200 dark:focus:ring-cyan-800">
+                <span class="hover:bg-gray-600 text-white py-1 px-3 rounded-md cursor-pointer">
+                    <i class="fas fa-upload"></i>
+                </span>
+                <input id="fileInput" type="file" class="hidden" multiple />
+            </label>
+            <input id="messageInput" type="text"
+                class="flex-1 border rounded-l-lg p-2 focus:ring-0 focus:border-cyan-500"
+                placeholder="Type your message..."
+                style="outline: none;">
+            <button id="sendMessageButton"
+                class="bg-cyan-500 text-white p-2 rounded-r-lg hover:bg-cyan-600 focus:outline-none">
+                Send
+            </button>
+        </div>
+
+        <!-- Toast when uploading File -->
+        <div id="toast-success"
+            class="flex items-center w-full max-w-xs p-4 mb-4 text-black-100 bg-white rounded-lg dark:bg-gray-300 hidden absolute top-4 right-4"
+            role="alert">
+            <div
+                class="inline-flex items-center justify-center flex-shrink-0 w-8 h-8 text-green-500 bg-green-100 rounded-lg dark:bg-green-800 dark:text-green-200">
+                <svg class="w-5 h-5" aria-hidden="true" xmlns="http://www.w3.org/2000/svg" fill="currentColor"
+                    viewBox="0 0 20 20">
+                    <path
+                        d="M10 .5a9.5 9.5 0 1 0 9.5 9.5A9.51 9.51 0 0 0 10 .5Zm3.707 8.207-4 4a1 1 0 0 1-1.414 0l-2-2a1 1 0 0 1 1.414-1.414L9 10.586l3.293-3.293a1 1 0 0 1 1.414 1.414Z" />
+                </svg>
+                <span class="sr-only">Check icon</span>
+            </div>
+            <span class="ml-2 text-sm font-semibold">Files uploaded successfully!</span>
+        </div>
+    </div>
+</div>
+
+    <script src="{{url_for('static', filename='js/chatdocs.js')}}"></script>
+
+    {% endblock %}

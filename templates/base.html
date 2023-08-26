@@ -72,13 +72,15 @@
 	</style>
 </head>
 <body>
+    {% block header %}
     <div class="header">
-		<div class="logo">Magicaibox</div>
-		<div class="menu">
-			<a href="/dashboard" class="menu-item">Home</a>
-			<a href="/logout" class="menu-item">Logout</a>
-		</div>
-	</div>
+        <div class="logo">Magicaibox</div>
+        <div class="menu">
+            <a href="/dashboard" class="menu-item">Home</a>
+            <a href="/logout" class="menu-item">Logout</a>
+        </div>
+    </div>
+    {% endblock %}
 	
     {% block content %}
     {% endblock %}
