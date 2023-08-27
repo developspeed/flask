@@ -8,7 +8,7 @@ def ChatGPTAPI(prompt, userSession):
     result = {}
     try:
         response = openai.ChatCompletion.create(
-        model_name="gpt-4-32k",
+        model="gpt-3.5-turbo-16k",
         # "messages": [{"role": "user", "content": "Hello!"}],
         messages=[{"role": "user", "content": prompt}],
         temperature=1,
