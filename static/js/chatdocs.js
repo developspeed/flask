@@ -46,16 +46,15 @@ fileInput.addEventListener('change', (event) => {
             console.log(file.name);
         }
 
-        // Show the success toast
-        successToast.classList.remove('hidden');
+        // // Show the success toast
+        // successToast.classList.remove('hidden');
 
-        // Hide the toast after a few seconds
-        setTimeout(() => {
-            successToast.classList.add('hidden');
-        }, 3000);
+        // // Hide the toast after a few seconds
+        // setTimeout(() => {
+        //     successToast.classList.add('hidden');
+        // }, 3000);
     }
 });
-
 
 // After UPloading the file then show the file from user side and success message from bot side
 
