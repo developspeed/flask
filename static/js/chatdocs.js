@@ -67,7 +67,7 @@ fileInput.addEventListener('change', (event) => {
     if (files && files.length > 0) {
         for (const file of files) {
             const messageDivUploaded = document.createElement('div');
-            messageDivUploaded.classList.add('flex', 'items-start', 'mb-2','justify-end');
+            messageDivUploaded.classList.add('flex', 'items-start', 'mb-2', 'justify-end');
             messageDivUploaded.innerHTML = `
                 <div class="bg-green-100 text-black py-2 px-4 rounded-lg max-w-md">
                 Uploaded Files :  
@@ -84,15 +84,6 @@ fileInput.addEventListener('change', (event) => {
             messagesContainer.appendChild(messageDivUploadedSuccess);
 
         }
-
-        // Show the success toast
-        const successToast = document.getElementById('toast-success');
-        successToast.classList.remove('hidden');
-
-        // Hide the toast after a few seconds
-        setTimeout(() => {
-            successToast.classList.add('hidden');
-        }, 3000);
     }
 });
 
@@ -100,8 +91,7 @@ fileInput.addEventListener('change', (event) => {
 // Sending the uploaded file the the server
 
 // const fileInput = document.getElementById('fileInput'); already declared 
-const sendMessageButton = document.getElementById('sendMessageButton');
-const messageInput = document.getElementById('messageInput');
+
 fileInput.addEventListener('change', (event) => {
     const files = event.target.files;
     if (files && files.length > 0) {
@@ -116,18 +106,109 @@ fileInput.addEventListener('change', (event) => {
             method: 'POST',
             body: formData
         })
+            .then(response => response.json())
+            .then(data => {
+                // Show the success toast
+                const successToast = document.getElementById('toast-success');
+                const successMessage = document.getElementById('success-message')
+                successToast.classList.remove('hidden');
+                successMessage.innerHTML = data.message; //Server returns a response after uploading the file successfully 
+
+                // Hide the toast after a few seconds
+                setTimeout(() => {
+                    successToast.classList.add('hidden');
+                }, 3000);
+                console.log('Files uploaded:', data);
+            })
+            .catch(error => {
+                const errorToast = document.getElementById('toast-error');
+                const errorMessage = document.getElementById('error-message')
+                errorToast.classList.remove('hidden');
+                errorMessage.innerText = 'An error occurred during upload';
+
+                setTimeout(() => {
+                    errorToast.classList.add('hidden');
+                }, 3000);
+                console.error('Error uploading files:', error);
+            });
+    }
+});
+
+const sendMessageButton = document.getElementById('sendMessageButton');
+const messageInput = document.getElementById('messageInput');
+// const messagesContainer = document.getElementById('messagesContainer');  Already declared
+
+sendMessageButton.addEventListener('click', () => {
+    const userMessage = messageInput.value;
+
+    if (userMessage.trim() !== '') {
+        messageInput.value = ''; // Clear input field
+
+        // Append user message to messages container
+        appendMessage(userMessage, true);
+
+        // Display waiting message
+        const waitingMessageDiv = document.createElement('div');
+        waitingMessageDiv.classList.add('flex', 'items-start', 'mb-2');
+        waitingMessageDiv.innerHTML = `
+            <div class="bg-blue-200 text-black py-2 px-4 rounded-lg max-w-md">
+                Waiting for response...
+            </div>`;
+        messagesContainer.appendChild(waitingMessageDiv);
+
+        // Send message to the server
+        let formData = new FormData();
+        formData.append('userMessage', userMessage);
+        fetch('/chatdocs', {
+            method: 'POST',
+            body: formData
+        })
         .then(response => response.json())
         .then(data => {
-            console.log('Files uploaded:', data);
+            // Remove waiting message
+            messagesContainer.removeChild(waitingMessageDiv);
+
+            // Display server response
+            const responseMessageDiv = document.createElement('div');
+            responseMessageDiv.classList.add('flex', 'items-start', 'mb-2');
+            responseMessageDiv.innerHTML = `
+                <div class="bg-green-500 text-white py-2 px-4 rounded-lg max-w-md">
+                    ${data.response}
+                </div>`;
+            messagesContainer.appendChild(responseMessageDiv);
         })
         .catch(error => {
-            console.error('Error uploading files:', error);
+            console.error('Error sending/receiving messages:', error);
+            // Remove waiting message
+            messagesContainer.removeChild(waitingMessageDiv);
+
+            // Display error message
+            const errorMessageDiv = document.createElement('div');
+            errorMessageDiv.classList.add('flex', 'items-start', 'mb-2');
+            errorMessageDiv.innerHTML = `
+                <div class="bg-red-500 text-white py-2 px-4 rounded-lg max-w-md">
+                    An error occurred: ${error.message}
+                </div>`;
+            messagesContainer.appendChild(errorMessageDiv);
         });
     }
 });
 
-sendMessageButton.addEventListener('click', () => {
-    const message = messageInput.value;
-    // Send the message to the server using AJAX
-    // Your AJAX code here...
-});
+function appendMessage(message, isUserMessage = false) {
+    const messageElement = document.createElement('div');
+    messageElement.classList.add('flex', 'mb-2', 'justify-' + (isUserMessage ? 'end' : 'start'));
+    
+    const messageContent = document.createElement('div');
+    messageContent.classList.add('py-2', 'px-4', 'rounded-lg', 'max-w-md');
+    
+    if (isUserMessage) {
+        messageContent.classList.add('bg-gray-200', 'text-gray-900');
+    } else {
+        messageContent.classList.add('bg-gray-200', 'text-black');
+    }
+
+    messageContent.textContent = message;
+    messageElement.appendChild(messageContent);
+
+    messagesContainer.appendChild(messageElement);
+}
