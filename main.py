@@ -8,6 +8,7 @@ from dalleimage import DalleImageAPI
 from dalleedit import DalleImageEditAPI
 from dallevariation import DalleImageVariationAPI
 from scribble import ScribbleAPI
+from chatdocs import get_answer_for_question
 from utitlities import DBRead, DBReadARG, DBUpdateARG, custom_round
 import threading
 import os
@@ -1009,13 +1010,38 @@ def upload_files():
             file.save(file_path)
             uploaded_filenames.append(filename)
 
-    return jsonify({'uploaded_files': uploaded_filenames})
+    return jsonify({'message': 'Successfully Uploaded'})
 
+@app.route('/delete_files', methods=['POST'])
+def delete_files():
+    # Delete all uploaded files in the user's folder
+    indexFile = f'index_{g.userSession}.json'
+    os.remove(indexFile)
+    user_folder_path = os.path.join(app.config['UPLOAD_FOLDER'], g.userSession) 
+    if os.path.exists(user_folder_path):
+        for filename in os.listdir(user_folder_path):
+            file_path = os.path.join(user_folder_path, filename)
+            if os.path.isfile(file_path):
+                os.remove(file_path)
+        
+        return jsonify({'message': 'Successfully Deleted'})
+    else:
+        return jsonify({'message': 'User folder not found'})
+    
 
 @app.route('/chatdocs',methods=['GET','POST'])
 def ChatDocs():
     if "userSession" in session:
-        return render_template("chatdocs.html")
+        if request.method == 'GET':
+            return render_template("chatdocs.html")
+        elif request.method == 'POST':
+            userSession = session.get('userSession')
+            question = request.form.get('userMessage')
+            # Process user_message and generate server_response
+            response = get_answer_for_question(question,userSession)
+            if response == 'null':
+                return jsonify({'response': 'First upload the documents!'})
+            return jsonify({'response': response})
     else:
         return redirect(url_for('login'))
 

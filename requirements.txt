@@ -6,3 +6,7 @@ mysql-connector==2.2.9
 openai==0.27.8
 replicate==0.9.0
 gevent==23.7.0
+gpt-index==0.4.24
+langsmith==0.0.26
+mysql-connector==2.2.9
+pypdf2==3.0.1
