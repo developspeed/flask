@@ -1,5 +1,4 @@
 // Messaging Area
-
 document.addEventListener('DOMContentLoaded', function () {
     const messageInput = document.getElementById('messageInput');
     const sendMessageButton = document.getElementById('sendMessageButton');
@@ -38,13 +37,13 @@ document.addEventListener('DOMContentLoaded', function () {
 const fileInput = document.getElementById('fileInput');
 const successToast = document.getElementById('toast-success');
 
-fileInput.addEventListener('change', (event) => {
-    const files = event.target.files;
-    if (files && files.length > 0) {
-        console.log('Uploaded files:');
-        for (const file of files) {
-            console.log(file.name);
-        }
+// fileInput.addEventListener('change', (event) => {
+//     const files = event.target.files;
+//     if (files && files.length > 0) {
+//         console.log('Uploaded files:');
+//         for (const file of files) {
+//             console.log(file.name);
+//         }
 
         // // Show the success toast
         // successToast.classList.remove('hidden');
@@ -53,8 +52,9 @@ fileInput.addEventListener('change', (event) => {
         // setTimeout(() => {
         //     successToast.classList.add('hidden');
         // }, 3000);
-    }
-});
+//     }
+// });
+
 
 // After UPloading the file then show the file from user side and success message from bot side
 
