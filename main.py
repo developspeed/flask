@@ -1039,7 +1039,7 @@ def ChatDocs():
             question = request.form.get('userMessage')
             # Process user_message and generate server_response
             response = get_answer_for_question(question,userSession)
-            if response == 'null':
+            if response == None:
                 return jsonify({'response': 'First upload the documents!'})
             return jsonify({'response': response})
     else:
@@ -1056,4 +1056,4 @@ def internal_server(e):
 
 
 if __name__ == "__main__":
-    app.run(port=5000, host="0.0.0.0",debug=True)
+    app.run(port=5000, host="0.0.0.0")
