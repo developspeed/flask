@@ -112,6 +112,30 @@ def Dashboard():
             target=DBReadARG,
             args=("user", "scribble", "email", userSession, result),
         )
+        chat_owndocs = threading.Thread(
+            target=DBReadARG,
+            args=("user", "chat_owndocs", "email", userSession, result),
+        )
+        webscraping = threading.Thread(
+            target=DBReadARG,
+            args=("user", "webscraping", "email", userSession, result),
+        )
+        training = threading.Thread(
+            target=DBReadARG,
+            args=("user", "training", "email", userSession, result),
+        )
+        training_count = threading.Thread(
+            target=DBReadARG,
+            args=("user", "training_count", "email", userSession, result),
+        )
+        docbot_words = threading.Thread(
+            target=DBReadARG,
+            args=("user", "docbot_words", "email", userSession, result),
+        )
+        docbot_wordt_count = threading.Thread(
+            target=DBReadARG,
+            args=("user", "docbot_wordt_count", "email", userSession, result),
+        )
 
         # Start the task
         name_task.start()
@@ -129,6 +153,12 @@ def Dashboard():
         chatgpt.start()
         dalle.start()
         scribble.start()
+        chat_owndocs.start()
+        webscraping.start()
+        training.start()
+        training_count.start()
+        docbot_words.start()
+        docbot_wordt_count.start()
 
         # Join the task
         name_task.join()
@@ -146,6 +176,12 @@ def Dashboard():
         chatgpt.join()
         dalle.join()
         scribble.join()
+        chat_owndocs.join()
+        webscraping.join()
+        training.join()
+        training_count.join()
+        docbot_words.join()
+        docbot_wordt_count.join()
         
         # User Name
         name = result["name"]
@@ -166,6 +202,14 @@ def Dashboard():
         minutes_total = result["minutes_total"]
         minutes_count = result["minutes_count"]
 
+        # DocBot Words Usage
+        docbot_words = result["docbot_words"]
+        docbot_wordt_count = result["docbot_wordt_count"]
+
+        # Training 
+        training = result["training"]
+        training_count = result["training_count"]
+
         # State Check
         whisper_state = result["whisper"]
         edit_image_state = result["edit_image"]
@@ -173,6 +217,11 @@ def Dashboard():
         create_content_state = result["create_content"]
         dalle_state = result['create_image']
         scribble_state = result['scribble']
+        chat_owndocs_state = result['chat_owndocs']
+        webscraping_state = result['webscraping']
+
+        # print(webscraping, chat_owndocs, training , training_count , docbot_words , docbot_wordt_count)
+
 
         # If someone is new user and haven't got susbscription yet then he has 10 days from today after that he will not able to use the api
         if(subscription_start == None):
@@ -212,6 +261,12 @@ def Dashboard():
                 "create_content_state": create_content_state,
                 "create_image_state": dalle_state,
                 "scribble_state":scribble_state,
+                "docbot_words":docbot_words,
+                "docbot_wordt_count":docbot_wordt_count,
+                "training":training,
+                "training_count":training_count,
+                "chat_owndocs_state":chat_owndocs_state,
+                "webscraping_state":webscraping_state,
                 "flag": flag
             },
         )
@@ -1029,21 +1084,21 @@ def delete_files():
         return jsonify({'message': 'User folder not found'})
     
 
-@app.route('/chatdocs',methods=['GET','POST'])
-def ChatDocs():
-    if "userSession" in session:
-        if request.method == 'GET':
-            return render_template("chatdocs.html")
-        elif request.method == 'POST':
-            userSession = session.get('userSession')
-            question = request.form.get('userMessage')
-            # Process user_message and generate server_response
-            response = get_answer_for_question(question,userSession)
-            if response == None:
-                return jsonify({'response': 'First upload the documents!'})
-            return jsonify({'response': response})
-    else:
-        return redirect(url_for('login'))
+# @app.route('/chatdocs',methods=['GET','POST'])
+# def ChatDocs():
+#     if "userSession" in session:
+#         if request.method == 'GET':
+#             return render_template("chatdocs.html")
+#         elif request.method == 'POST':
+#             userSession = session.get('userSession')
+#             question = request.form.get('userMessage')
+#             # Process user_message and generate server_response
+#             response = get_answer_for_question(question,userSession)
+#             if response == None:
+#                 return jsonify({'response': 'First upload the documents!'})
+#             return jsonify({'response': response})
+#     else:
+#         return redirect(url_for('login'))
 
 @app.errorhandler(404)
 def page_not_found(e):
@@ -1056,4 +1111,4 @@ def internal_server(e):
 
 
 if __name__ == "__main__":
-    app.run(port=5000, host="0.0.0.0")
+    app.run(port=5000, host="0.0.0.0",)
