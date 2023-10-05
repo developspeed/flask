@@ -2,9 +2,6 @@ import replicate
 import os
 from utitlities import DBUpdateARG, DBReadARG, DBRead, custom_round
 
-# Initializing Tokens
-os.environ['REPLICATE_API_TOKEN'] = str(DBRead('scribble','API_KEY'))
-
 def ScribbleAPI(image,prompt,userSession):
     result = {}
     try:

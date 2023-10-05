@@ -3,8 +3,6 @@ from langchain.chat_models import ChatOpenAI
 from utitlities import DBRead
 import os
 
-os.environ["OPENAI_API_KEY"] = DBRead('chatgpt-4','API_KEY')
-
 def construct_index(directory_path,userSession):
     max_input_size = 16000
     num_outputs = 8000

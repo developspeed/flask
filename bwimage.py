@@ -2,9 +2,6 @@ import replicate
 import os
 from utitlities import DBUpdateARG, DBReadARG, DBRead
 
-os.environ["REPLICATE_API_TOKEN"] = str(DBRead("image_edit_config", "API_KEY"))
-
-
 def BWImageAPI(imgFile, model, renderFactor, userSession):
     result = {}
     try:
@@ -17,5 +14,3 @@ def BWImageAPI(imgFile, model, renderFactor, userSession):
     except Exception as error:
         images_count = int(DBReadARG('user','images_count','email',userSession,result))
         return '', error, images_count
-
-

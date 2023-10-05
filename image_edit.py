@@ -2,8 +2,6 @@ import replicate
 import os
 from utitlities import DBUpdateARG, DBReadARG, DBRead
 
-os.environ["REPLICATE_API_TOKEN"] = str(DBRead("image_edit_config", "API_KEY"))
-
 
 def ImageEditAPI(imageFile, userprompt, neg_prompt, user_output_images, userSession):
     result = {}

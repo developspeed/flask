@@ -1,8 +1,6 @@
 import openai
 from utitlities import DBUpdateARG, DBReadARG, DBRead, count_words
 
-# Initializing Tokkens
-openai.api_key = DBRead('chatgpt-4','API_KEY')
 
 def ChatGPTAPI(prompt, userSession):
     result = {}

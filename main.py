@@ -20,6 +20,8 @@ from connection_cred import username, hostname, password, remote_file_path
 app = Flask(__name__, static_url_path="/static")
 app.secret_key = "5gfdfdsdr345dgfs45dgfdgdfg09043532%##$h2h340adsf9"
 app.config['TEMPLATES_AUTO_RELOAD'] = True
+os.environ["REPLICATE_API_TOKEN"] = str(DBRead("image_edit_config", "API_KEY"))
+os.environ["OPENAI_API_KEY"] = DBRead('chatgpt-4','API_Key')
 
 @app.route("/")
 def login():
@@ -1052,4 +1054,4 @@ def internal_server(e):
 
 
 if __name__ == "__main__":
-    app.run(port=5000, host="0.0.0.0")
+    app.run(port=5000, host="0.0.0.0",debug=True)

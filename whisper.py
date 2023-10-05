@@ -4,13 +4,6 @@ import replicate
 import os
 from utitlities import DBUpdateARG, DBReadARG, DBRead, custom_round
 
-# Initializing Tokens
-os.environ['REPLICATE_API_TOKEN'] = str(DBRead('image_edit_config','API_KEY'))
-openai.api_key = str(DBRead('whisper_config','API_KEY'))
-
-
-
-
 def WhisperMICAPI(audioFile, duration, userSession, task):
     output = replicate.run("openai/whisper:91ee9c0c3df30478510ff8c8a3a545add1ad0259ad3a9f78fba57fbc05ee64f7",
                                            input={"audio": open(audioFile,'rb'),"translate":True,"model":'large-v2'})

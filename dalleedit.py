@@ -1,9 +1,6 @@
 import openai
 from utitlities import DBUpdateARG, DBReadARG, DBRead
 
-openai.api_key = DBRead('dalle_image_generator','API_Key')
-
-
 def DalleImageEditAPI(image, prompt, numberOfImage, size, userSession):
     try:
         result = {}
