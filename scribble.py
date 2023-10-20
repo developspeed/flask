@@ -1,6 +1,6 @@
 import replicate
 import os
-from utitlities import DBUpdateARG, DBReadARG, DBRead, custom_round
+from utilities import DBUpdateARG, DBReadARG, DBRead, custom_round
 
 def ScribbleAPI(image,prompt,userSession):
     result = {}

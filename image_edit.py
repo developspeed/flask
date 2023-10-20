@@ -1,6 +1,6 @@
 import replicate
 import os
-from utitlities import DBUpdateARG, DBReadARG, DBRead
+from utilities import DBUpdateARG, DBReadARG, DBRead
 
 
 def ImageEditAPI(imageFile, userprompt, neg_prompt, user_output_images, userSession):

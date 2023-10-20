@@ -2,7 +2,7 @@
 import openai
 import replicate
 import os
-from utitlities import DBUpdateARG, DBReadARG, DBRead, custom_round
+from utilities import DBUpdateARG, DBReadARG, DBRead, custom_round
 
 def WhisperMICAPI(audioFile, duration, userSession, task):
     output = replicate.run("openai/whisper:91ee9c0c3df30478510ff8c8a3a545add1ad0259ad3a9f78fba57fbc05ee64f7",

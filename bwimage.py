@@ -1,6 +1,6 @@
 import replicate
 import os
-from utitlities import DBUpdateARG, DBReadARG, DBRead
+from utilities import DBUpdateARG, DBReadARG, DBRead
 
 def BWImageAPI(imgFile, model, renderFactor, userSession):
     result = {}
