@@ -16,6 +16,7 @@ from ftplib import FTP
 from pytube import YouTube
 from datetime import datetime, date, timedelta 
 from connection_cred import username, hostname, password, remote_file_path
+import subprocess
 
 app = Flask(__name__, static_url_path="/static")
 app.secret_key = "5gfdfdsdr345dgfs45dgfdgdfg09043532%##$h2h340adsf9"
@@ -1044,14 +1045,27 @@ def DalleImageVariation():
 # Redirected to another railway service  docbotmagicaibox.up.railway.app
 
 ######################## WebScraper ###########################
-@app.route('/webscrape',methods=['GET','POST'])
+@app.route('/webscrape', methods=['GET', 'POST'])
 def scrape():
-    if "userSession" in session:
-        userSession = session.get("userSession")
+    if request.method == 'POST':
+        url = request.form.get('url')
+        outputFile = request.form.get('outputFile')
+        
+        # Set the URL as an environment variable
+        os.environ['SCRAPE_URL'] = url
 
-        return render_template('scrape.html')
-    else:
-        return redirect(url_for(login))
+        # Specify the full path to your Scrapy spider script
+        spider_script = 'C:\\Users\\busin\\OneDrive\\Desktop\\flask\\myscrapyproject\\myscrapyproject'
+        os.chdir(spider_script)
+        print(os.getenv('SCRAPE_URL'))
+        try:
+            # Run the Scrapy spider script directly
+            subprocess.run(['scrapy', 'crawl','scrape'], check=True)
+            return jsonify({"message": "Scraping completed successfully."}), 200
+        except subprocess.CalledProcessError:
+            return jsonify({"message": "Scraping process failed."}), 500
+
+    return render_template('scrape.html')
 
 
 
