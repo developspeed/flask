@@ -1,14 +1,114 @@
-{% extends 'base.html' %}
+{% extends 'base.html' %} {% block title %}Webscraper{% endblock %} {% block
+content %}
 
+<!-- Compiled and minified CSS -->
+<link
+  rel="stylesheet"
+  href="https://cdnjs.cloudflare.com/ajax/libs/materialize/1.0.0/css/materialize.min.css"
+/>
 
-{% block title %}Image Edit Magic AI Box{% endblock %}
+<style>
+  h1 {
+    margin-top: 0;
+    margin-bottom: 1rem;
+  }
 
-{% block content %}
+  form {
+    display: flex;
+    flex-direction: column;
+    gap: 1rem;
+  }
+
+  input[type="text"] {
+    padding: 0.5rem;
+    font-size: 1rem;
+    border: 1px solid #ccc;
+    border-radius: 4px;
+  }
+
+  button[type="submit"] {
+    /* padding: 0.5rem 1rem;
+    font-size: 1rem;
+    color: #fff;
+    background-color: #007bff;
+    border: none;
+    border-radius: 4px; */
+    cursor: pointer;
+    margin: auto;
+  }
+
+  button[type="submit"]:hover {
+    background-color: #0056b3;
+  }
+
+  #results {
+    margin-top: 2rem;
+    white-space: pre-wrap;
+  }
+</style>
 
 <div class="container">
-    <div class="card">
-        Hello
-    </div>
-</div>
+  <div class="card">
+    <h1>Web Scraper</h1>
+    <hr />
+    <form id="scraper-form">
+      <label for="tags">Enter the name of Output File : </label>
+      <input type="text" id="outputFile" name="outputFile" required />
+      <label for="url">Enter the URL to scrape : </label>
+      <input type="text" id="url" name="url" required />
+      <button class="btn btn-primary waves-effect waves-light" type="submit">Scrape</button>
+    </form>
 
+    <!-- Loader -->
+    <div class="working">
+      <div class="progress" id="progress" style="display: none; margin-top: 2rem;">
+        <div class="indeterminate"></div>
+      </div>
+    </div>
+
+
+    <div id="results"></div>
+  </div>
+</div>
+<script>
+  document
+    .getElementById("scraper-form")
+    .addEventListener("submit", async (event) => {
+      event.preventDefault();
+      let progress = document.getElementById("progress");
+      progress.style.display = "block";
+
+      const url = document.getElementById("url").value;
+      const tags = document.getElementById("outputFile").value;
+      const results = document.getElementById("results");
+
+      const formData = new FormData();
+      formData.append("url", url);
+      formData.append("outputFile", tags);
+
+      try {
+        const response = await fetch("/webscrape", {
+          method: "POST",
+          body: formData,
+        });
+
+        if (!response.ok) {
+          throw new Error("An error occurred while scraping the website");
+        }
+
+        const data = await response.json();
+        progress.style.display = "none";
+        results.textContent = JSON.stringify(data, null, 2);
+      } catch (error) {
+        console.error(error);
+        progress.style.display = "none";
+        results.textContent = "Error: " + error.message;
+      }
+
+      return false; // Prevent automatic form submission
+    });
+</script>
+
+<!-- Compiled and minified JavaScript -->
+<script src="https://cdnjs.cloudflare.com/ajax/libs/materialize/1.0.0/js/materialize.min.js"></script>
 {% endblock %}
