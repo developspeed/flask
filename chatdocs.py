@@ -1,6 +1,6 @@
 from gpt_index import SimpleDirectoryReader, GPTSimpleVectorIndex, LLMPredictor, PromptHelper
 from langchain.chat_models import ChatOpenAI
-from utitlities import DBRead
+from utilities import DBRead
 import os
 
 def construct_index(directory_path,userSession):

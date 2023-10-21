@@ -1,5 +1,5 @@
 import openai
-from utitlities import DBUpdateARG, DBReadARG, DBRead, count_words
+from utilities import DBUpdateARG, DBReadARG, DBRead, count_words
 
 
 def ChatGPTAPI(prompt, userSession):

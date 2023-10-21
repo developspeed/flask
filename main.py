@@ -9,7 +9,7 @@ from dalleedit import DalleImageEditAPI
 from dallevariation import DalleImageVariationAPI
 from scribble import ScribbleAPI
 # from chatdocs import get_answer_for_question
-from utitlities import DBRead, DBReadARG, DBUpdateARG, custom_round
+from utilities import DBRead, DBReadARG, DBUpdateARG, custom_round
 import threading
 import os
 from ftplib import FTP
@@ -1043,6 +1043,18 @@ def DalleImageVariation():
 ######################## ChatDocs ###########################
 # Redirected to another railway service  docbotmagicaibox.up.railway.app
 
+######################## WebScraper ###########################
+@app.route('/webscrape',methods=['GET','POST'])
+def scrape():
+    if "userSession" in session:
+        userSession = session.get("userSession")
+
+        return render_template('scrape.html')
+    else:
+        return redirect(url_for(login))
+
+
+
 @app.errorhandler(404)
 def page_not_found(e):
     return render_template("404.html"), 404
@@ -1054,4 +1066,4 @@ def internal_server(e):
 
 
 if __name__ == "__main__":
-    app.run(port=5000, host="0.0.0.0")
+    app.run(port=5000, host="0.0.0.0",debug=True)
