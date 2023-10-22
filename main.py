@@ -1057,12 +1057,16 @@ def scrape():
             os.environ['UserDownloads'] = session.get('userSession')
             os.environ['OutputFileName'] = outputFile
 
-            # Specify the full path to your Scrapy spider script
-            spider_script = 'C:\\Users\\busin\\OneDrive\\Desktop\\flask\\myscrapyproject\\myscrapyproject'
+            # Get the current directory of your application
+            current_dir = os.path.dirname(os.path.abspath(__file__))
+            # Assuming the Scrapy project directory is at the same level as your Flask application
+            spider_script = os.path.join(current_dir, 'myscrapyproject', 'myscrapyproject')
+            print(spider_script)
+
             user_downloads = os.environ.get('UserDownloads')
-            output_file_name = os.environ.get('OutputFileName')
+            output_file_name = os.environ.get('OutputFileName')+'.html'
             # Construct the file path with the environment variables for validation and downloading
-            file_path = f'C:\\Users\\busin\\OneDrive\\Desktop\\flask\\{user_downloads}\\{output_file_name}.html'
+            file_path =  os.path.join(current_dir,user_downloads,output_file_name)
 
             # Change directory where spider is present
             os.chdir(spider_script)
