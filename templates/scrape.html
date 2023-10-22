@@ -66,47 +66,58 @@ content %}
       </div>
     </div>
 
-
-    <div id="results"></div>
+    <!-- Show Results -->
+    <div id="results" class="btn-floating btn-large pulse"></div>
+    
+    <!-- To download the file -->
+    <a href="{{url_for('DownloadScrapeFile')}}" class="btn btn-primary waves-effect waves-light" id="download-button" style="display: none; margin: auto;" type="button">Download</a>
   </div>
 </div>
 <script>
-  document
-    .getElementById("scraper-form")
-    .addEventListener("submit", async (event) => {
-      event.preventDefault();
-      let progress = document.getElementById("progress");
-      progress.style.display = "block";
+document
+  .getElementById("scraper-form")
+  .addEventListener("submit", async (event) => {
+    event.preventDefault(); // Prevent the default form submission behavior
+    let progress = document.getElementById("progress");
+    progress.style.display = "block";
 
-      const url = document.getElementById("url").value;
-      const tags = document.getElementById("outputFile").value;
-      const results = document.getElementById("results");
+    const url = document.getElementById("url").value;
+    const tags = document.getElementById("outputFile").value;
+    const results = document.getElementById("results");
 
-      const formData = new FormData();
-      formData.append("url", url);
-      formData.append("outputFile", tags);
+    const formData = new FormData();
+    formData.append("url", url);
+    formData.append("outputFile", tags);
 
-      try {
-        const response = await fetch("/webscrape", {
-          method: "POST",
-          body: formData,
-        });
+    try {
+      const response = await fetch("/webscrape", {
+        method: "POST",
+        body: formData,
+      });
 
-        if (!response.ok) {
-          throw new Error("An error occurred while scraping the website");
-        }
-
-        const data = await response.json();
-        progress.style.display = "none";
-        results.textContent = JSON.stringify(data, null, 2);
-      } catch (error) {
-        console.error(error);
-        progress.style.display = "none";
-        results.textContent = "Error: " + error.message;
+      if (!response.ok) {
+        throw new Error("An error occurred while scraping the website");
       }
 
-      return false; // Prevent automatic form submission
-    });
+      const data = await response.json();
+      progress.style.display = "none";
+      results.textContent = data.message;
+      console.log(data);
+
+      if (data.message == "Scraping completed successfully.")
+      {
+        // After scraping, display the "Download" button and attach the Blob data
+        const downloadButton = document.getElementById("download-button");
+        downloadButton.style.display = "block";
+      }
+      
+
+    } catch (error) {
+      console.error(error);
+      progress.style.display = "none";
+      results.textContent = "Error: " + error.message;
+    }
+  });
 </script>
 
 <!-- Compiled and minified JavaScript -->

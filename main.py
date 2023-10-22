@@ -1,4 +1,4 @@
-from flask import Flask, render_template, request, redirect, session, url_for, jsonify, g 
+from flask import Flask, render_template, request, redirect, session, url_for, jsonify, g , send_file
 from werkzeug.utils import secure_filename
 from bwimage import BWImageAPI
 from whisper import WhisperFileAPI, WhisperMICAPI
@@ -1047,26 +1047,48 @@ def DalleImageVariation():
 ######################## WebScraper ###########################
 @app.route('/webscrape', methods=['GET', 'POST'])
 def scrape():
-    if request.method == 'POST':
-        url = request.form.get('url')
-        outputFile = request.form.get('outputFile')
-        
-        # Set the URL as an environment variable
-        os.environ['SCRAPE_URL'] = url
+    if "userSession" in session:
+        if request.method == 'POST':
+            url = request.form.get('url')
+            outputFile = request.form.get('outputFile')
+            
+            # Set the URL as an environment variable
+            os.environ['SCRAPE_URL'] = url
+            os.environ['UserDownloads'] = session.get('userSession')
+            os.environ['OutputFileName'] = outputFile
 
-        # Specify the full path to your Scrapy spider script
-        spider_script = 'C:\\Users\\busin\\OneDrive\\Desktop\\flask\\myscrapyproject\\myscrapyproject'
-        os.chdir(spider_script)
-        print(os.getenv('SCRAPE_URL'))
-        try:
-            # Run the Scrapy spider script directly
-            subprocess.run(['scrapy', 'crawl','scrape'], check=True)
-            return jsonify({"message": "Scraping completed successfully."}), 200
-        except subprocess.CalledProcessError:
-            return jsonify({"message": "Scraping process failed."}), 500
+            # Specify the full path to your Scrapy spider script
+            spider_script = 'C:\\Users\\busin\\OneDrive\\Desktop\\flask\\myscrapyproject\\myscrapyproject'
+            user_downloads = os.environ.get('UserDownloads')
+            output_file_name = os.environ.get('OutputFileName')
+            # Construct the file path with the environment variables for validation and downloading
+            file_path = f'C:\\Users\\busin\\OneDrive\\Desktop\\flask\\{user_downloads}\\{output_file_name}.html'
 
-    return render_template('scrape.html')
+            # Change directory where spider is present
+            os.chdir(spider_script)
 
+            #check is scraping was successful and file got created or not
+            try:
+                # Run the Scrapy spider script directly
+                subprocess.run(['scrapy', 'crawl','scrape'], check=True)
+                if os.path.exists(file_path):
+                    return jsonify({"message": "Scraping completed successfully."}), 200
+                else:
+                    return jsonify({"message": "The website owner doesn't allow crawling with bots."}), 200
+
+            except subprocess.CalledProcessError:
+                return jsonify({"message": "Scraping process failed."}), 500
+
+        return render_template('scrape.html')
+    else:
+        return redirect(url_for('login'))
+
+@app.route('/scrapedFile')
+def DownloadScrapeFile():
+    user_downloads = os.environ.get('UserDownloads')
+    output_file_name = os.environ.get('OutputFileName')
+    file_path = os.path.join(user_downloads,output_file_name+'.html')
+    return send_file(file_path,as_attachment=True)
 
 
 @app.errorhandler(404)
